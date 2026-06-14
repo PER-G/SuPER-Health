@@ -1,0 +1,11 @@
+{
+  "name": "super-health-tracking",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "SuPER Health Tracking – Kalorien- & Fitness-Tracker mit KI-Mahlzeit-Analyse",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0"
+  }
+}
