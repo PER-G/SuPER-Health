@@ -1,0 +1,1704 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#0B2B26">
+<title>SuPER Health – Kalorien, Makros & Fitness verstehen</title>
+<meta name="description" content="SuPER Health: moderne Gesundheits-, Fitness- und Ernährungsplattform. Kalorienbedarf, Makronährstoffe, Aktivität und Wochenprognosen – für Kinder und Erwachsene.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,420;0,9..144,560;0,9..144,640;1,9..144,460&family=Instrument+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --pine:#11403A; --pine-deep:#0B2B26; --pine-soft:#1A574E;
+  --cream:#F3F7F4; --cream-2:#CDE0D6;
+  --ink:#1B2421; --ink-2:#46544F; --ink-3:#6C7A75;
+  --paper:#F7FAF8; --card:#FFFFFF;
+  --sage:#E5EEE9; --sage-2:#D6E4DD; --line:#DCE7E1;
+  --amber:#C97A2B; --amber-deep:#A85F17; --amber-soft:#F7ECDD;
+  --mint:#2E8C6B; --mint-soft:#E3F2EA;
+  --warn:#A2541C; --warn-soft:#FBEFE2;
+  --bad:#A23A2E; --bad-soft:#F9E9E6;
+  --r:16px; --r-s:10px;
+  --shadow:0 1px 2px rgba(17,64,58,.06),0 8px 28px rgba(17,64,58,.07);
+  --disp:"Fraunces",Georgia,serif;
+  --body:"Instrument Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  --mono:"Spline Sans Mono",ui-monospace,SFMono-Regular,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html,body{background:var(--paper)!important}
+main#view{display:block;background:var(--paper)}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{font-family:var(--body);color:var(--ink);background:var(--paper);line-height:1.55;font-size:16px;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:var(--pine);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:4px}
+.wrap{max-width:1140px;margin:0 auto;padding:0 20px}
+.wrap-s{max-width:860px;margin:0 auto;padding:0 20px}
+
+/* ---------- typography ---------- */
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--pine-soft);display:inline-flex;align-items:center;gap:8px}
+.eyebrow::before{content:"";width:18px;height:2px;background:var(--amber);border-radius:2px}
+h1,h2,h3{font-family:var(--disp);font-weight:560;line-height:1.12;color:var(--pine-deep);letter-spacing:-.01em}
+h1{font-size:clamp(34px,5.4vw,56px)}
+h2{font-size:clamp(26px,3.6vw,38px)}
+h3{font-size:21px;font-weight:560}
+.lead{font-size:clamp(17px,2vw,19px);color:var(--ink-2);max-width:58ch}
+p{color:var(--ink-2)}
+.mono{font-family:var(--mono)}
+.muted{color:var(--ink-3);font-size:14px}
+.small{font-size:13.5px}
+
+/* ---------- header ---------- */
+header.site{position:sticky;top:0;z-index:50;background:rgba(247,250,248,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:18px;height:66px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:640;font-size:20px;color:var(--pine-deep);white-space:nowrap}
+.brand:hover{text-decoration:none}
+.brand .mark{width:34px;height:34px;border-radius:10px;background:var(--pine);display:grid;place-items:center;flex:none}
+.brand b{font-weight:640}.brand span{color:var(--pine-soft);font-style:italic;font-weight:460}
+.navlinks{display:flex;gap:2px;margin-left:auto;align-items:center}
+.navlinks a{padding:8px 12px;border-radius:999px;font-size:14.5px;font-weight:500;color:var(--ink-2)}
+.navlinks a:hover{background:var(--sage);text-decoration:none;color:var(--pine-deep)}
+.navlinks a.on{background:var(--pine);color:#fff}
+.navlinks a.cta{background:var(--amber);color:#fff;font-weight:600;margin-left:6px}
+.navlinks a.cta:hover{background:var(--amber-deep)}
+/* Dropdown-Navigation */
+.navdrop{position:relative;display:flex}
+.navdrop-t{display:inline-flex;align-items:center;gap:5px;padding:8px 12px;border-radius:999px;font:inherit;font-size:14.5px;font-weight:500;color:var(--ink-2);background:none;border:0;cursor:pointer}
+.navdrop-t svg{transition:transform .15s}
+.navdrop:hover .navdrop-t,.navdrop-t:hover{background:var(--sage);color:var(--pine-deep)}
+.navdrop.act .navdrop-t{background:var(--pine);color:#fff}
+.navdrop-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:248px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:6px;display:none;flex-direction:column;gap:2px;z-index:60}
+.navdrop:hover .navdrop-menu,.navdrop.open .navdrop-menu{display:flex}
+.navdrop:hover .navdrop-t svg,.navdrop.open .navdrop-t svg{transform:rotate(180deg)}
+.navdrop-menu a{padding:9px 12px;border-radius:10px;font-size:14px;color:var(--ink-2);white-space:nowrap}
+.navdrop-menu a:hover{background:var(--sage);color:var(--pine-deep);text-decoration:none}
+.navdrop-menu a.on{background:var(--pine);color:#fff}
+.navdrop-menu a b{display:block;font-weight:600}
+.navdrop-menu a small{display:block;font-size:12px;color:var(--ink-3);font-weight:400}
+.navdrop-menu a.on small{color:#BFD6CB}
+/* Lebensmittel-Vergleich */
+.cmp{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch;margin:16px 0}
+.cmp .vs{align-self:center;font-weight:700;color:var(--ink-3);font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+.fcard{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);display:flex;flex-direction:column}
+.fcard.good{border-color:#BFE0CC}.fcard.bad{border-color:#EBD9BF}
+.fcard .fimg{position:relative;height:132px;background:var(--sage);display:flex;align-items:center;justify-content:center;font-size:46px}
+.fcard .fimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.fcard .fbody{padding:11px 13px}
+.fcard .fbody h4{font-size:15px;margin:0;color:var(--pine-deep)}
+.fcard .fbody .meta{font-size:12.5px;color:var(--ink-3);margin-top:2px;line-height:1.35}
+.fcard .kc{font-family:var(--mono);font-weight:600;font-size:19px;margin-top:8px}
+.fcard.good .kc{color:#15803D}.fcard.bad .kc{color:#C0392B}
+.kcbar{height:9px;border-radius:6px;background:var(--sage-2);overflow:hidden;margin-top:7px}
+.kcbar i{display:block;height:100%;border-radius:6px}
+@media(max-width:620px){.cmp{grid-template-columns:1fr;gap:8px}.cmp .vs{justify-self:start;padding:2px 0}}
+.habrow{display:grid;grid-template-columns:160px 1fr 70px;gap:10px;align-items:center;margin:7px 0;font-size:13.5px}
+.habrow .hb{height:16px;border-radius:5px;background:var(--sage-2);overflow:hidden}
+.habrow .hb i{display:block;height:100%;border-radius:5px}
+.habrow .hk{font-family:var(--mono);font-weight:600;text-align:right;color:var(--ink-2)}
+@media(max-width:620px){.habrow{grid-template-columns:1fr 60px;grid-template-areas:'l k' 'b b'}.habrow>span:first-child{grid-area:l}.habrow .hb{grid-area:b}.habrow .hk{grid-area:k}}
+.burger{display:none;margin-left:auto;background:none;border:1px solid var(--line);border-radius:10px;width:42px;height:42px;cursor:pointer;color:var(--pine-deep)}
+@media(max-width:920px){
+  .navlinks{display:none;position:absolute;top:66px;left:0;right:0;background:var(--card);border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;padding:10px 14px 16px;gap:4px;box-shadow:var(--shadow)}
+  .navlinks.open{display:flex}
+  .navlinks a{padding:12px 14px;border-radius:12px;font-size:16px}
+  .burger{display:grid;place-items:center}
+  .navdrop{flex-direction:column;align-items:stretch}
+  .navdrop-t{justify-content:space-between;padding:12px 14px;border-radius:12px;font-size:16px}
+  .navdrop-t svg{display:none}
+  .navdrop-menu{position:static;display:flex;box-shadow:none;border:0;background:transparent;padding:2px 0 4px 12px;min-width:0}
+  .navdrop-menu a{padding:10px 12px;font-size:15px}
+  .navdrop-menu a small{display:none}
+}
+
+/* ---------- buttons / pills ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--pine);color:#fff;border:none;border-radius:999px;padding:13px 24px;font-family:var(--body);font-size:15.5px;font-weight:600;cursor:pointer;text-decoration:none;box-shadow:0 1px 2px rgba(11,43,38,.18),0 6px 18px rgba(11,43,38,.14);transition:transform .15s ease,box-shadow .15s ease,background .15s ease}
+.btn:hover{background:var(--pine-soft);text-decoration:none;transform:translateY(-1px);box-shadow:0 2px 4px rgba(11,43,38,.18),0 10px 26px rgba(11,43,38,.18)}
+.btn:active{transform:translateY(0)}
+.btn.amber{background:var(--amber);box-shadow:0 1px 2px rgba(168,95,23,.25),0 8px 22px rgba(201,122,43,.32)}.btn.amber:hover{background:var(--amber-deep)}
+.btn.ghost{background:var(--card);color:var(--pine-deep);border:1.5px solid var(--sage-2);box-shadow:none}
+.btn.ghost:hover{background:var(--sage);transform:none}
+.btn.sm{padding:9px 16px;font-size:14px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--sage);color:var(--pine-deep);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600}
+.pill.ok{background:var(--mint-soft);color:var(--mint)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.amber{background:var(--amber-soft);color:var(--amber-deep)}
+
+/* ---------- layout / cards ---------- */
+section.block{padding:72px 0}
+section.block.tight{padding:48px 0}
+section.alt{background:var(--sage);}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px;box-shadow:var(--shadow)}
+.card.flat{box-shadow:none}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:920px){.g3,.g4{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.split{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
+@media(max-width:920px){.split{grid-template-columns:1fr;gap:28px}}
+.icon{width:42px;height:42px;border-radius:12px;background:var(--sage);display:grid;place-items:center;color:var(--pine);flex:none}
+.note{border-radius:var(--r-s);padding:13px 15px;font-size:14.5px;display:flex;gap:10px;align-items:flex-start;border:1px solid transparent}
+.note svg{flex:none;margin-top:2px}
+.note.info{background:var(--sage);color:var(--pine-deep);border-color:var(--sage-2)}
+.note.ok{background:var(--mint-soft);color:#1E6B50;border-color:#C8E6D6}
+.note.warn{background:var(--warn-soft);color:var(--warn);border-color:#F0DCC4}
+.note.bad{background:var(--bad-soft);color:var(--bad);border-color:#F0D2CC}
+
+/* ---------- signature: step rail ---------- */
+.rail{position:relative;display:flex;flex-direction:column;gap:0}
+.rail .rstep{display:flex;gap:16px;position:relative;padding-bottom:26px}
+.rail .rstep:last-child{padding-bottom:0}
+.rail .rstep::before{content:"";position:absolute;left:17px;top:38px;bottom:0;width:2px;background:var(--sage-2)}
+.rail .rstep:last-child::before{display:none}
+.rail .dot{width:36px;height:36px;border-radius:50%;background:var(--card);border:2px solid var(--sage-2);display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:14px;color:var(--pine);flex:none;z-index:1}
+.rail .rstep.done .dot{background:var(--pine);border-color:var(--pine);color:#fff}
+.rail .rstep.now .dot{border-color:var(--amber);color:var(--amber-deep);box-shadow:0 0 0 4px var(--amber-soft)}
+
+/* ---------- forms ---------- */
+.field{display:flex;flex-direction:column;gap:6px}
+.field>label{font-size:13.5px;font-weight:600;color:var(--pine-deep)}
+.field .hint{font-size:12.5px;color:var(--ink-3)}
+input[type=text],input[type=number],input[type=email],input[type=password],select{font-family:var(--body);font-size:16px;padding:11px 13px;border:1.5px solid var(--sage-2);border-radius:var(--r-s);background:var(--card);color:var(--ink);width:100%}
+input:focus,select:focus{border-color:var(--pine);outline:none}
+.unit{position:relative}
+.unit input{padding-right:54px}
+.unit em{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-style:normal;font-size:13px;color:var(--ink-3);font-family:var(--mono)}
+.seg{display:flex;background:var(--sage);border-radius:999px;padding:4px;gap:4px;flex-wrap:wrap}
+.seg button{flex:1;border:none;background:transparent;border-radius:999px;padding:9px 14px;font-family:var(--body);font-size:14px;font-weight:600;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.seg button.on{background:var(--card);color:var(--pine-deep);box-shadow:0 1px 4px rgba(17,64,58,.14)}
+.chk{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid var(--sage-2);border-radius:var(--r-s);cursor:pointer;background:var(--card)}
+.chk:hover{border-color:var(--pine)}
+.chk.on{border-color:var(--pine);background:var(--mint-soft)}
+.chk input{margin-top:3px;accent-color:var(--pine);width:17px;height:17px}
+.chk b{font-size:14.5px;color:var(--pine-deep);display:block}
+.chk span{font-size:13px;color:var(--ink-3)}
+input[type=range]{width:100%;accent-color:var(--pine);height:34px}
+.rangebox{background:var(--sage);border-radius:var(--r-s);padding:14px 16px}
+.rangebox .val{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--pine-deep)}
+.scalebar{height:10px;border-radius:6px;background:linear-gradient(90deg,#C4554311 0,var(--bad-soft) 0%, var(--warn-soft) 25%, var(--mint-soft) 45%, var(--mint-soft) 75%, var(--warn-soft) 92%, var(--bad-soft) 100%);position:relative;margin-top:8px}
+.scalebar .mk{position:absolute;top:-4px;width:4px;height:18px;border-radius:2px;background:var(--pine-deep)}
+
+/* ---------- tables ---------- */
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--card)}
+table.tbl{width:100%;border-collapse:collapse;font-size:14.5px;min-width:560px}
+.tbl th{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--sage)}
+.tbl td{padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.num{font-family:var(--mono);font-weight:500;white-space:nowrap}
+
+/* ---------- app area ---------- */
+.appshell{display:grid;grid-template-columns:250px 1fr;gap:26px;align-items:start}
+@media(max-width:920px){.appshell{grid-template-columns:1fr}}
+.appside{position:sticky;top:84px}
+@media(max-width:920px){.appside{position:static}}
+.stepnav{display:flex;flex-direction:column;gap:6px}
+.stepnav button{display:flex;align-items:center;gap:11px;border:1.5px solid transparent;background:transparent;border-radius:12px;padding:10px 12px;cursor:pointer;font-family:var(--body);text-align:left;width:100%}
+.stepnav button:hover{background:var(--sage)}
+.stepnav button.on{background:var(--card);border-color:var(--sage-2);box-shadow:var(--shadow)}
+.stepnav .n{width:30px;height:30px;border-radius:50%;border:2px solid var(--sage-2);display:grid;place-items:center;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--pine);flex:none;background:var(--card)}
+.stepnav button.done .n{background:var(--pine);border-color:var(--pine);color:#fff}
+.stepnav b{display:block;font-size:14px;color:var(--pine-deep)}
+.stepnav span{font-size:12px;color:var(--ink-3)}
+@media(max-width:920px){.stepnav{flex-direction:row;overflow-x:auto;padding-bottom:6px}.stepnav button{flex:none}.stepnav b{white-space:nowrap}.stepnav span{display:none}}
+
+/* silhouettes */
+.figrow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media(max-width:720px){.figrow{grid-template-columns:repeat(5,minmax(96px,1fr));overflow-x:auto;padding-bottom:6px}}
+.figopt{border:2px solid var(--sage-2);border-radius:14px;background:var(--card);padding:10px 6px 8px;cursor:pointer;text-align:center;transition:border-color .15s}
+.figopt:hover{border-color:var(--pine-soft)}
+.figopt.on{border-color:var(--amber);background:var(--amber-soft)}
+.figopt svg{margin:0 auto}
+.figopt b{font-size:11.5px;color:var(--pine-deep);display:block;margin-top:6px;line-height:1.25;font-weight:600}
+.figmatrix{display:flex;flex-direction:column;gap:10px}
+.figmrow{display:grid;grid-template-columns:92px 1fr;gap:10px;align-items:stretch}
+.figmax{font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;line-height:1.3}
+.figmcells{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.figmfoot span{font-size:11px;color:var(--ink-3);text-align:center;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+@media(max-width:720px){.figmrow{grid-template-columns:1fr}.figmax{justify-content:center;margin-top:2px}.figopt b{font-size:10.5px}}
+.figopt.figimg{padding:7px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--card)}
+.figopt.figimg img{width:100%;height:auto;border-radius:9px;display:block}
+.figopt.figimg.on{box-shadow:inset 0 0 0 2px var(--amber)}
+@media(max-width:720px){.figopt.figimg img{max-width:220px;margin:0 auto}}
+
+/* result sheet */
+.sheet{background:var(--pine-deep);color:#EAF4EF;border-radius:20px;padding:26px;position:relative;overflow:hidden}
+.sheet::after{content:"";position:absolute;inset:auto -60px -90px auto;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(46,140,107,.35),transparent 70%)}
+.sheet h3{color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px}
+@media(max-width:760px){.kpis{grid-template-columns:1fr 1fr}}
+.kpi{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:14px}
+.kpi .l{font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:#A9C9BC}
+.kpi .v{font-family:var(--mono);font-size:clamp(20px,2.6vw,27px);font-weight:600;color:#fff;margin-top:4px}
+.kpi .u{font-size:12px;color:#A9C9BC}
+.macrobar{display:flex;height:14px;border-radius:8px;overflow:hidden;margin-top:16px}
+.macrobar i{display:block;height:100%}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:#C9DED4}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+
+/* chart */
+.chart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.chart svg text{font-family:var(--mono);font-size:11px;fill:var(--ink-3)}
+
+/* footer */
+footer.site{background:var(--pine-deep);color:#BFD6CB;margin-top:80px}
+footer .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px;padding:56px 0 36px}
+@media(max-width:820px){footer .cols{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){footer .cols{grid-template-columns:1fr}}
+footer h4{color:#fff;font-size:13px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;font-weight:600}
+footer a{color:#BFD6CB;display:block;padding:4px 0;font-size:14.5px}
+footer a:hover{color:#fff}
+footer .base{border-top:1px solid rgba(255,255,255,.14);padding:18px 0 26px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:13px}
+.fbrand{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-size:20px;color:#fff;font-weight:640;margin-bottom:12px}
+.fbrand .mark{width:30px;height:30px;border-radius:9px;background:var(--mint);display:grid;place-items:center}
+
+/* hero — deep pine, premium */
+.hero{position:relative;padding:84px 0 96px;background:
+  radial-gradient(1000px 520px at 88% -12%,rgba(46,140,107,.34),transparent 62%),
+  radial-gradient(820px 480px at -8% 108%,rgba(201,122,43,.20),transparent 58%),
+  linear-gradient(160deg,#0E342E 0%,var(--pine-deep) 58%,#08211D 100%)}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:42px;background:var(--paper);clip-path:ellipse(62% 100% at 50% 100%)}
+.hero .eyebrow{color:#9FD3BC}
+.hero .eyebrow::before{background:var(--amber)}
+.hero h1{color:var(--cream)}
+.hero h1 em{font-style:italic;color:#8FD0B4}
+.hero .lead{color:#C2D6CC}
+.hero .pillrow{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0 4px}
+.hero .pill{background:rgba(243,247,244,.10);color:var(--cream);border:1px solid rgba(243,247,244,.16);backdrop-filter:blur(4px)}
+.hero .pill.ok{color:#9FE0C2}.hero .pill.ok svg{color:#7ED4AC}
+.hero .pill.amber{background:rgba(201,122,43,.18);color:#F3C58E;border-color:rgba(201,122,43,.35)}
+.hero .btn.ghost{background:rgba(243,247,244,.06);color:var(--cream);border-color:rgba(243,247,244,.28)}
+.hero .btn.ghost:hover{background:rgba(243,247,244,.14)}
+.hero .trustline{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;color:#8FA89E;font-size:13.5px}
+.hero .trustline span{display:inline-flex;gap:7px;align-items:center}
+.hero .trustline svg{color:#6FBF99}
+
+/* mock "Tagesblatt" card */
+.mock{position:relative;background:linear-gradient(180deg,#FFFFFF, #FBFDFB);border:1px solid rgba(255,255,255,.6);border-radius:26px;box-shadow:0 2px 0 rgba(255,255,255,.25) inset,0 30px 80px rgba(0,0,0,.45),0 8px 24px rgba(0,0,0,.28);padding:24px}
+.mock .mhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
+.mock .mtag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.bigkcal{font-family:var(--mono);font-size:46px;font-weight:600;color:var(--pine-deep);line-height:1;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.bigkcal small{font-size:14px;color:var(--ink-3);font-weight:400;font-family:var(--body);letter-spacing:0}
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.stat3 .s{background:var(--sage);border:1px solid var(--sage-2);border-radius:14px;padding:11px 13px}
+.stat3 .s b{font-family:var(--mono);font-size:19px;color:var(--pine-deep);display:block;font-variant-numeric:tabular-nums}
+.stat3 .s span{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.07em}
+.spark{margin-top:16px;background:var(--sage);border:1px solid var(--sage-2);border-radius:14px;padding:14px 12px 10px}
+.spark svg text{font-family:var(--mono);font-size:11px;fill:var(--ink-3)}
+
+/* chart legend */
+.leg{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:2px 2px 10px;font-size:13px;color:var(--ink-2);font-weight:500}
+.leg .li{display:inline-flex;align-items:center;gap:7px}
+.leg .sw{width:20px;height:0;border-top:3px solid currentColor;border-radius:2px}
+.leg .sw.dash{border-top-style:dashed}
+.fade{animation:fade .5s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.hr{border:none;border-top:1px solid var(--line);margin:26px 0}
+ul.clean{list-style:none}
+ul.clean li{padding:7px 0 7px 30px;position:relative;color:var(--ink-2)}
+ul.clean li::before{content:"";position:absolute;left:4px;top:13px;width:14px;height:8px;border-left:2.5px solid var(--mint);border-bottom:2.5px solid var(--mint);transform:rotate(-45deg)}
+.steps5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+@media(max-width:980px){.steps5{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.steps5{grid-template-columns:1fr}}
+.cardiorow{display:grid;grid-template-columns:1.3fr .8fr .9fr auto auto;gap:10px;align-items:end}
+@media(max-width:760px){.cardiorow{grid-template-columns:1fr 1fr;}}
+.imprint dt{font-weight:600;color:var(--pine-deep);margin-top:18px;font-size:14px;text-transform:uppercase;letter-spacing:.06em}
+.imprint dd{margin:4px 0 0;color:var(--ink-2)}
+.ph{background:var(--amber-soft);border-radius:6px;padding:1px 7px;font-family:var(--mono);font-size:14px;color:var(--amber-deep)}
+.toc a{display:block;padding:6px 0}
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="#/"><span class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 13h4l2.4-6 3.6 10 2.4-6.5L17 13h4" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>SuPER</b>&nbsp;<span>Health</span></a>
+    <button class="burger" aria-label="Menü öffnen" aria-expanded="false" onclick="toggleMenu(this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <nav class="navlinks" id="navlinks" aria-label="Hauptnavigation">
+      <a href="#/" data-r="">Startseite</a>
+      <a href="#/so-funktionierts" data-r="so-funktionierts">So funktioniert’s</a>
+      <a href="#/sixpack" data-r="sixpack">Weg zum Sixpack</a>
+      <a href="#/kraftsport" data-r="kraftsport">Kraftsport</a>
+      <a href="#/ueber" data-r="ueber">Über SuPER Health</a>
+      <div class="navdrop" data-rgroup="probleme cheat-days gewohnheiten bewusst-essen">
+        <button type="button" class="navdrop-t" onclick="toggleDrop(this)" aria-haspopup="true" aria-expanded="false">Probleme &amp; Lösungen <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="navdrop-menu">
+          <a href="#/probleme" data-r="probleme"><b>Übersicht</b><small>Worauf es wirklich ankommt</small></a>
+          <a href="#/cheat-days" data-r="cheat-days"><b>Cheat Days</b><small>Warum ein Tag die Woche kippt</small></a>
+          <a href="#/gewohnheiten" data-r="gewohnheiten"><b>Tägliche Gewohnheiten</b><small>Kleine Sünden, große Wirkung</small></a>
+          <a href="#/bewusst-essen" data-r="bewusst-essen"><b>Bewusstes Ernähren</b><small>FODMAP &amp; Verträglichkeit</small></a>
+        </div>
+      </div>
+      <a href="#/faq" data-r="faq">FAQ</a>
+      <a class="cta" href="#/app" data-r="app">App &amp; Rechner</a>
+    </nav>
+  </div>
+</header>
+
+<main id="view"></main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <div class="fbrand"><span class="mark"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M3 13h4l2.4-6 3.6 10 2.4-6.5L17 13h4" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>SuPER Health</div>
+        <p style="color:#9DBBAD;font-size:14px;max-width:34ch">Kalorien, Makros, Aktivität und Ziele verstehen – einfach, visuell und alltagstauglich. Für Kinder und Erwachsene.</p>
+      </div>
+      <div>
+        <h4>Plattform</h4>
+        <a href="#/">Startseite</a>
+        <a href="#/app">App &amp; Rechner</a>
+        <a href="#/so-funktionierts">So funktioniert’s</a>
+        <a href="#/faq">FAQ</a>
+      </div>
+      <div>
+        <h4>Wissen</h4>
+        <a href="#/sixpack">Einfacher Weg zum Sixpack</a>
+        <a href="#/kraftsport">Stärke durch Kraftsport</a>
+        <a href="#/ueber">Über SuPER Health</a>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <a href="#/impressum">Impressum</a>
+        <a href="#/datenschutz">Datenschutz</a>
+      </div>
+    </div>
+    <div class="base">
+      <span>© 2026 SuPER Health · Paul Elias Ruppersberg</span>
+      <span>Keine medizinische Beratung – Orientierungswerte für gesunde Personen.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ================= utilities ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num=v=>{const n=parseFloat(String(v??"").replace(",","."));return isFinite(n)?n:null};
+const r0=v=>Math.round(v), r1=v=>Math.round(v*10)/10;
+const fmt=v=>r0(v).toLocaleString("de-DE");
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+function toggleMenu(btn){const n=$("#navlinks");n.classList.toggle("open");btn.setAttribute("aria-expanded",n.classList.contains("open"));}
+function toggleDrop(btn){const d=btn.closest(".navdrop");const open=d.classList.toggle("open");btn.setAttribute("aria-expanded",open);document.querySelectorAll(".navdrop").forEach(x=>{if(x!==d)x.classList.remove("open");});}
+document.addEventListener("click",e=>{if(!e.target.closest||!e.target.closest(".navdrop"))document.querySelectorAll(".navdrop.open").forEach(d=>d.classList.remove("open"));},false);
+const ico={
+  info:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 10.5V17M12 7.2v.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  warn:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 4 21 19H3L12 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4m0 2.6v.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  ok:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="m8.5 12.2 2.4 2.4 4.6-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+const note=(t,k="info")=>`<div class="note ${k}">${ico[k==="bad"?"warn":k]}<div>${t}</div></div>`;
+
+/* ================= storage (Geräte-Speicher) ================= */
+const MEMORY={}; let storageOK=true;
+async function stGet(k){try{if(window.storage){const r=await window.storage.get(k);return r?r.value:null}}catch(e){} storageOK=false; return MEMORY[k]??null;}
+async function stSet(k,v){try{if(window.storage){await window.storage.set(k,v);return}}catch(e){} storageOK=false; MEMORY[k]=v;}
+
+/* ================= state ================= */
+function newData(){return{
+  s1:{mode:"erwachsen",alter:"",geschlecht:"w",groesse:"",gewicht:"",kfa:"",kfaUnbekannt:false,fitlevel:0,fitFett:0,fitMuskel:0,zielgewicht:"",taille:"",huefte:"",erfahrung:"einsteiger",stillt:false,babyMonate:"",milchMl:"",beikost:"keine"},
+  s2:{ziel:"",rate:-0.35,muskel:null,kindziele:[]},
+  s3:{aktiv:"mittel",schritte:8000,beruf:"gemischt"},
+  s4:{ern:[],cardio:[],kraft:false,krafttage:2},
+  adj:0, saved:{}
+};}
+let DB={profiles:{},active:null};
+let GUEST=newData();
+const KEY="superhealth:v1";
+function cur(){return DB.active&&DB.profiles[DB.active]?DB.profiles[DB.active]:GUEST;}
+async function loadDB(){const raw=await stGet(KEY);if(raw){try{const d=JSON.parse(raw);DB=Object.assign({profiles:{},active:null},d);}catch(e){}}}
+let saveT=null;
+function persist(){clearTimeout(saveT);saveT=setTimeout(()=>stSet(KEY,JSON.stringify(DB)),300);}
+function U(path,val){ // update deep path on current data
+  const d=cur(); const p=path.split("."); let o=d;
+  for(let i=0;i<p.length-1;i++)o=o[p[i]];
+  o[p[p.length-1]]=val;
+  if(DB.active)persist();
+}
+function Ur(path,val){U(path,val);renderApp();}
+function saveStep(n){const d=cur();d.saved[n]=new Date().toISOString();if(DB.active)persist();renderApp();}
+function toggleArr(path,val){const d=cur();const p=path.split(".");let o=d;for(let i=0;i<p.length-1;i++)o=o[p[i]];const arr=o[p[p.length-1]];const i=arr.indexOf(val);i>=0?arr.splice(i,1):arr.push(val);if(DB.active)persist();renderApp();}
+
+/* account actions */
+function createProfile(){const inp=$("#newprof");const name=(inp?.value||"").trim();const msg=$("#accmsg");
+  if(!name){msg.textContent="Bitte einen Profilnamen eingeben.";return}
+  if(DB.profiles[name]){msg.textContent="Dieses Profil existiert bereits – bitte anmelden.";return}
+  DB.profiles[name]=GUEST&&!DB.active?GUEST:newData(); DB.active=name; GUEST=newData(); persist(); renderApp();}
+function loginProfile(name){DB.active=name;persist();renderApp();}
+function logoutProfile(){DB.active=null;persist();renderApp();}
+function deleteProfile(name){if(!confirm(`Profil „${name}“ und alle gespeicherten Stufen wirklich löschen?`))return;delete DB.profiles[name];if(DB.active===name)DB.active=null;persist();renderApp();}
+</script>
+<script>
+/* ================= domain logic ================= */
+function ageGroup(a){if(a==null)return null;if(a<5)return"0–5";if(a<10)return"5–10";if(a<15)return"10–15";if(a<20)return"15–20";if(a<30)return"20–30";if(a<40)return"30–40";if(a<50)return"40–50";if(a<60)return"50–60";if(a<70)return"60–70";return"70+";}
+function ageCat(a){return a==null?null:a<10?"kind":a<15?"jugend":a<20?"teen":a>=60?"senior":"erwachsen";}
+const MET={gehen:["Gehen",3.5],joggen:["Joggen / Laufen",8.5],rad:["Radfahren",6.8],schwimmen:["Schwimmen",7],cross:["Crosstrainer",5.5],rudern:["Rudern",7],wandern:["Wandern",5.3],seil:["Seilspringen",10.5],tanzen:["Tanzen",5],hiit:["HIIT / Zirkel",8.5]};
+const INT={locker:["locker",0.82],moderat:["moderat",1.0],intensiv:["intensiv",1.18]};
+function cardioKcal(u,kg){const met=(MET[u.art]?.[1]||5)*(INT[u.int]?.[1]||1);return met*3.5*(kg||70)/200*(num(u.min)||0);}
+
+function estKfa(level,sex,cat){ // estimate body fat from visual scale (adults/teens)
+  const m=[26,21,17,13,10],w=[36,31,26,21,17];
+  let v=(sex==="m"?m:w)[clamp(level,1,5)-1];
+  if(cat==="senior")v+=2; if(cat==="teen")v-=1; return v;
+}
+function estKfa2(f,mu,sex,cat){ // 2D: Körperfett (1 wenig–3 viel) × Muskulatur (1 wenig–3 viel)
+  const base=sex==="m"?[13,19,27]:[21,28,36];
+  let v=base[clamp(f,1,3)-1];
+  if(mu===1)v+=2;                       // wenig Muskeln → gleiches Fett = höherer Anteil
+  if(mu===3)v-=sex==="m"?3:2;           // viel Muskelmasse senkt den Prozentanteil
+  if(cat==="senior")v+=2; if(cat==="teen")v-=1;
+  return clamp(v,sex==="m"?8:14,48);
+}
+function recompMuscleCap(s1,sex,kfa,kg,fatRateWk){
+  // Realistische, natürliche (dopingfreie) Muskelaufbaurate in kg/Woche für Recomposition.
+  // Basis nach Trainingsstand (Modell Lyle McDonald / Alan Aragon, kg/Monat für Männer):
+  const monthly={keine:1.0,einsteiger:0.7,fortgeschritten:0.35,sehr:0.18}[s1.erfahrung]??0.5;
+  let base=monthly/4.345;                 // → kg/Woche
+  if(sex==="w")base*=0.55;                 // Frauen ~halbe Rate (hormonell bedingt)
+  // Höherer Körperfettanteil = mehr "Brennstoff" für gleichzeitigen Aufbau:
+  const bf=kfa, bfF= sex==="m"?(bf<12?0.65:bf<18?0.9:bf<25?1.1:bf<32?1.2:1.25)
+                              :(bf<20?0.65:bf<26?0.9:bf<33?1.1:bf<40?1.2:1.25);
+  base*=bfF;
+  // Defizit-Faktor: je schneller der Fettabbau, desto weniger Aufbau möglich (≈0 bei ~0,85 % KG/Woche):
+  const pct=Math.abs(fatRateWk)/kg*100;
+  const defF=clamp(1-pct/0.85,0,1);
+  return Math.max(0,Math.round(base*defF*100)/100);
+}
+function kidEnergy(a,sex){ // Orientierung (≈ Referenzwerte, mittlere Aktivität)
+  const t=[[1,3,1200,1100],[4,6,1450,1350],[7,9,1850,1700],[10,12,2150,1950],[13,14,2400,2100],[15,17,2700,2100]];
+  for(const[lo,hi,m,w]of t)if(a>=lo&&a<=hi)return sex==="m"?m:w;
+  return a<1?700:(sex==="m"?2600:2050);
+}
+function kidProteinPerKg(a){return a<1?1.3:a<4?1.0:a<15?0.9:0.87;}
+
+/* Stillen: Energiekosten der Milchproduktion
+   Grundlagen: Muttermilch ≈ 0,67 kcal/ml; Syntheseeffizienz ≈ 80 % (FAO/IOM)
+   → Kosten ≈ ml × 0,67 / 0,8. Ausschließliches Stillen Ø ~750 ml/Tag ≈ 630 kcal.
+   Zum Vergleich: DGE/D-A-CH ≈ +500 kcal (rechnet ~170 kcal/Tag aus Schwangerschaftsreserven ein) */
+function stillEstMl(s1){
+  const m=num(s1.babyMonate);
+  let ml=750;                              // ausschließliches Stillen, eingespielte Laktation
+  if(m!=null&&m<1)ml=600;                  // 1. Monat: Milchmenge baut sich noch auf
+  const bk=s1.beikost||"keine";
+  if(bk==="wenig")ml-=150;                 // 1 Beikostmahlzeit ersetzt ~150 ml
+  if(bk==="mittel")ml-=300;                // 2–3 Beikostmahlzeiten
+  if(bk==="viel")ml-=450;                  // überwiegend Beikost, Stillen ergänzend
+  if(m!=null&&m>=12)ml=Math.min(ml,300);   // Kleinkind: meist nur noch einzelne Stillmahlzeiten
+  return clamp(ml,100,1100);
+}
+function stillCalc(s1){
+  if(!s1.stillt)return null;
+  const own=num(s1.milchMl);
+  const ml=own!=null?clamp(own,50,1500):stillEstMl(s1);
+  const kcal=ml*0.67/0.8;
+  return {ml:r0(ml),kcal:r0(kcal),est:own==null};
+}
+
+function calc(d){
+  const s1=d.s1,s2=d.s2,s3=d.s3,s4=d.s4;
+  const miss=[];
+  const a=num(s1.alter),h=num(s1.groesse),kg=num(s1.gewicht);
+  const isKid=s1.mode==="kind";
+  if(s1.mode!=="kind"&&s1.mode!=="erwachsen")miss.push("Stufe 1: Kind oder Erwachsener wählen");
+  if(a==null)miss.push("Stufe 1: Alter");
+  if(!s1.geschlecht)miss.push("Stufe 1: Geschlecht");
+  if(h==null)miss.push("Stufe 1: Körpergröße");
+  if(kg==null)miss.push("Stufe 1: Körpergewicht");
+  let kfa=num(s1.kfa);
+  if(!isKid){
+    if(kfa==null&&s1.kfaUnbekannt){
+      if(s1.fitFett&&s1.fitMuskel)kfa=estKfa2(s1.fitFett,s1.fitMuskel,s1.geschlecht,ageCat(a));
+      else if(s1.fitlevel)kfa=estKfa(s1.fitlevel,s1.geschlecht,ageCat(a));
+    }
+    if(kfa==null)miss.push("Stufe 1: Körperfettanteil (oder „unbekannt“ + Körperform wählen)");
+  }
+  if(!isKid&&!s2.ziel)miss.push("Stufe 2: Ziel wählen");
+  if(isKid&&!s2.kindziele.length)miss.push("Stufe 2: mindestens einen Schwerpunkt wählen");
+  if(miss.length)return{ok:false,miss};
+
+  const sex=s1.geschlecht, cat=ageCat(a), grp=ageGroup(a);
+  const steps=num(s3.schritte)||0;
+  const stepK=steps*kg*0.00045;
+  const cardioWeek=s4.cardio.reduce((s,u)=>s+cardioKcal(u,kg),0);
+  const cardioDay=cardioWeek/7;
+  const kraftDay=s4.kraft?(num(s4.krafttage)||0)*240/7:0;
+
+  let out={ok:true,isKid,a,sex,kg,h,kfa,cat,grp,steps,cardioWeek,cardioDay,kraftDay,ziel:s2.ziel,warn:[],info:[]};
+
+  if(isKid){
+    const base=kidEnergy(a,sex);
+    const actF=s3.aktiv==="niedrig"?0.93:s3.aktiv==="hoch"?1.1:1.0;
+    const tdee=base*actF+cardioDay*0.6+stepK*0.3; // grob, ohne Doppelzählung
+    const lo=r0(tdee*0.92), hi=r0(tdee*1.08);
+    const pkg=kidProteinPerKg(a);
+    const prot=[r0(kg*pkg),r0(kg*pkg*1.5)];
+    const fat=[r0(tdee*0.30/9),r0(tdee*0.35/9)];
+    const carb=[r0((tdee-prot[0]*4-fat[1]*9)/4),r0((tdee*1.0-prot[0]*4-fat[0]*9)/4)];
+    const sugar=[r0(tdee*0.05/4),r0(tdee*0.10/4)];
+    out.kid={tdee:r0(tdee),lo,hi,prot,fat,carb,sugar,pkg};
+    out.info.push("Kindermodus: keine Diät- oder Defizitlogik. Die Werte sind ein Orientierungsbereich für gesunde Entwicklung – bei Fragen zu Gewicht oder Wachstum bitte kinderärztlich beraten lassen.");
+    if(steps<6000)out.info.push("Mehr Alltagsbewegung tut Kindern gut: Spielen, Schulweg zu Fuß, Sportverein – kleine Schritte zählen.");
+    return out;
+  }
+
+  /* adults & teens 15+ */
+  const lbm=kg*(1-kfa/100);
+  const bmrM=10*kg+6.25*h-5*a+(sex==="m"?5:-161);
+  const bmrK=370+21.6*lbm;
+  const bmr=num(s1.kfa)!=null?bmrK*0.6+bmrM*0.4:bmrM;
+  const jobF=s3.beruf==="sitzend"?1.14:s3.beruf==="aktiv"?1.32:1.21;
+  const still=sex==="w"?stillCalc(s1):null;
+  const tdee=bmr*jobF+stepK+cardioDay+kraftDay+(still?still.kcal:0);
+
+  const ziel=s2.ziel;
+  let rate=ziel==="halten"?0:num(s2.rate)??0;
+  if(ziel==="abnehmen"||ziel==="beides")rate=clamp(rate,-1.2,-0.05);
+  if(ziel==="muskel")rate=clamp(rate,0.0,0.4);
+  if(ziel==="zunehmen")rate=clamp(rate,0.05,0.6);
+  const target0=tdee+rate*7700/7;
+  const floor=still?1800:sex==="m"?1500:1200;
+  const target=clamp(target0+(num(d.adj)||0),floor,Math.max(tdee+1000,floor));
+  const diff=target-tdee;
+  const wkChange=diff*7/7700;
+
+  /* Recomposition (Ziel „beides“): realistischer, dopingfreier Muskelaufbau –
+     gekoppelt an Defizit-Tempo, Trainingsstand und Körperfettanteil. */
+  let muscleCap=0, muscle=0, netWk=wkChange;
+  if(ziel==="beides"){
+    muscleCap=recompMuscleCap(s1,sex,kfa,kg,wkChange);
+    muscle=clamp(num(s2.muskel)!=null?num(s2.muskel):muscleCap,0,muscleCap);
+    netWk=wkChange+muscle; // Waage = Fettverlust (negativ) + Muskelaufbau (positiv)
+  }
+
+  /* protein: LBM-basiert */
+  let pf=1.6; // g/kg LBM Basis
+  if(ziel==="abnehmen"||ziel==="beides")pf=2.1;
+  if(ziel==="muskel")pf=2.0;
+  if(ziel==="halten")pf=1.7;
+  if(ziel==="zunehmen")pf=1.8;
+  if(s4.kraft)pf+=0.2;
+  if(s3.aktiv==="hoch"||steps>14000)pf+=0.1;
+  if(cat==="senior")pf+=0.15;
+  let prot=lbm*pf;
+  prot=clamp(prot,kg*0.9,kg*(s4.kraft?2.0:1.7));
+  if(still)prot+=23; // D-A-CH: Stillende +23 g Protein/Tag
+  const protKg=prot/kg, protLbm=prot/lbm;
+
+  const fat=Math.max(kg*0.65,target*0.28/9);
+  const carb=Math.max(0,(target-prot*4-fat*9)/4);
+  const sugar=[r0(target*0.05/4),r0(target*0.10/4)];
+
+  /* Zielbewertung */
+  const pct=Math.abs(wkChange)/kg*100;
+  let zielRating="moderat";
+  if(rate<0){zielRating=pct<=0.5?"moderat":pct<=0.85?"ambitioniert":"aggressiv";}
+  if(rate>0){zielRating=wkChange<=0.25?"moderat":wkChange<=0.4?"ambitioniert":"aggressiv";}
+
+  /* Empfehlung Recomposition */
+  let empf="";
+  if(kfa>=(sex==="m"?25:33)&&(ziel==="muskel"))empf="Bei deinem aktuellen Körperfettanteil ist eine moderate Fettabnahme mit hohem Protein und Krafttraining („Recomposition“) meist sinnvoller als ein klassischer Kalorienüberschuss.";
+  if(kfa<=(sex==="m"?12:20)&&ziel==="abnehmen"&&pct>0.6)empf="Dein Körperfettanteil ist bereits niedrig – ein kleineres Defizit schützt Muskulatur und Leistungsfähigkeit.";
+  if(ziel==="beides")empf="Fettabnahme + Muskelaufbau gleichzeitig funktioniert am besten mit kleinem Defizit, viel Protein und regelmäßigem Krafttraining.";
+
+  /* Warnungen */
+  const W=out.warn;
+  if(s1.fitMuskel===1&&s1.fitFett>=2)out.info.push("Deine Körperform-Auswahl deutet auf eine <b>„Skinny Fat“-Konstellation</b> hin (wenig Muskulatur, relativ hoher Fettanteil trotz schlanker Optik). Hier wirkt <b>Krafttraining + proteinreiche Ernährung bei nur kleinem oder gar keinem Defizit</b> („Recomposition“) meist deutlich besser als reines Hungern – sonst verlierst du vor allem Muskeln statt Fett.");
+  out.still=still;
+  if(still){
+    out.info.push("Stillen ist eingerechnet: <b>≈ +"+fmt(still.kcal)+" kcal/Tag</b> für ~"+fmt(still.ml)+" ml Milch"+(still.est?" (geschätzt aus Babyalter & Beikost)":"")+" – Basis: 0,67 kcal/ml Milchenergie und ~80 % Syntheseeffizienz (FAO/IOM; die DGE nennt als Faustwert +500 kcal bei ausschließlichem Stillen). Zusätzlich sind <b>+23 g Protein</b> berücksichtigt (D-A-CH). Denk außerdem an reichlich Flüssigkeit – grob ein großes Glas Wasser pro Stillmahlzeit – sowie Jod und ggf. DHA nach ärztlicher Rücksprache.");
+    if(rate<-0.5)W.push("Stillzeit: Mehr als ~0,5 kg pro Woche (≈ 2 kg/Monat) abzunehmen kann die Milchmenge beeinträchtigen. Wähle in Stufe 2 ein sanfteres Tempo.");
+  }
+  if(zielRating==="aggressiv")W.push("Sehr aggressives Tempo gewählt. Mehr als ~0,5–0,8 % des Körpergewichts pro Woche ist selten nachhaltig – Muskelverlust und Jo-Jo-Risiko steigen.");
+  if(ziel==="muskel"&&diff<-100)W.push("Muskelaufbau bei deutlichem Kaloriendefizit ist kaum möglich. Erhöhe die Kalorien Richtung Erhaltungsbedarf oder passe Stufe 2 an.");
+  if(protKg>1.7&&!s4.kraft)W.push("Hohe Proteinmenge ohne Krafttraining: mehr als ~1,6 g/kg bringt dann kaum Zusatznutzen. Krafttraining ergänzen oder Protein leicht senken.");
+  if(kfa>=(sex==="m"?28:36))out.info.push("Hinweis zur Proteinlogik: Bei höherem Körperfettanteil rechnen wir bewusst über die fettfreie Masse ("+r1(lbm)+" kg) statt über das Gesamtgewicht – das ergibt eine realistischere, gesündere Empfehlung.");
+  if(target<=floor+10)W.push("Die Kalorien liegen am unteren Sicherheitsrand ("+floor+" kcal). Niedriger sollte es ohne ärztliche Begleitung nicht sein.");
+  if(s4.kraft&&ziel==="abnehmen"&&pct>0.8)W.push("Großes Defizit + Krafttraining: plane Erholung bewusst ein und halte das Protein am oberen Rand.");
+  if(ziel==="beides"){
+    if(muscleCap<0.02)W.push("Bei diesem Fettabbau-Tempo ist gleichzeitiger Muskelaufbau kaum noch möglich – der Realismus spricht hier eher für <b>Muskelerhalt</b>. Für echte Recomposition ein kleineres Defizit wählen.");
+    else if(!s4.kraft)W.push("Recomposition (Fett ab + Muskeln auf) funktioniert praktisch nur mit <b>regelmäßigem Krafttraining</b>. Ohne Training bleibt vor allem der Muskelerhalt – aktiviere Krafttraining in Stufe 4.");
+    if(s1.erfahrung==="sehr"||s1.erfahrung==="fortgeschritten")out.info.push("Hinweis: Als trainierte Person ist gleichzeitiger Auf- und Abbau begrenzt – die größten Recomposition-Erfolge haben Einsteiger:innen, Wiedereinsteiger:innen und Menschen mit höherem Körperfettanteil. Deine Werte sind entsprechend konservativ angesetzt.");
+  }
+
+  out.adult={lbm:r1(lbm),bmr:r0(bmr),tdee:r0(tdee),target:r0(target),target0:r0(target0),diff:r0(diff),wkChange:r1(wkChange*10)/10,netWk:Math.round(netWk*100)/100,muscle:Math.round(muscle*100)/100,muscleCap,fatLoss:Math.round(Math.abs(wkChange)*100)/100,rate,zielRating,prot:r0(prot),protKg:r1(protKg),protLbm:r1(protLbm),fat:r0(fat),carb:r0(carb),sugar,empf,stepK:r0(stepK)};
+  return out;
+}
+
+function forecast(out,weeks=12,extraDaily=0){
+  if(!out.ok||out.isKid)return[];
+  let w=out.kg;const rows=[];const A=out.adult;
+  for(let i=1;i<=weeks;i++){
+    const bmrM=10*w+6.25*out.h-5*out.a+(out.sex==="m"?5:-161);
+    const lbm=w*(1-out.kfa/100);
+    const tdee=(0.6*(370+21.6*lbm)+0.4*bmrM)*(A.tdee/A.bmr)+extraDaily;
+    const muscleWk=out.ziel==="beides"?(A.muscle||0):0; // Recomposition: Muskelaufbau hebt die Waage gegen den Fettverlust
+    const ch=(A.target-tdee)*7/7700+muscleWk;
+    w=Math.max(35,w+ch);
+    rows.push({wk:i,change:r1(ch*10)/10,weight:r1(w*10)/10});
+  }
+  return rows;
+}
+
+/* ================= SVG: chart + silhouettes ================= */
+function lineChart(series,startW){
+  // series: [{label,color,rows:[{wk,weight}],dash?}] – erste Serie bekommt die Fläche
+  series=series.filter(s=>s&&s.rows&&s.rows.length);
+  if(!series.length)return"";
+  const W=640,H=260,P={l:46,r:14,t:18,b:30};
+  const base=series[0].rows;
+  const ys=[startW,...series.flatMap(s=>s.rows.map(r=>r.weight))];
+  let lo=Math.min(...ys),hi=Math.max(...ys);if(hi-lo<1.6){const m=(hi+lo)/2;lo=m-0.8;hi=m+0.8}
+  lo=Math.floor(lo*2)/2-0.25;hi=Math.ceil(hi*2)/2+0.25;
+  const X=w=>P.l+(w)/(base.length)*(W-P.l-P.r);
+  const Y=v=>P.t+(hi-v)/(hi-lo)*(H-P.t-P.b);
+  let grid="",lbl="";
+  for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4,y=Y(v);grid+=`<line x1="${P.l}" x2="${W-P.r}" y1="${y}" y2="${y}" stroke="#DCE7E1"/>`;lbl+=`<text x="${P.l-8}" y="${y+4}" text-anchor="end">${v.toFixed(1)}</text>`;}
+  base.forEach(r=>{if(r.wk%2===0||base.length<=8)lbl+=`<text x="${X(r.wk)}" y="${H-8}" text-anchor="middle">W${r.wk}</text>`;});
+  let areas="",lines="",dots="";
+  let areaIdx=series.findIndex(s=>s.area); if(areaIdx<0)areaIdx=0;
+  series.forEach((s,si)=>{
+    const pts=[[X(0),Y(startW)],...s.rows.map(r=>[X(r.wk),Y(r.weight)])];
+    const path=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
+    if(si===areaIdx)areas=`<path d="${path} L${pts[pts.length-1][0].toFixed(1)},${Y(lo)} L${pts[0][0].toFixed(1)},${Y(lo)} Z" fill="url(#gA)"/>`;
+    lines+=`<path d="${path}" fill="none" stroke="${s.color}" stroke-width="${s.thin?2:2.6}" stroke-linecap="round"${s.dash?` stroke-dasharray="${s.dash===true?"7 6":s.dash}"`:""}/>`;
+    if(!s.thin)dots+=pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.2" fill="${s.color}"/>`).join("");
+  });
+  const legend=series.length>1?`<div class="leg">${series.map(s=>{const dp=s.dash?(s.dash===true?"7 6":s.dash):"";return `<span class="li"><svg width="28" height="10" aria-hidden="true" style="flex:none;overflow:visible"><line x1="1" y1="5" x2="27" y2="5" stroke="${s.color}" stroke-width="${s.thin?2.6:3.4}" stroke-linecap="round"${dp?` stroke-dasharray="${dp}"`:""}/></svg><span style="color:var(--ink-2)">${s.label}</span></span>`;}).join("")}</div>`:"";
+  return `${legend}<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Prognose der Gewichtsentwicklung" style="width:100%;height:auto">
+    <defs><linearGradient id="gA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E8C6B" stop-opacity=".28"/><stop offset="1" stop-color="#2E8C6B" stop-opacity="0"/></linearGradient></defs>
+    ${grid}${areas}${lines}${dots}${lbl}</svg>`;
+}
+
+/* Hinweis: Die früheren prozedural erzeugten SVG-Silhouetten (figure / adultFigure)
+   wurden durch echte Grafiken ersetzt – siehe bilder/body-{m|w|k}-{muskulatur}-{fett}.png,
+   eingebunden in Stufe 1 (step1). */
+</script>
+<script>
+/* ================= static pages ================= */
+const STEPS=[["Körperdaten","Ausgangslage & Körperfett"],["Ziel","Tempo & Bewertung"],["Alltag","Schritte & Aktivität"],["Ernährung & Sport","Cardio & Krafttraining"],["Prognose","Wochen im Blick"]];
+
+function Home(){
+  const base=[81.7,81.4,81.1,80.8,80.4,80.1,79.8,79.5].map((w,i)=>({wk:i+1,weight:w}));
+  const aktiv=[81.3,80.7,80.0,79.4,78.7,78.1,77.4,76.8].map((w,i)=>({wk:i+1,weight:w}));
+  const previewChart=lineChart([
+    {label:"Nur Ernährung (−340 kcal)",color:"#11403A",rows:base},
+    {label:"+400 kcal Bewegung/Tag",color:"#C97A2B",rows:aktiv,dash:true}
+  ],82);
+  return `
+  <section class="hero">
+    <div class="wrap split">
+      <div class="fade">
+        <span class="eyebrow">Gesundheit · Fitness · Ernährung</span>
+        <h1 style="margin:14px 0 16px">Verstehe deinen Körper.<br><em>Dann verändere ihn.</em></h1>
+        <p class="lead">SuPER Health berechnet deinen Kalorienbedarf, deine Makronährstoffe, deinen Fitnesszustand und eine realistische Wochenprognose – einfach, visuell und alltagstauglich. Für Erwachsene und Kinder, ohne Diät-Dogma.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:26px">
+          <a class="btn amber" href="#/app">Rechner starten →</a>
+          <a class="btn ghost" href="#/so-funktionierts">So funktioniert’s</a>
+        </div>
+        <div class="trustline">
+          <span>${ico.ok} Wissenschaftlich vernünftig</span>
+          <span>${ico.ok} Für Kinder &amp; Erwachsene</span>
+          <span>${ico.ok} Kostenlos</span>
+        </div>
+      </div>
+      <div class="mock fade" aria-hidden="true">
+        <div class="mhead"><span class="mtag">Dein Tagesblatt · Beispiel</span><span class="pill ok">Stufe 1–4 ✓</span></div>
+        <div class="bigkcal">2.180 <small>kcal / Tag empfohlen</small></div>
+        <div class="muted" style="margin-top:4px">Erhaltungsbedarf 2.520 kcal · Defizit −340 kcal · ≈ −0,3 kg/Woche</div>
+        <div class="stat3">
+          <div class="s"><b>148 g</b><span>Protein</span></div>
+          <div class="s"><b>225 g</b><span>Kohlenhydrate</span></div>
+          <div class="s"><b>72 g</b><span>Fett</span></div>
+        </div>
+        <div class="spark">${previewChart}</div>
+        <p class="muted" style="margin-top:10px;font-size:12.5px;line-height:1.5">Schon <b style="color:var(--amber-deep)">400 kcal Bewegung pro Tag</b> – z.&nbsp;B. ein zügiger 70-Minuten-Spaziergang oder 35 Min Cardio – verdoppeln das Tempo fast: <b style="color:var(--pine-deep)">≈ −0,7 statt −0,3 kg/Woche</b>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block tight">
+    <div class="wrap">
+      <span class="eyebrow">Was SuPER Health macht</span>
+      <h2 style="margin:12px 0 8px">Eine Plattform, fünf Stufen, ein klares Ergebnis</h2>
+      <p class="lead">Statt grober Faustformeln verbindet SuPER Health deine Körperdaten, dein Ziel, deinen Alltag und deinen Sport zu einer Empfehlung, die zu dir passt.</p>
+      <div class="grid g4" style="margin-top:28px">
+        ${[["Kalorien & Makros","Tagesbedarf, empfohlene Kalorien, Protein, Kohlenhydrate, Fett – inkl. Obergrenze für freien Zucker."],
+           ["Körperfett & Fitness","Körperfettanteil plus visuelle Fitnessskala nach Alter und Geschlecht – für realistischere Empfehlungen."],
+           ["Aktivität & Cardio","Schritte, Berufsprofil und Cardio-Einheiten mit direkt angezeigtem Kalorienverbrauch."],
+           ["Wochenprognose","Modernes Diagramm und Tabelle: so entwickelt sich dein Gewicht voraussichtlich Woche für Woche."]]
+          .map(([t,d],i)=>`<div class="card"><div class="icon mono" style="font-weight:600">${["⚖","◔","➝","∿"][i]}</div><h3 style="margin:12px 0 6px;font-size:18px">${t}</h3><p class="small">${d}</p></div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap split">
+      <div>
+        <span class="eyebrow">Der Weg</span>
+        <h2 style="margin:12px 0 18px">Stufe für Stufe zum Ergebnis</h2>
+        <div class="rail">
+          ${STEPS.map((s,i)=>`<div class="rstep ${i===0?"now":""}"><span class="dot">${i+1}</span><div><b style="color:var(--pine-deep)">Stufe ${i+1} · ${s[0]}</b><div class="muted">${s[1]}</div></div></div>`).join("")}
+        </div>
+        <a class="btn" style="margin-top:24px" href="#/app">Mit Stufe 1 beginnen</a>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <span class="pill amber">Wissen</span>
+          <h3 style="margin:10px 0 6px">Einfacher Weg zum Sixpack</h3>
+          <p class="small">Warum sichtbare Bauchmuskeln vor allem eine Frage des Körperfettanteils sind – und wie ein kleines, durchhaltbares Defizit besser wirkt als jede Radikaldiät.</p>
+          <a href="#/sixpack" style="font-weight:600;font-size:14px">Seite lesen →</a>
+        </div>
+        <div class="card">
+          <span class="pill amber">Wissen</span>
+          <h3 style="margin:10px 0 6px">Stärke durch Kraftsport</h3>
+          <p class="small">Muskelkräftigendes Training wird gesundheitlich empfohlen – für Haltung, Knochen, Alltagskraft und Selbstständigkeit, gerade im höheren Alter.</p>
+          <a href="#/kraftsport" style="font-weight:600;font-size:14px">Seite lesen →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap-s" style="text-align:center">
+      <span class="eyebrow" style="justify-content:center">Vertrauen</span>
+      <h2 style="margin:12px 0 14px">Seriös statt sensationell</h2>
+      <p class="lead" style="margin:0 auto">Keine Wunderversprechen, keine Crash-Diäten, kein Bodybuilding-Dogma. SuPER Health arbeitet mit anerkannten Rechenmodellen, gesunden Grenzwerten und klaren Warnhinweisen – und trennt Empfehlungen für Kinder konsequent von denen für Erwachsene.</p>
+      <div class="grid g3" style="margin-top:28px;text-align:left">
+        ${[["Gesunde Grenzen","Sicherheitsuntergrenzen bei Kalorien, realistische Protein-Obergrenzen, Zucker-Limits nach gängigen Empfehlungen."],
+           ["Kindermodus","Keine Diätlogik für Kinder – Fokus auf Entwicklung, ausgewogene Ernährung und Bewegung."],
+           ["Transparente Logik","Du siehst jederzeit, wie sich Erhaltungsbedarf, Defizit und Prognose zusammensetzen."]]
+          .map(([t,d])=>`<div class="card flat" style="background:var(--sage);border-color:var(--sage-2)"><b style="color:var(--pine-deep)">${t}</b><p class="small" style="margin-top:6px">${d}</p></div>`).join("")}
+      </div>
+      <a class="btn amber" style="margin-top:30px" href="#/app">Jetzt kostenlos berechnen</a>
+      <p class="muted" style="margin-top:14px">Hinweis: SuPER Health ersetzt keine medizinische Beratung.</p>
+    </div>
+  </section>`;
+}
+
+function HowPage(){
+  const txt=[["Körperdaten & Ausgangslage","Alter, Geschlecht, Größe, Gewicht und – ganz wichtig – dein Körperfettanteil. Wer ihn nicht kennt, nutzt idealerweise eine Körperanalysewaage oder unsere visuelle Fitnessskala."],
+  ["Zieldefinition","Abnehmen, Muskelaufbau, beides, halten oder zunehmen. Ein Regler zeigt dein Wunschtempo – farblich markiert von moderat bis aggressiv, mit Warnung bei unrealistischen Kombinationen."],
+  ["Alltag & Aktivität","Schritte pro Tag (0–50.000) per Slider, dazu dein Berufsprofil: sitzend, gemischt oder körperlich aktiv. Alltagsbewegung ist oft der unterschätzte Hebel."],
+  ["Ernährung & Sport","Dein Ziel aus Stufe 2 und deine Schritte aus Stufe 3 fließen ein; Cardio-Einheiten per Plus hinzufügen – Art, Dauer, Intensität, geschätzter Verbrauch sofort sichtbar. Optional: Krafttraining."],
+  ["Prognose","Ein modernes Diagramm und eine Wochentabelle zeigen, wie sich dein Gewicht bei deinem Kalorienziel voraussichtlich entwickelt."]];
+  return `
+  <section class="block">
+    <div class="wrap-s">
+      <span class="eyebrow">So funktioniert’s</span>
+      <h1 style="margin:12px 0 14px">In fünf Stufen zu deinem Tagesblatt</h1>
+      <p class="lead">Jede Stufe lässt sich einzeln speichern – mit Konto machst du genau dort weiter, wo du aufgehört hast.</p>
+      <div class="rail" style="margin-top:34px">
+        ${txt.map((s,i)=>`<div class="rstep"><span class="dot">${i+1}</span><div style="padding-bottom:4px"><h3 style="margin-bottom:6px">Stufe ${i+1}: ${s[0]}</h3><p>${s[1]}</p></div></div>`).join("")}
+      </div>
+      <div class="card" style="margin-top:30px">
+        <h3>Das Ergebnis</h3>
+        <p style="margin-top:8px">Sobald Stufe 1–4 vollständig sind, erscheint dein großer Ergebnisbereich: <b>täglicher Kalorienbedarf, empfohlene Kalorien, Defizit oder Überschuss, Protein, Kohlenhydrate, Fett und freier Zucker</b> – als Karten, Tabelle und Textempfehlung. Ein Kalorien-Schieberegler lässt dich fein justieren; die Prognose passt sich live an.</p>
+        <a class="btn amber" style="margin-top:16px" href="#/app">Rechner öffnen</a>
+      </div>
+    </div>
+  </section>`;
+}
+
+function Sixpack(){return `
+  <section class="block">
+    <div class="wrap-s">
+      <span class="eyebrow">Wissen · Körperfett</span>
+      <h1 style="margin:12px 0 14px">Einfacher Weg zum Sixpack</h1>
+      <p class="lead">Die unbequeme, aber befreiende Wahrheit: Ein Sixpack entsteht nicht im Bauchmuskel­training – es wird sichtbar, wenn der Körperfettanteil ausreichend niedrig ist. Jeder Mensch hat Bauchmuskeln. Die Frage ist nur, was darüber liegt.</p>
+
+      <div class="grid g3" style="margin:30px 0">
+        ${[["1 · Kaloriendefizit","Über Wochen etwas weniger Energie aufnehmen, als du verbrauchst – das ist der eigentliche Mechanismus der Fettabnahme."],
+           ["2 · Tägliche Bewegung","Schritte, Alltag, Cardio: Bewegung erhöht den Verbrauch, ohne dass du am Teller leiden musst."],
+           ["3 · Ausreichend Protein","Schützt Muskulatur im Defizit, sättigt gut und hält den Stoffwechsel arbeitsfähig."]]
+          .map(([t,d])=>`<div class="card"><b style="color:var(--pine-deep)">${t}</b><p class="small" style="margin-top:6px">${d}</p></div>`).join("")}
+      </div>
+
+      <h2>Das Prinzip in einem Satz</h2>
+      <p style="margin:10px 0 0">Du nimmst Körperfett langfristig vor allem dann ab, wenn du über Zeit etwas weniger Energie aufnimmst, als du verbrauchst. Am besten gelingt das mit einer Kombination aus <b>mehr Alltagsbewegung</b>, <b>regelmäßigem Training</b> und einer <b>leicht reduzierten, gut durchhaltbaren Ernährung</b> – nicht mit Verboten.</p>
+
+      <div class="card" style="margin:26px 0;background:var(--sage)">
+        <h3>Warum „leicht reduziert“ extreme Diäten schlägt</h3>
+        <ul class="clean" style="margin-top:8px">
+          <li>Ein kleines Defizit (ca. 250–500 kcal/Tag) ist im Alltag durchhaltbar – und Durchhalten entscheidet.</li>
+          <li>Radikale Diäten kosten Muskulatur, Energie und Motivation; danach folgt oft der Jo-Jo-Effekt.</li>
+          <li>Bewegung + moderates Essen verteilt die „Last“ auf zwei Schultern statt auf eine.</li>
+          <li>Sichtbare Bauchmuskeln brauchen Wochen bis Monate – Geduld und Konstanz schlagen jede Radikalmaßnahme.</li>
+        </ul>
+      </div>
+
+      <h2>Bauchtraining ist Bonus, nicht Basis</h2>
+      <p style="margin:10px 0 0">Crunches und Planks kräftigen die Rumpfmuskulatur und sind sinnvoll – sie verbrennen aber kaum Fett am Bauch. „Gezielte Fettverbrennung“ an einer Körperstelle funktioniert physiologisch nicht. Erst das Defizit macht sichtbar, was das Training aufgebaut hat.</p>
+
+      <div class="note info" style="margin-top:22px">${ico.info}<div><b>Ehrlich gesagt:</b> Wie schnell ein Sixpack sichtbar wird, hängt von Ausgangslage, Genetik und Geschlecht ab. Frauen haben von Natur aus einen höheren essentiellen Körperfettanteil – sehr niedrige Werte sind kein Gesundheitsziel.</div></div>
+
+      <div class="card" style="margin-top:26px;text-align:center;background:var(--pine-deep)">
+        <h3 style="color:#fff">Wie groß sollte dein Defizit sein?</h3>
+        <p style="color:#BFD6CB;margin:8px 0 16px">Der Rechner bestimmt deinen Bedarf und ein gesundes Tempo – inklusive Wochenprognose.</p>
+        <a class="btn amber" href="#/app">Zum Rechner</a>
+      </div>
+    </div>
+  </section>`;}
+
+function Kraft(){return `
+  <section class="block">
+    <div class="wrap-s">
+      <span class="eyebrow">Wissen · Krafttraining</span>
+      <h1 style="margin:12px 0 14px">Stärke durch Kraftsport</h1>
+      <p class="lead">Krafttraining ist weit mehr als Muskelaufbau für den Spiegel: Es erhält Funktion, Haltung und Selbstständigkeit – und wird in Bewegungs­empfehlungen weltweit ausdrücklich genannt. Gerade im höheren Alter ist Muskelmasse ein Stück Lebensqualität.</p>
+
+      <div class="grid g2" style="margin:30px 0">
+        ${[["Muskelmasse erhalten & aufbauen","Ab etwa dem 30. Lebensjahr nimmt Muskelmasse ohne Training schleichend ab (Sarkopenie). Regelmäßiges Krafttraining bremst diesen Prozess – und kann ihn in jedem Alter teilweise umkehren."],
+           ["Knochen & Bewegungsapparat","Belastung ist ein Wachstumsreiz: Je nach Trainingsform kann Krafttraining den Knochenerhalt unterstützen und Sehnen, Bänder und Gelenke belastbarer machen."],
+           ["Haltung & Alltagskraft","Tragen, Treppensteigen, Aufstehen, Gleichgewicht: Kraft ist die Basis fast jeder Alltagsbewegung – und ein wichtiger Faktor in der Sturzprävention."],
+           ["Stoffwechsel & Körperkomposition","Mehr Muskulatur erhöht den Energieverbrauch in Ruhe und verbessert die Verwertung von Kohlenhydraten – wertvoll für Gewichtsmanagement und Gesundheit."]]
+          .map(([t,d])=>`<div class="card"><h3 style="font-size:18px">${t}</h3><p class="small" style="margin-top:8px">${d}</p></div>`).join("")}
+      </div>
+
+      <h2>Was die Wissenschaft empfiehlt</h2>
+      <div class="grid" style="margin-top:16px">
+        ${[["WHO-Bewegungsempfehlung","Erwachsene sollten an mindestens 2 Tagen pro Woche muskelkräftigende Aktivitäten für alle großen Muskelgruppen durchführen – zusätzlich zur Ausdaueraktivität. Für Ältere werden ergänzend Gleichgewichts- und Kraftübungen empfohlen."],
+           ["Krafttraining im Alter wirkt","Interventionsstudien zeigen: Auch Menschen über 70 oder 80 können durch progressives Krafttraining Kraft und Muskelmasse messbar steigern – mit Verbesserungen bei Gehgeschwindigkeit, Aufstehen und Alltagsfunktion."],
+           ["Mehr Kraft, weniger Risiko","Größere Muskelkraft und regelmäßiges Krafttraining sind in Beobachtungsstudien mit geringerer Gesamtsterblichkeit und besserer Stoffwechselgesundheit verbunden."]]
+          .map(([t,d])=>`<div class="card flat" style="border-left:4px solid var(--mint)"><b style="color:var(--pine-deep)">${t}</b><p class="small" style="margin-top:6px">${d}</p></div>`).join("")}
+      </div>
+
+      <div class="card" style="margin-top:26px;background:var(--sage)">
+        <h3>So startest du vernünftig</h3>
+        <ul class="clean" style="margin-top:8px">
+          <li><b>Progressiv:</b> klein anfangen, Gewicht oder Wiederholungen langsam steigern – der Reiz muss wachsen, nicht der Ehrgeiz explodieren.</li>
+          <li><b>Individuell:</b> Übungsauswahl und Intensität an Alter, Vorerfahrung und Beschwerden anpassen; bei Vorerkrankungen ärztlich abklären.</li>
+          <li><b>Regelmäßig:</b> 2–3 Einheiten pro Woche reichen für deutliche Effekte – Konstanz schlägt Perfektion.</li>
+          <li><b>Mit Protein:</b> ausreichende Proteinzufuhr unterstützt Aufbau und Erhalt – unser Rechner berücksichtigt Krafttraining automatisch.</li>
+        </ul>
+      </div>
+
+      <div class="note info" style="margin-top:20px">${ico.info}<div>Krafttraining ersetzt keine medizinische Behandlung. Die genannten Effekte sind wissenschaftlich gut gestützt, im Einzelfall aber von Trainingsform, Umfang und Ausgangslage abhängig.</div></div>
+
+      <div style="text-align:center;margin-top:28px">
+        <a class="btn" href="#/app">Krafttraining im Rechner berücksichtigen →</a>
+      </div>
+    </div>
+  </section>`;}
+
+function About(){return `
+  <section class="block">
+    <div class="wrap-s">
+      <span class="eyebrow">Über uns</span>
+      <h1 style="margin:12px 0 14px">Über SuPER Health</h1>
+      <p class="lead">SuPER Health ist eine moderne Gesundheits-, Fitness- und Ernährungsplattform mit einem einfachen Anspruch: komplexe Zusammenhänge so erklären und berechnen, dass echte Menschen im echten Alltag damit arbeiten können.</p>
+      <div class="grid" style="margin-top:30px">
+        <div class="card"><h3>Für wen ist die Plattform gedacht?</h3><p style="margin-top:8px">Für alle, die ihre Kalorien, Makros, Aktivität und Ziele besser verstehen wollen – vom Einsteiger bis zur sportlichen Person, von Eltern, die sich für die Ernährung ihrer Kinder interessieren, bis zu älteren Erwachsenen, die Kraft und Selbstständigkeit erhalten möchten.</p></div>
+        <div class="card"><h3>Warum trennen wir Kinder und Erwachsene?</h3><p style="margin-top:8px">Kinder sind keine kleinen Erwachsenen. Sie wachsen, ihr Energie- und Proteinbedarf folgt anderen Regeln, und Diätlogik hat in der Kindheit nichts verloren. Der Kindermodus arbeitet deshalb mit Orientierungsbereichen, altersgerechten Empfehlungen und einem klaren Fokus auf gesunde Entwicklung, ausgewogene Ernährung und Bewegung – ohne Defizite, ohne Druck.</p></div>
+        <div class="card"><h3>Warum Körperfett, Aktivität und Ziel zusammen betrachten?</h3><p style="margin-top:8px">Zwei Personen mit 100 kg brauchen nicht dieselbe Empfehlung: Wer 10 % Körperfett und viel Muskelmasse hat, benötigt in der Regel mehr Protein und mehr Energie als jemand mit 30 % – bei gleichem Gewicht. Erst die Kombination aus Körperzusammensetzung, Alltagsaktivität, Sport und Ziel ergibt eine Empfehlung, die wirklich passt. Genau das rechnet SuPER Health.</p></div>
+        <div class="card"><h3>Warum verständliche Gesundheitsaufklärung?</h3><p style="margin-top:8px">Zwischen Fitness-Marketing und Fachliteratur klafft eine Lücke. Wir füllen sie mit Inhalten, die seriös sind, ohne trocken zu wirken: ehrlich über Geduld und Konstanz, klar bei Grenzwerten, motivierend ohne Versprechen. Wer versteht, <em>warum</em> etwas funktioniert, bleibt eher dran.</p></div>
+      </div>
+      <div class="note info" style="margin-top:24px">${ico.info}<div><b>Ausblick:</b> SuPER Health ist so gebaut, dass Ernährungstracking, Rezepte und Essenspläne als nächste Module folgen können – auf demselben Daten- und Designfundament.</div></div>
+    </div>
+  </section>`;}
+
+function FAQ(){const qs=[
+  ["Ist SuPER Health kostenlos?","Ja, der Rechner und alle Wissensseiten sind kostenlos nutzbar."],
+  ["Wie genau sind die Berechnungen?","Wir nutzen anerkannte Schätzformeln (u. a. Mifflin-St Jeor und Katch-McArdle) plus Aktivitäts- und Cardio-Daten. Das Ergebnis ist eine fundierte Orientierung – der echte Bedarf zeigt sich im Verlauf, deshalb gibt es den Kalorien-Schieberegler und die Wochenprognose."],
+  ["Ich kenne meinen Körperfettanteil nicht. Was nun?","Nutze idealerweise eine Körperfett- bzw. Körperanalysewaage. Die Werte sind nicht perfekt, helfen aber, die Körperzusammensetzung grob einzuschätzen und Fortschritte zu verfolgen. Alternativ kannst du in Stufe 1 „unbekannt“ wählen und dich über die visuelle Fitnessskala einordnen."],
+  ["Warum gibt es einen eigenen Kindermodus?","Weil Kinder andere Bedürfnisse haben: Wachstum, Entwicklung, keine Diätlogik. Der Kindermodus zeigt Orientierungsbereiche statt Defizite und gibt altersgerechte Protein- und Zuckerempfehlungen."],
+  ["Wo werden meine Daten gespeichert?","Deine Eingaben werden lokal für dieses Gerät gespeichert, wenn du ein Profil anlegst. Jede Stufe lässt sich einzeln sichern, und du kannst Profile jederzeit löschen."],
+  ["Ersetzt SuPER Health eine ärztliche Beratung?","Nein. Alle Werte sind Orientierungswerte für gesunde Personen. Bei Erkrankungen, Essstörungen, Schwangerschaft oder Unsicherheit bitte medizinischen Rat einholen."]];
+  return `<section class="block"><div class="wrap-s">
+    <span class="eyebrow">Hilfe</span><h1 style="margin:12px 0 24px">Häufige Fragen</h1>
+    <div class="grid">${qs.map(([q,a])=>`<div class="card"><h3 style="font-size:17.5px">${q}</h3><p class="small" style="margin-top:8px">${a}</p></div>`).join("")}</div>
+  </div></section>`;}
+
+function Impressum(){return `
+  <section class="block"><div class="wrap-s">
+    <span class="eyebrow">Rechtliches</span>
+    <h1 style="margin:12px 0 10px">Impressum</h1>
+    <p class="muted">Angaben gemäß § 5 DDG (Platzhalter-Struktur – vor Veröffentlichung vervollständigen und rechtlich prüfen lassen).</p>
+    <div class="card" style="margin-top:24px"><dl class="imprint">
+      <dt>Name / Betreiber</dt><dd>Paul Elias Ruppersberg</dd>
+      <dt>Markenname / Projektname</dt><dd>SuPER Health</dd>
+      <dt>Anschrift</dt><dd><span class="ph">[Straße und Hausnummer einfügen]</span><br><span class="ph">[PLZ und Ort einfügen]</span><br><span class="ph">[Land einfügen]</span></dd>
+      <dt>Kontakt</dt><dd>E-Mail: <span class="ph">[E-Mail einfügen]</span><br>Telefon: <span class="ph">[Telefon einfügen]</span></dd>
+      <dt>Verantwortlich für den Inhalt</dt><dd>Paul Elias Ruppersberg</dd>
+      <dt>Website</dt><dd>SuPER Health</dd>
+      <dt>Umsatzsteuer-ID (sofern vorhanden)</dt><dd><span class="ph">[USt-IdNr. einfügen oder Abschnitt entfernen]</span></dd>
+      <dt>Registereintrag (sofern vorhanden)</dt><dd><span class="ph">[Registergericht und Registernummer einfügen oder Abschnitt entfernen]</span></dd>
+      <dt>Aufsichtsbehörde (sofern zutreffend)</dt><dd><span class="ph">[Zuständige Aufsichtsbehörde einfügen oder Abschnitt entfernen]</span></dd>
+    </dl></div>
+    <div class="card" style="margin-top:18px"><h3>Haftungshinweis</h3>
+      <p class="small" style="margin-top:8px">Die Inhalte dieser Website wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte wird jedoch keine Gewähr übernommen. Alle Berechnungen und Empfehlungen sind Orientierungswerte für gesunde Personen und ersetzen keine medizinische, ernährungs­therapeutische oder sonstige fachliche Beratung. Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links; für deren Inhalte sind ausschließlich deren Betreiber verantwortlich.</p></div>
+    <div class="card" style="margin-top:18px"><h3>Urheberrecht</h3>
+      <p class="small" style="margin-top:8px">Die durch den Betreiber erstellten Inhalte und Werke auf dieser Website unterliegen dem deutschen Urheberrecht. Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechts bedürfen der schriftlichen Zustimmung des Betreibers.</p></div>
+  </div></section>`;}
+
+function Datenschutz(){return `
+  <section class="block"><div class="wrap-s">
+    <span class="eyebrow">Rechtliches</span>
+    <h1 style="margin:12px 0 10px">Datenschutz</h1>
+    <p class="muted">Platzhalter-Struktur – vor Veröffentlichung an die tatsächliche Datenverarbeitung anpassen und rechtlich prüfen lassen.</p>
+    <div class="grid" style="margin-top:24px">
+      <div class="card"><h3>Verantwortlicher</h3><p class="small" style="margin-top:8px">Paul Elias Ruppersberg · <span class="ph">[Anschrift einfügen]</span> · <span class="ph">[E-Mail einfügen]</span></p></div>
+      <div class="card"><h3>Lokale Speicherung im Rechner</h3><p class="small" style="margin-top:8px">Eingaben im App-Bereich (Körperdaten, Ziele, Aktivität, Ernährung) werden ausschließlich gespeichert, wenn du ein Profil anlegst – und zwar gerätebezogen, um deine Stufen fortsetzen zu können. Du kannst Profile jederzeit in der App löschen. Es findet kein Verkauf von Daten und keine werbliche Auswertung statt.</p></div>
+      <div class="card"><h3>Gesundheitsbezogene Angaben</h3><p class="small" style="margin-top:8px">Angaben wie Gewicht oder Körperfettanteil sind sensible Daten. Sie werden nur für die Berechnung deiner Ergebnisse verwendet. <span class="ph">[Bei Server-Speicherung: Rechtsgrundlage Art. 9 Abs. 2 lit. a DSGVO, Einwilligungstext und Löschkonzept ergänzen]</span></p></div>
+      <div class="card"><h3>Hosting, Cookies, Schriftarten</h3><p class="small" style="margin-top:8px"><span class="ph">[Hosting-Anbieter, Server-Logs, ggf. Cookie-/Consent-Lösung und Einbindung externer Schriftarten dokumentieren]</span></p></div>
+      <div class="card"><h3>Deine Rechte</h3><p class="small" style="margin-top:8px">Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerspruch sowie Beschwerde bei einer Aufsichtsbehörde gemäß DSGVO.</p></div>
+    </div>
+  </div></section>`;}
+
+/* ================= Probleme & Lösungen ================= */
+const FODMAP_URL="https://fodmap-app-pi.vercel.app/#/dashboard";
+const PIMG={
+  friesFried:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/McDonald%27s_Pommes-Frites-Sauce_2025-03-27.jpg/960px-McDonald%27s_Pommes-Frites-Sauce_2025-03-27.jpg",
+  friesOven:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Potato_wedges_%28164510%29.jpg/960px-Potato_wedges_%28164510%29.jpg",
+  wings:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Buffalo_Burgers_Buffalo_Chicken_Wings_%2836082467922%29.jpg/960px-Buffalo_Burgers_Buffalo_Chicken_Wings_%2836082467922%29.jpg",
+  chicken:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Chicken_breasts-01.jpg/960px-Chicken_breasts-01.jpg",
+  chips:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Chips_in_a_bowl_at_a_party.JPG/960px-Chips_in_a_bowl_at_a_party.JPG",
+  pizza:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Margherita_Originale.JPG/960px-Margherita_Originale.JPG",
+  bowl:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Healthy_Lentil_Salad_%28Unsplash%29.jpg/960px-Healthy_Lentil_Salad_%28Unsplash%29.jpg",
+  cake:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Piece_of_chocolate_cake_on_a_white_plate_decorated_with_chocolate_sauce.jpg/960px-Piece_of_chocolate_cake_on_a_white_plate_decorated_with_chocolate_sauce.jpg",
+  cola:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Glass_cola.jpg/960px-Glass_cola.jpg",
+  beer:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Beer_wuerzburger_hofbraue_v.jpg/960px-Beer_wuerzburger_hofbraue_v.jpg",
+  iced:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Iced_Coffee_in_Glass_-_Sunshine_Coffee_-_Laramie_Cafe_%2853838344552%29.jpg/960px-Iced_Coffee_in_Glass_-_Sunshine_Coffee_-_Laramie_Cafe_%2853838344552%29.jpg"
+};
+function fCard(o,maxK){const w=Math.max(5,Math.min(100,Math.round(o.kcal/maxK*100)));const col=o.good?"#15803D":"#C0392B";
+  return `<div class="fcard ${o.good?"good":"bad"}"><div class="fimg">${o.emoji||""}${o.img?`<img src="${o.img}" alt="${o.name}" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:""}</div>
+    <div class="fbody"><h4>${o.name}</h4><div class="meta">${o.meta||""}</div>
+      <div class="kc">${o.kcal} <span style="font-size:12px;color:var(--ink-3);font-weight:500">kcal ${o.unit||"/ 100 g"}</span></div>
+      <div class="kcbar"><i style="width:${w}%;background:${col}"></i></div></div></div>`;}
+function fCmp(bad,good){const maxK=Math.max(bad.kcal,good.kcal);return `<div class="cmp">${fCard(Object.assign({good:false},bad),maxK)}<span class="vs">statt</span>${fCard(Object.assign({good:true},good),maxK)}</div>`;}
+
+function ProblemeHub(){return `
+<section class="block"><div class="wrap-s">
+  <span class="eyebrow">Probleme &amp; Lösungen</span>
+  <h1 style="margin:12px 0 14px">Wo Diäten wirklich scheitern</h1>
+  <p class="lead">Selten ist der Plan das Problem – meistens ist es der Alltag drumherum: der eine „Cheat Day“, die kleinen Gewohnheiten nebenbei und die Frage, welche Lebensmittel dir überhaupt guttun. Drei Themen, die über Erfolg oder Frust entscheiden.</p>
+  <div class="grid g3" style="margin:30px 0">
+    ${[["#/cheat-days","🍔","Cheat Days","Wie ein einziger Tag das Defizit einer ganzen Woche zunichtemachen kann – und was stattdessen funktioniert."],
+       ["#/gewohnheiten","🥤","Tägliche Gewohnheiten","Cola, Bier, Chips, Kuchen: kleine Kalorien­sünden, die sich über Monate zu Kilos summieren – mit Diagrammen."],
+       ["#/bewusst-essen","🥗","Bewusstes Ernähren","Kalorien sind nicht alles: Verträglichkeit, FODMAP und warum jeder Körper anders reagiert."]]
+      .map(([h,e,t,dd])=>`<a class="card" href="${h}" style="display:block;text-decoration:none"><div style="font-size:34px;line-height:1">${e}</div><b style="color:var(--pine-deep);display:block;margin-top:10px;font-size:17px">${t}</b><p class="small" style="margin-top:6px;color:var(--ink-2)">${dd}</p><span style="display:inline-block;margin-top:10px;color:var(--amber-deep);font-weight:600;font-size:14px">Mehr erfahren →</span></a>`).join("")}
+  </div>
+  ${note("Diese Seiten erklären die Prinzipien. Deine konkreten Zahlen – Bedarf, Defizit und Wochenprognose – bekommst du im <a href='#/app'>Rechner</a>.","info")}
+</div></section>`;}
+
+function CheatDays(){
+  const maxR=312;
+  return `
+<section class="block"><div class="wrap-s">
+  <span class="eyebrow">Probleme &amp; Lösungen · Cheat Days</span>
+  <h1 style="margin:12px 0 14px">Cheat Days – ein Tag, der die Woche kippt</h1>
+  <p class="lead">Die Idee klingt verlockend: sechs Tage diszipliniert, ein Tag „alles erlaubt“. Das Problem ist Mathematik. Ein einziger Schlemmertag kann das mühsam aufgebaute Defizit einer ganzen Woche fast vollständig auslöschen – und dir das Gefühl geben, dass „Diäten bei mir eben nicht funktionieren“.</p>
+
+  <h2>Erst die Grundlagen: Grundumsatz, Verbrauch &amp; Überschuss</h2>
+  <p style="margin:10px 0 0">Dein Körper verbraucht jeden Tag Energie – im Schlaf (Grundumsatz), durch Beruf, Alltag, Schritte und Sport. Die Summe ist dein <b>Gesamtbedarf (TDEE)</b>. Isst du genau so viel, bleibt dein Gewicht stabil. Isst du <b>weniger</b>, entsteht ein <b>Defizit</b> (du nimmst ab). Isst du <b>mehr</b>, ein <b>Überschuss</b> (du nimmst zu).</p>
+  <div class="note info" style="margin-top:16px">${ico.info}<div><b>Die wichtigste Faustregel:</b> Rund <b>7.000–7.700 kcal</b> entsprechen etwa <b>1 kg Körperfett</b>. (Reines Fett liefert 9 kcal/g, Körperfettgewebe enthält aber auch Wasser und Bindegewebe – daher der Wert unter 9.000.) Unser Rechner kalkuliert mit 7.700 kcal/kg. Das heißt: Für 1 kg Fettverlust musst du über die Zeit ca. 7.700 kcal mehr verbrauchen, als du isst.</div></div>
+
+  <h2 style="margin-top:30px">Warum ein Cheat Day so teuer ist – ein Rechenbeispiel</h2>
+  <p style="margin:10px 0 14px">Angenommen, dein Bedarf liegt bei <b>2.400 kcal</b> und du isst im Plan <b>1.900 kcal</b> (−500 kcal/Tag).</p>
+  <div class="card" style="margin:6px 0 8px">
+    <div class="habrow"><span>7 Tage konsequent</span><div class="hb"><i style="width:100%;background:#15803D"></i></div><span class="hk">−3.500</span></div>
+    <div class="habrow"><span>6 Tage + 1 Cheat Day (4.500 kcal)</span><div class="hb"><i style="width:26%;background:#E0741A"></i></div><span class="hk">−900</span></div>
+    <div class="habrow"><span>6 Tage + 1 Cheat Day (5.500 kcal)</span><div class="hb"><i style="width:3%;background:#C0392B"></i></div><span class="hk">≈ 0</span></div>
+    <p class="small" style="margin:8px 0 0;color:var(--ink-3)">Wochenbilanz in kcal (negativ = Fettabbau). An einem Cheat Day mit 4.500 kcal isst du <b>+2.100 kcal über deinen Bedarf</b> – das frisst von den −3.000 kcal der sechs guten Tage fast alles wieder auf. Statt rund <b>0,45 kg</b> Fettverlust bleibt nur noch ein Bruchteil.</p>
+  </div>
+  ${note("Dazu kommt: Sehr große, salz- und kohlenhydratreiche Mahlzeiten binden Wasser. Die Waage zeigt am Tag nach dem Cheat Day oft <b>1–2 kg mehr</b> – das ist zwar überwiegend Wasser, demotiviert aber massiv und führt häufig zum Abbruch.","warn")}
+
+  <h2 style="margin-top:30px">Die Lösung: gar nicht erst „cheaten“ – sondern clever tauschen</h2>
+  <p style="margin:10px 0 0">Der Trick ist nicht Verzicht, sondern <b>dieselbe Lust in besser</b>: Lebensmittel, die ähnlich schmecken, aber anders zubereitet sind oder mehr Protein liefern. Protein sättigt am stärksten und schützt im Defizit deine Muskeln. So brauchst du keinen Cheat Day, weil du dir den „Genuss“ jederzeit leisten kannst.</p>
+
+  <h3 style="margin:24px 0 4px">Gleicher Geschmack, halbe Kalorien</h3>
+  ${fCmp(
+    {name:"Frittierte Pommes",meta:"in Fett ausgebacken, saugt viel Öl",kcal:312,emoji:"🍟",img:PIMG.friesFried},
+    {name:"Ofen-Kartoffelspalten",meta:"mit 1 TL Öl im Ofen / Heißluft",kcal:150,emoji:"🥔",img:PIMG.friesOven})}
+  ${fCmp(
+    {name:"Chicken Wings",meta:"mit Haut, paniert, frittiert",kcal:290,emoji:"🍗",img:PIMG.wings},
+    {name:"Hähnchenbrust aus dem Ofen",meta:"ohne Haut, gewürzt gebacken – viel Protein",kcal:165,emoji:"🍗",img:PIMG.chicken})}
+  ${fCmp(
+    {name:"Kartoffelchips",meta:"~6 g Protein / 100 g",kcal:535,emoji:"🥔",img:PIMG.chips},
+    {name:"Protein-Chips",meta:"~30–40 g Protein / 100 g (z. B. More, ESN)",kcal:380,emoji:"🥨",img:null})}
+  ${fCmp(
+    {name:"Tiefkühl-Pizza (Salami)",meta:"Weißmehlboden, fettige Beläge",kcal:270,emoji:"🍕",img:PIMG.pizza},
+    {name:"Protein-/Lower-Carb-Pizza",meta:"Boden mit Magerquark o. Skyr, mehr Protein",kcal:180,emoji:"🍕",img:null})}
+  ${fCmp(
+    {name:"Cremige Sahne-Pasta",meta:"~400 g Portion, einfache Kohlenhydrate",kcal:900,unit:"/ Portion",emoji:"🍝",img:null},
+    {name:"Protein-Bowl mit Gemüse",meta:"~400 g: Hähnchen/Hülsenfrüchte, Gemüse, etwas Vollkorn",kcal:480,unit:"/ Portion",emoji:"🥗",img:PIMG.bowl})}
+
+  ${note("<b>Tipp:</b> Halte proteinreiche Snacks griffbereit – Proteinchips, Skyr, körniger Frischkäse, Beef Jerky, Proteinpudding oder einen Eiweißshake. Wer satt und mit Protein versorgt ist, braucht den Cheat Day meist gar nicht. Ergänzungsprodukte mit hohem Proteingehalt (z. B. von More, ESN, GymQueen) sind dafür praktische Helfer – kein Muss, aber ein cleverer Joker.","ok")}
+
+  <div class="card" style="margin-top:26px;text-align:center;background:var(--pine-deep)">
+    <h3 style="color:#fff">Wie groß ist dein Defizit überhaupt?</h3>
+    <p style="color:#BFD6CB;margin:8px 0 16px">Der Rechner zeigt dir Bedarf, Defizit und wie viel ein einzelner Tag wirklich ausmacht.</p>
+    <a class="btn amber" href="#/app">Zum Rechner</a>
+  </div>
+</div></section>`;}
+
+function Gewohnheiten(){
+  const traj=(s,wk,startW)=>{let w=startW;const r=[];for(let i=1;i<=wk;i++){w+=s*7/7700;r.push({wk:i,weight:Math.round(w*100)/100});}return r;};
+  const monthsChart=lineChart([
+    {label:"1 Cola/Tag (+210 kcal)",color:"#1F6FD0",dash:"8 5",thin:true,rows:traj(210,26,80)},
+    {label:"Cola + Chips (+370 kcal)",color:"#9A2FB8",dash:"2 5",thin:true,rows:traj(370,26,80)},
+    {label:"Cola + 2 Bier + Chips (+800 kcal)",color:"#C0392B",rows:traj(800,26,80)}
+  ],80);
+  const base=2200,sur=800,tot=base+sur;
+  return `
+<section class="block"><div class="wrap-s">
+  <span class="eyebrow">Probleme &amp; Lösungen · Tägliche Gewohnheiten</span>
+  <h1 style="margin:12px 0 14px">Die kleinen Kaloriensünden des Alltags</h1>
+  <p class="lead">Nicht das große Festmahl ist gefährlich, sondern die unscheinbaren Dinge nebenbei: der Griff in die Chipstüte, das Stückchen Kuchen im Büro, die Flasche Cola, die zwei Feierabendbiere. Einzeln harmlos – in Summe der Grund, warum die Waage über Monate klettert.</p>
+
+  <h2>Was die „Kleinigkeiten“ wirklich kosten</h2>
+  <div class="grid g4" style="margin:18px 0">
+    ${[["🥤","Cola",210,"/ 0,5 l",PIMG.cola],["🍺","2 × 0,5 l Bier",430,"/ 1 l",PIMG.beer],["🥔","Chips (Handvoll, 30 g)",160,"",PIMG.chips],["🍫","Stück Kuchen",320,"",PIMG.cake]]
+      .map(([e,n,k,u,img])=>`<div class="fcard bad"><div class="fimg">${e}<img src="${img}" alt="${n}" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"></div><div class="fbody"><h4>${n}</h4><div class="kc">${k} <span style="font-size:12px;color:var(--ink-3);font-weight:500">kcal ${u||"/ Portion"}</span></div></div></div>`).join("")}
+  </div>
+  ${note("<b>Bier nachgerechnet:</b> Ein normales Pils/Helles hat rund <b>43 kcal pro 100 ml</b> – also etwa <b>215 kcal pro 0,5 l</b> und <b>≈ 430 kcal pro Liter</b>. Alkohol liefert mit 7 kcal/g fast so viel Energie wie Fett – und hemmt nebenbei die Fettverbrennung.","info")}
+
+  <h2 style="margin-top:30px">So entsteht der Überschuss – an einem einzigen Tag</h2>
+  <p style="margin:10px 0 14px">Beispiel: Bedarf <b>2.200 kcal</b>. Das Essen selbst trifft die Erhaltung – aber Cola, zwei Bier und eine Handvoll Chips kommen „nebenbei“ oben drauf.</p>
+  <div class="card" style="margin:6px 0">
+    <div style="font-size:13px;color:var(--ink-3);margin-bottom:4px">Erhaltungsbedarf (TDEE)</div>
+    <div style="display:flex;align-items:center;gap:10px"><div style="flex:1;height:22px;border-radius:7px;background:var(--sage-2);overflow:hidden"><i style="display:block;height:100%;width:${base/tot*100}%;background:var(--pine)"></i></div><b class="mono" style="width:62px;text-align:right;color:var(--pine-deep)">${fmt(base)}</b></div>
+    <div style="font-size:13px;color:var(--ink-3);margin:14px 0 4px">Tatsächlich gegessen &amp; getrunken</div>
+    <div style="display:flex;align-items:center;gap:10px"><div style="flex:1;height:22px;border-radius:7px;background:var(--sage-2);overflow:hidden;display:flex"><i style="height:100%;width:${base/tot*100}%;background:var(--pine)"></i><i style="height:100%;width:${sur/tot*100}%;background:#C0392B"></i></div><b class="mono" style="width:62px;text-align:right;color:#C0392B">${fmt(tot)}</b></div>
+    <div style="margin-top:12px;text-align:center"><span style="background:#FBE9E7;color:#C0392B;border-radius:999px;padding:5px 14px;font-weight:600;font-size:13.5px">Täglicher Überschuss +${fmt(sur)} kcal → ≈ 0,7 kg Fett pro Woche (Modell)</span></div>
+  </div>
+
+  <h2 style="margin-top:30px">… und über Monate</h2>
+  <p style="margin:10px 0 14px">Was täglich passiert, summiert sich. Hier die modellhafte Gewichtsentwicklung über 26 Wochen (≈ 6 Monate), ausgehend von 80 kg – je nach Gewohnheit:</p>
+  <div class="chart">${monthsChart}</div>
+  ${note("Modellrechnung (vollständige Einlagerung, 7.700 kcal/kg). In der Realität gleicht der Körper einen Teil aus – die <b>Richtung</b> stimmt aber: Kleine tägliche Überschüsse werden über Monate zu Kilos. Genau deshalb lohnt es sich, an den Gewohnheiten anzusetzen.","info")}
+
+  <h2 style="margin-top:30px">Lösung 1: Flüssige Kalorien streichen</h2>
+  <p style="margin:10px 0 0">Getränke sind die heimtückischsten Kalorien – sie sättigen kaum, summieren sich aber rasant. Hier ist der Hebel am größten, weil Süßstoff-Varianten praktisch identisch schmecken.</p>
+  ${fCmp(
+    {name:"Cola (mit Zucker)",meta:"~42 kcal / 100 ml · ~53 g Zucker pro 0,5 l",kcal:210,unit:"/ 0,5 l",emoji:"🥤",img:PIMG.cola},
+    {name:"Cola Zero / Light",meta:"mit Süßstoff – praktisch zuckerfrei",kcal:1,unit:"/ 0,5 l",emoji:"🥤",img:null})}
+  ${note("Auch <b>kalorienfreie Geschmacks-Booster</b> für Wasser (z. B. <b>Zerups von More</b> oder ähnliche Drink-Sticks/Tabs) bringen Abwechslung statt zuckriger Limo: aus ~200 kcal pro Glas werden so <b>etwa 0–5 kcal</b> – bei gleichem süßem Trinkgefühl. Über den Tag macht das schnell mehrere hundert Kalorien aus.","ok")}
+
+  <h2 style="margin-top:30px">Lösung 2: Das Frühstück, das satt macht</h2>
+  <p style="margin:10px 0 0">Der Klassiker: Croissant oder Muffin plus ein süßer Kaffee „to go“. Eine Kombination aus Gebäck und einem Caramel-/Frappuccino-Kaffee bringt schnell <b>600–900 kcal</b> – und hält trotzdem kaum satt, weil Zucker und Fett den Blutzucker schaukeln.</p>
+  ${fCmp(
+    {name:"Gebäck + süßer Coffee to go",meta:"z. B. Muffin + Caramel-Kaffee",kcal:750,unit:"/ Frühstück",emoji:"🧁",img:null},
+    {name:"Protein-Iced-Coffee",meta:"z. B. Eiweißshake „Iced Coffee“ von More · ~24 g Protein",kcal:120,unit:"/ Portion",emoji:"🥤",img:PIMG.iced})}
+  <div class="note ok" style="margin-top:8px">${ico.ok}<div><b>Warum das so gut funktioniert:</b> Protein hat den stärksten <b>Sättigungseffekt</b> aller Nährstoffe und eine hohe thermische Wirkung (der Körper verbraucht beim Verdauen mehr Energie). Ein Eiweißshake zum Frühstück (z. B. ~24–30 g Protein) hält dich oft bis mittags satt, stabilisiert den Blutzucker und senkt den Heißhunger – bei einem Bruchteil der Kalorien des Café-Frühstücks. So sparst du Kalorien, <b>ohne</b> zu hungern.</div></div>
+
+  <div class="card" style="margin-top:26px;text-align:center;background:var(--pine-deep)">
+    <h3 style="color:#fff">Wie viel „Puffer“ hast du pro Tag?</h3>
+    <p style="color:#BFD6CB;margin:8px 0 16px">Der Rechner zeigt deinen Bedarf – dann siehst du sofort, was eine Cola oder ein Bier davon auffrisst.</p>
+    <a class="btn amber" href="#/app">Zum Rechner</a>
+  </div>
+</div></section>`;}
+
+function BewusstEssen(){return `
+<section class="block"><div class="wrap-s">
+  <span class="eyebrow">Probleme &amp; Lösungen · Bewusstes Ernähren</span>
+  <h1 style="margin:12px 0 14px">Bewusstes Ernähren – Kalorien sind nicht alles</h1>
+  <p class="lead">Zwei Menschen können dieselbe Mahlzeit essen – der eine fühlt sich fit, der andere bekommt Blähungen, Bauchschmerzen und ein Völlegefühl. Wie gut du dich fühlst, hängt nicht nur von Kalorien ab, sondern auch davon, <b>welche</b> Lebensmittel du isst und wie dein Körper auf sie reagiert.</p>
+
+  <h2>Jeder Körper reagiert anders</h2>
+  <p style="margin:10px 0 0">Viele Menschen merken irgendwann: „Nach Brot fühle ich mich aufgebläht“ oder „Milch liegt mir schwer im Magen“. Das ist kein Einbildung – häufig steckt eine <b>Unverträglichkeit</b> dahinter (z. B. gegenüber <b>Laktose</b> in Milchprodukten oder gegenüber <b>Weizen</b> bzw. dessen Bestandteilen). Wer das bei sich bemerkt, sollte darauf hören und beobachten, welche Lebensmittel Beschwerden auslösen.</p>
+
+  <h2 style="margin-top:28px">Das FODMAP-Prinzip</h2>
+  <p style="margin:10px 0 0"><b>FODMAP</b> steht für <b>F</b>ermentierbare <b>O</b>ligosaccharide, <b>D</b>isaccharide, <b>M</b>onosaccharide <b>a</b>nd (und) <b>P</b>olyole. Das sind bestimmte <b>kurzkettige Kohlenhydrate und Zuckeralkohole</b>, die im Dünndarm schlecht aufgenommen werden. Sie wandern weiter in den Dickdarm, ziehen Wasser an und werden dort von Darmbakterien <b>vergoren</b> – dabei entstehen Gase. Bei empfindlichen Menschen (z. B. bei Reizdarm) führt das zu <b>Blähungen, Bauchschmerzen, Völlegefühl, Durchfall oder Verstopfung</b>.</p>
+  <div class="note info" style="margin-top:16px">${ico.info}<div>FODMAPs sind <b>nicht ungesund</b> – viele sind sogar wertvolle Ballaststoffe. Es geht nur um <b>individuelle Verträglichkeit</b>: Manche Menschen vertragen große Mengen problemlos, andere reagieren schon auf kleine.</div></div>
+
+  <h2 style="margin-top:28px">Häufige Auslöser (High-FODMAP)</h2>
+  <div class="grid g2" style="margin:16px 0">
+    ${[["🥛","Milch &amp; Frischkäse","Laktose (Milchzucker). Gereifter Hartkäse ist oft laktosearm und besser verträglich."],
+       ["🍞","Weizenprodukte","Fruktane in Brot, <b>Toast, Pizza, Pasta, Fast-Food-Brötchen</b> – vor allem, wenn der Teig nur kurz geht."],
+       ["🧅","Zwiebeln &amp; Knoblauch","Klassische Fruktan-Bomben – stecken in fast jeder Fertigsauce und jedem Fast Food."],
+       ["🌱","Artischocken &amp; Hülsenfrüchte","Artischocken, Bohnen, Linsen, Kichererbsen (Fruktane &amp; GOS) – stark blähend in größeren Mengen."],
+       ["🍎","Bestimmtes Obst","Äpfel, Birnen, Wassermelone, Mango (Fruktose) sowie Steinobst wie Pflaumen, Kirschen (Polyole)."],
+       ["🧂","Stark gesalzene Speisen","Kein FODMAP, aber: viel Salz bindet Wasser – das Gefühl von „aufgebläht“ und ein höheres Waagengewicht am Folgetag."]]
+      .map(([e,t,d])=>`<div class="card"><div style="font-size:26px;line-height:1">${e}</div><b style="color:var(--pine-deep);display:block;margin-top:6px">${t}</b><p class="small" style="margin-top:5px;color:var(--ink-2)">${d}</p></div>`).join("")}
+  </div>
+
+  <h2 style="margin-top:28px">Warum „einfaches“ Brot oft das Problem ist</h2>
+  <p style="margin:10px 0 0">Entscheidend ist die <b>Teigführung</b>: Bei langer Gärung (z. B. echtem Sauerteig, 12–24 h) bauen Hefen und Bakterien einen Großteil der Fruktane ab – das Brot wird deutlich bekömmlicher. Schnell produziertes Brot mit kurzer Liegezeit – <b>Toast, Aufback-Brötchen, Pizzateig, Fast-Food-Buns</b> – behält die Fruktane und liegt vielen schwer im Magen. Wer empfindlich ist, fährt mit gut gereiftem Sauerteig oder Dinkel-/Vollkornvarianten oft besser.</p>
+
+  <div class="card" style="margin:22px 0;background:var(--sage)">
+    <h3>Faustregeln für einen ruhigen Bauch</h3>
+    <ul class="clean" style="margin-top:8px">
+      <li><b>Abwechslung statt Einseitigkeit:</b> Nicht jeden Tag dieselben Lebensmittel – und nicht ausschließlich auf <b>tierisches Protein</b> setzen. Pflanzliche Quellen, Gemüse und fermentierte Lebensmittel ergänzen.</li>
+      <li><b>Auf den eigenen Körper hören:</b> Ein kleines Ernährungstagebuch zeigt schnell, welche Lebensmittel Beschwerden machen.</li>
+      <li><b>Nicht blind alles weglassen:</b> Eine strenge Low-FODMAP-Phase ist nur bei echten Beschwerden sinnvoll – und am besten zeitlich begrenzt, mit anschließendem schrittweisem Wiedereinführen, idealerweise mit Fachbegleitung.</li>
+      <li><b>Langsam essen, gut kauen:</b> Hilft der Verdauung mehr, als viele denken.</li>
+    </ul>
+  </div>
+
+  <div class="card" style="margin-top:26px;text-align:center;background:var(--pine-deep)">
+    <h3 style="color:#fff">FODMAP-Gehalt eines Lebensmittels prüfen</h3>
+    <p style="color:#BFD6CB;margin:8px 0 16px">Unsere FODMAP-App analysiert Lebensmittel, Rezepte und ganze Mahlzeiten per Ampel-System (grün/gelb/rot), nennt verträgliche Alternativen und Nährwerte – mit Text- oder Foto-Eingabe.</p>
+    <a class="btn amber" href="${FODMAP_URL}" target="_blank" rel="noopener">FODMAP-App öffnen →</a>
+    <p class="small" style="color:#8FB3A4;margin-top:12px">Öffnet sich in einem neuen Tab.</p>
+  </div>
+</div></section>`;}
+
+function NotFound(){return `<section class="block"><div class="wrap-s" style="text-align:center"><h1>Seite nicht gefunden</h1><p class="lead" style="margin:14px auto 22px">Diese Seite existiert nicht (mehr).</p><a class="btn" href="#/">Zur Startseite</a></div></section>`;}
+</script>
+<script>
+/* ================= App / Rechner ================= */
+let APPSTEP=1;
+function go(n){APPSTEP=n;renderApp();const el=$("#apppanel");if(el)el.scrollIntoView({block:"start"});}
+function AppPage(){return `<section class="block tight"><div class="wrap" id="appbody"></div></section>`;}
+
+function stepValid(n,d){
+  const a=num(d.s1.alter);
+  if(n===1)return a!=null&&d.s1.geschlecht&&num(d.s1.groesse)!=null&&num(d.s1.gewicht)!=null&&(d.s1.mode==="kind"||num(d.s1.kfa)!=null||(d.s1.kfaUnbekannt&&(d.s1.fitlevel>0||(d.s1.fitFett>0&&d.s1.fitMuskel>0))));
+  if(n===2)return d.s1.mode==="kind"?d.s2.kindziele.length>0:!!d.s2.ziel;
+  if(n===3)return true;
+  if(n===4)return true;
+  return true;
+}
+
+function accountBox(d){
+  const names=Object.keys(DB.profiles);
+  if(DB.active){
+    const savedN=Object.keys(cur().saved).length;
+    return `<div class="card flat" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--mint-soft);border-color:#C8E6D6">
+      <span class="pill ok">${ico.ok} Angemeldet: <b>&nbsp;${esc(DB.active)}</b></span>
+      <span class="muted">${savedN} Stufe(n) gespeichert · Daten bleiben auf diesem Gerät</span>
+      <span style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn ghost sm" onclick="logoutProfile()">Abmelden</button>
+        <button class="btn ghost sm" style="color:var(--bad)" onclick="deleteProfile('${esc(DB.active)}')">Profil löschen</button>
+      </span></div>`;
+  }
+  return `<div class="card flat" style="background:var(--sage);border-color:var(--sage-2)">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+      <div class="field" style="flex:1;min-width:200px"><label for="newprof">Benutzerkonto (auf diesem Gerät)</label>
+        <input id="newprof" type="text" placeholder="Profilname, z. B. Paul" autocomplete="off"></div>
+      <button class="btn sm" onclick="createProfile()">Profil anlegen &amp; speichern</button>
+      ${names.map(n=>`<button class="btn ghost sm" onclick="loginProfile('${esc(n)}')">Anmelden: ${esc(n)}</button>`).join("")}
+    </div>
+    <div class="muted" id="accmsg" style="margin-top:8px">Ohne Profil bleiben Eingaben nur für diese Sitzung erhalten. Mit Profil wird jede Stufe gespeichert und du machst später genau dort weiter.</div>
+  </div>`;
+}
+
+function saveBar(n,d){
+  const ts=d.saved[n];
+  return `<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:22px">
+    <button class="btn sm" onclick="saveStep(${n})">Stufe ${n} speichern</button>
+    ${n<5?`<button class="btn amber sm" onclick="go(${n+1})">Weiter zu Stufe ${n+1} →</button>`:""}
+    ${ts?`<span class="pill ok">${ico.ok} gespeichert ${new Date(ts).toLocaleDateString("de-DE")}</span>`:`<span class="muted">Noch nicht gespeichert</span>`}
+    ${!DB.active?`<span class="muted">(Tipp: Profil anlegen für dauerhafte Speicherung)</span>`:""}
+  </div>`;
+}
+
+const seg=(path,opts,curv)=>`<div class="seg" role="group">${opts.map(([v,l])=>`<button type="button" class="${curv===v?"on":""}" onclick="Ur('${path}','${v}')">${l}</button>`).join("")}</div>`;
+
+/* ---- Stufe 1 ---- */
+function fitLabels(cat,sex){
+  if(cat==="kind"||cat==="jugend")return["Weniger aktiv","Eher gemütlich","Ausgewogen","Aktiv","Sehr sportlich"];
+  return["Höherer Fettanteil","Etwas weicher","Durchschnittlich","Sportlich","Sehr definiert"];
+}
+function step1(d){
+  const s=d.s1,a=num(s.alter),cat=ageCat(a)||"erwachsen",grp=ageGroup(a);
+  const labels=fitLabels(cat,s.geschlecht);
+  const est=s.kfaUnbekannt&&s.mode!=="kind"?(s.fitFett&&s.fitMuskel?estKfa2(s.fitFett,s.fitMuskel,s.geschlecht,cat):(s.fitlevel?estKfa(s.fitlevel,s.geschlecht,cat):null)):null;
+  const kidAgeWarn=a!=null&&a<15&&s.mode==="erwachsen"?note("Bei einem Alter unter 15 empfehlen wir den Kindermodus – er rechnet altersgerecht und ohne Diätlogik.","warn"):"";
+  const adultAgeWarn=a!=null&&a>=18&&s.mode==="kind"?note("Ab 18 Jahren rechnet der Erwachsenenmodus genauer.","info"):"";
+  return `
+  <h2 style="font-size:24px">Stufe 1 · Körperdaten &amp; Ausgangslage</h2>
+  <p class="muted" style="margin:6px 0 20px">Pflichtfelder zuerst – der Körperfettanteil steht bewusst ganz am Anfang.</p>
+  <div class="grid g2">
+    <div class="field"><label>Für wen wird gerechnet? *</label>${seg("s1.mode",[["kind","Kind"],["erwachsen","Erwachsener"]],s.mode)}</div>
+    <div class="field"><label>Geschlecht *</label>${seg("s1.geschlecht",[["w","Weiblich"],["m","Männlich"]],s.geschlecht)}</div>
+    <div class="field"><label for="f-alter">Alter *</label><div class="unit"><input id="f-alter" type="number" min="0" max="110" inputmode="numeric" value="${esc(s.alter)}" onchange="Ur('s1.alter',this.value)"><em>Jahre</em></div>${grp?`<span class="hint">Altersgruppe: ${grp} Jahre</span>`:""}</div>
+    <div class="field"><label for="f-gr">Körpergröße *</label><div class="unit"><input id="f-gr" type="number" min="40" max="230" inputmode="decimal" value="${esc(s.groesse)}" onchange="Ur('s1.groesse',this.value)"><em>cm</em></div></div>
+    <div class="field"><label for="f-kg">Körpergewicht *</label><div class="unit"><input id="f-kg" type="number" min="3" max="300" step="0.1" inputmode="decimal" value="${esc(s.gewicht)}" onchange="Ur('s1.gewicht',this.value)"><em>kg</em></div></div>
+    <div class="field"><label for="f-kfa">Körperfettanteil ${s.mode==="kind"?"(optional)":"*"}</label>
+      <div class="unit"><input id="f-kfa" type="number" min="3" max="60" step="0.5" inputmode="decimal" value="${esc(s.kfa)}" ${s.kfaUnbekannt?"disabled":""} onchange="Ur('s1.kfa',this.value)"><em>%</em></div>
+      ${s.mode!=="kind"?`<label class="chk ${s.kfaUnbekannt?"on":""}" style="margin-top:6px"><input type="checkbox" ${s.kfaUnbekannt?"checked":""} onchange="Ur('s1.kfaUnbekannt',this.checked)"><span><b>Ich kenne meinen Körperfettanteil nicht</b><span>Dann schätzen wir ihn über die Fitnessskala unten.</span></span></label>`:""}
+    </div>
+  </div>
+  ${kidAgeWarn}${adultAgeWarn}
+  ${s.mode==="erwachsen"&&s.geschlecht==="w"?(()=>{
+    const sk=stillCalc(s);
+    const estMl=stillEstMl(s);
+    return `
+  <div class="card flat" style="margin-top:18px;background:var(--mint-soft);border-color:#C8E6D6">
+    <label class="chk ${s.stillt?"on":""}"><input type="checkbox" ${s.stillt?"checked":""} onchange="Ur('s1.stillt',this.checked)">
+      <span><b>Ich stille derzeit</b><span>Milchproduktion verbraucht viel Energie – wir rechnen sie wissenschaftlich fundiert in deinen Bedarf ein.</span></span></label>
+    ${s.stillt?`
+    <div class="grid g3" style="margin-top:14px">
+      <div class="field"><label for="f-babym">Alter des Babys</label><div class="unit"><input id="f-babym" type="number" min="0" max="48" inputmode="numeric" value="${esc(s.babyMonate)}" onchange="Ur('s1.babyMonate',this.value)"><em>Monate</em></div></div>
+      <div class="field"><label for="f-milch">Wie viel trinkt dein Baby? <span class="muted" style="font-weight:400">(falls bekannt)</span></label>
+        <div class="unit"><input id="f-milch" type="number" min="50" max="1500" step="10" inputmode="numeric" value="${esc(s.milchMl)}" placeholder="≈ ${estMl}" onchange="Ur('s1.milchMl',this.value)"><em>ml/Tag</em></div>
+        <span class="hint">Leer lassen = wir schätzen aus Alter &amp; Beikost.</span></div>
+      <div class="field"><label for="f-beikost">Beikost gestartet? Wie viel?</label>
+        <select id="f-beikost" onchange="Ur('s1.beikost',this.value)">
+          ${[["keine","Nein – ausschließlich Stillen"],["wenig","Ja, wenig (1 Mahlzeit/Tag)"],["mittel","Ja, mittel (2–3 Mahlzeiten)"],["viel","Ja, viel (überwiegend Beikost)"]].map(([v,l])=>`<option value="${v}" ${ (s.beikost||"keine")===v?"selected":""}>${l}</option>`).join("")}
+        </select></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <span class="pill ok">≈ +${fmt(sk.kcal)} kcal/Tag eingerechnet</span>
+      <span class="muted small">für ~${fmt(sk.ml)} ml Milch${sk.est?" (geschätzt)":""} · 0,67 kcal/ml, ~80 % Syntheseeffizienz · plus +23 g Protein</span>
+    </div>`:""}
+  </div>`})():""}
+  ${note("Falls du deinen Körperfettanteil nicht kennst, nutze idealerweise eine <b>Körperfettwaage/Körperanalysewaage</b>. Die Werte sind nicht perfekt, helfen aber dabei, deine Körperzusammensetzung grob einzuschätzen und Fortschritte im Zeitverlauf zu verfolgen.","info")}
+  <div style="height:8px"></div>
+  ${note("Einzelmessungen können schwanken. Am besten immer unter ähnlichen Bedingungen messen – z. B. morgens, nüchtern, nach dem Aufstehen.","info")}
+
+  <h3 style="margin:28px 0 4px">Körperform visuell einordnen ${s.mode!=="kind"&&!s.kfaUnbekannt?"<span class='muted' style='font-weight:400;font-size:14px'>(ergänzt den Körperfettanteil)</span>":""}</h3>
+  <p class="muted" style="margin-bottom:8px">Zwei Achsen: <b style="color:var(--pine-deep)">Körperfett</b> (Spalten, wenig → viel) und <b style="color:var(--pine-deep)">Muskulatur</b> (Zeilen, viel → wenig) · Front- und Seitenansicht${s.mode==="kind"?"":`, angepasst an ${s.geschlecht==="m"?"männlich":"weiblich"}`}.</p>
+  ${s.mode==="kind"
+    ?note("Wähle die Darstellung, die deinem Kind am nächsten kommt. Jeder Körper ist einzigartig – diese Einordnung dient nur der groben Orientierung.","info")
+    :note("<b>Bitte ehrlich auswählen.</b> Diese Einschätzung fließt direkt in deinen geschätzten Körperfettanteil und damit in Kalorien- und Proteinempfehlung ein. Eine geschönte Auswahl liefert dir einen Plan für einen Körper, den du (noch) nicht hast – und der dann nicht funktioniert.","warn")}
+  ${(()=>{
+    const prefix=s.mode==="kind"?"k":s.geschlecht;
+    const lbls=s.mode==="kind"
+      ?{ "3-1":"Kräftig & schlank","3-2":"Kräftig","3-3":"Kräftig, runder",
+         "2-1":"Schlank","2-2":"Durchschnittlich","2-3":"Etwas runder",
+         "1-1":"Sehr schlank","1-2":"Zart","1-3":"Höherer Fettanteil"}
+      :{ "3-1":"Definiert & muskulös","3-2":"Muskulös, etwas weicher","3-3":"Bulky – Kraft & Masse",
+         "2-1":"Schlank-sportlich","2-2":"Durchschnittlich","2-3":"Kräftig",
+         "1-1":"Sehr schlank, wenig Muskeln","1-2":"„Skinny Fat“ – schlank wirkend, weich","1-3":"Höherer Fettanteil, wenig Muskeln"};
+    const showCap=s.mode==="kind"; // Kinder-Grafiken haben keine eingebrannte Beschriftung
+    return `<div class="figmatrix" style="margin-top:12px">
+    ${[3,2,1].map(mu=>`
+      <div class="figmrow">
+        <span class="figmax">${mu===3?"Viel Muskulatur":mu===2?"Mittlere Muskulatur":"Wenig Muskulatur"}</span>
+        <div class="figmcells">
+        ${[1,2,3].map(f=>{
+          const on=s.fitFett===f&&s.fitMuskel===mu;
+          return `<button type="button" class="figopt figimg ${on?"on":""}" onclick="U('s1.fitFett',${f});Ur('s1.fitMuskel',${mu})" aria-pressed="${on}" title="${lbls[mu+"-"+f]}">
+            <img src="bilder/body-${prefix}-${mu}-${f}.png" alt="Körpertyp ${lbls[mu+"-"+f]}" loading="lazy">${showCap?`<b>${lbls[mu+"-"+f]}</b>`:""}</button>`;}).join("")}
+        </div>
+      </div>`).join("")}
+    <div class="figmrow"><span class="figmax"></span><div class="figmcells figmfoot"><span>← wenig Körperfett</span><span>mittel</span><span>viel Körperfett →</span></div></div>
+  </div>`;})()}
+  ${est!=null?`<div style="margin-top:12px"><span class="pill amber">Geschätzter Körperfettanteil: ~${est} %</span> <span class="muted small">Schätzung aus ${s.mode==="kind"||(!s.fitFett||!s.fitMuskel)?"Fitnessskala":"Körperform (Fett × Muskulatur)"}, Geschlecht und Altersgruppe – eine Messung ist immer genauer.</span></div>`:""}
+
+  <details style="margin-top:26px"><summary style="cursor:pointer;font-weight:600;color:var(--pine-deep)">Optionale Angaben (Zielgewicht, Umfänge, Erfahrung)</summary>
+    <div class="grid g3" style="margin-top:14px">
+      <div class="field"><label>Zielgewicht</label><div class="unit"><input type="number" step="0.1" value="${esc(s.zielgewicht)}" onchange="Ur('s1.zielgewicht',this.value)"><em>kg</em></div></div>
+      <div class="field"><label>Taillenumfang</label><div class="unit"><input type="number" value="${esc(s.taille)}" onchange="Ur('s1.taille',this.value)"><em>cm</em></div></div>
+      <div class="field"><label>Hüftumfang</label><div class="unit"><input type="number" value="${esc(s.huefte)}" onchange="Ur('s1.huefte',this.value)"><em>cm</em></div></div>
+      <div class="field"><label>Trainingserfahrung</label><select onchange="Ur('s1.erfahrung',this.value)">
+        ${[["keine","Keine"],["einsteiger","Einsteiger"],["fortgeschritten","Fortgeschritten"],["sehr","Sehr erfahren"]].map(([v,l])=>`<option value="${v}" ${s.erfahrung===v?"selected":""}>${l}</option>`).join("")}</select></div>
+    </div></details>
+  ${saveBar(1,d)}`;
+}
+
+/* ---- Stufe 2 ---- */
+/* Live-Kopplung der Recomposition-Regler (ohne vollständiges Re-Render bei jedem Pixel) */
+function recompKfaLive(){const s1=cur().s1,sx=s1.geschlecht,a=num(s1.alter);let k=num(s1.kfa);
+  if(k==null){if(s1.fitFett&&s1.fitMuskel)k=estKfa2(s1.fitFett,s1.fitMuskel,sx,ageCat(a));else if(s1.fitlevel)k=estKfa(s1.fitlevel,sx,ageCat(a));}
+  return k!=null?k:(sx==="m"?20:28);}
+function recompFat(el){const d=cur(),s1=d.s1,kg=num(s1.gewicht)||75,sx=s1.geschlecht,rate=+el.value;
+  U("s2.rate",rate);
+  const set=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t};
+  set("rateval",rate.toFixed(2).replace(".",","));
+  const fpct=Math.abs(rate)/kg*100,fr=fpct<=0.5?["moderat","ok"]:fpct<=0.85?["ambitioniert","warn"]:["aggressiv","bad"];
+  const rp=document.getElementById("ratepill");if(rp){rp.textContent=fr[0];rp.className="pill "+fr[1];}
+  const cap=recompMuscleCap(s1,sx,recompKfaLive(),kg,rate);
+  set("mcap",cap.toFixed(2).replace(".",","));set("mcapM",(cap*4.345).toFixed(2).replace(".",","));
+  const ms=document.getElementById("msl");
+  if(ms){ms.max=cap||0.01;ms.disabled=cap<=0;
+    if(+ms.value>cap){ms.value=cap;U("s2.muskel",Math.round(cap*100)/100);}
+    set("mslval","+"+(+ms.value).toFixed(2).replace(".",","));set("mslmonth",(+ms.value*4.345).toFixed(2).replace(".",","));}
+}
+function recompMus(el){const v=+el.value;U("s2.muskel",Math.round(v*100)/100);
+  const set=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t};
+  set("mslval","+"+v.toFixed(2).replace(".",","));set("mslmonth",(v*4.345).toFixed(2).replace(".",","));}
+function step2(d){
+  const s=d.s2,kid=d.s1.mode==="kind",kg=num(d.s1.gewicht)||75;
+  if(kid){
+    const opts=[["entwicklung","Gesund entwickeln","Wachstum & ausgewogene Versorgung im Blick"],["bewegung","Mehr Bewegung im Alltag","Spielen, Schulweg, Sportverein"],["essen","Ausgewogener essen","Mehr Gemüse, Obst & gute Routinen"],["energie","Mehr Energie für Sport & Schule","Passende Energie- und Proteinversorgung"]];
+    return `<h2 style="font-size:24px">Stufe 2 · Schwerpunkte für Kinder</h2>
+      <p class="muted" style="margin:6px 0 18px">Für Kinder gibt es bewusst <b>keine Diätziele und keine Muskelaufbau-Logik</b> – der Fokus liegt auf gesunder Entwicklung.</p>
+      <div class="grid g2">${opts.map(([v,t,sub])=>`<label class="chk ${s.kindziele.includes(v)?"on":""}"><input type="checkbox" ${s.kindziele.includes(v)?"checked":""} onchange="toggleArr('s2.kindziele','${v}')"><span><b>${t}</b><span>${sub}</span></span></label>`).join("")}</div>
+      ${note("Bei Sorgen rund um Gewicht oder Wachstum ist die Kinderärztin / der Kinderarzt die richtige Anlaufstelle – Perzentilkurven sagen mehr als jede App.","info")}
+      ${saveBar(2,d)}`;
+  }
+  const ziele=[["abnehmen","Abnehmen"],["muskel","Muskelaufbau"],["beides","Beides"],["halten","Gewicht halten"],["zunehmen","Zunehmen"]];
+  const z=s.ziel;
+  const sx=d.s1.geschlecht, aAge=num(d.s1.alter);
+  let kfaEst=num(d.s1.kfa);
+  if(kfaEst==null){ if(d.s1.fitFett&&d.s1.fitMuskel)kfaEst=estKfa2(d.s1.fitFett,d.s1.fitMuskel,sx,ageCat(aAge)); else if(d.s1.fitlevel)kfaEst=estKfa(d.s1.fitlevel,sx,ageCat(aAge)); }
+  if(kfaEst==null)kfaEst=sx==="m"?20:28;
+  let slider="";
+  if(z==="beides"){
+    /* Recomposition: zwei gekoppelte Regler – Fettabbau-Tempo + realistischer Muskelaufbau */
+    const fmin=-0.7,fmax=-0.1;
+    const rate=clamp(num(s.rate)??-0.3,fmin,fmax);
+    const fpos=v=>((v-fmin)/(fmax-fmin)*100).toFixed(1);
+    const fpct=Math.abs(rate)/kg*100;
+    const fr=fpct<=0.5?["moderat","ok"]:fpct<=0.85?["ambitioniert","warn"]:["aggressiv","bad"];
+    const cap=recompMuscleCap(d.s1,sx,kfaEst,kg,rate);
+    const mus=clamp(num(s.muskel)!=null?num(s.muskel):cap,0,cap);
+    slider=`
+    <div class="rangebox" style="margin-top:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <label for="rate" style="font-weight:600;color:var(--pine-deep)">1 · Fettabbau pro Woche</label>
+        <span><span class="val" id="rateval">${rate.toFixed(2).replace(".",",")}</span> <span class="muted">kg/Woche</span> <span class="pill ${fr[1]}" id="ratepill" style="margin-left:8px">${fr[0]}</span></span></div>
+      <input id="rate" type="range" min="${fmin}" max="${fmax}" step="0.05" value="${rate}"
+        oninput="recompFat(this)" onchange="renderApp()" aria-label="Fettabbau pro Woche">
+      <div class="scalebar" aria-hidden="true">
+        <div style="position:absolute;top:0;bottom:0;border-radius:6px;background:rgba(46,140,107,.35);left:${fpos(-0.4)}%;width:${(fpos(-0.2)-fpos(-0.4)).toFixed(1)}%"></div>
+        <span class="mk" style="left:calc(${fpos(rate)}% - 2px)"></span>
+      </div>
+      <div class="muted small" style="margin-top:8px">Empfohlen: −0,2 bis −0,4 kg/Woche. <b>Je schneller der Fettabbau, desto weniger Muskelaufbau</b> ist gleichzeitig möglich.</div>
+    </div>
+    <div class="rangebox" style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <label for="msl" style="font-weight:600;color:var(--pine-deep)">2 · Gewünschter Muskelaufbau</label>
+        <span><span class="val" id="mslval">+${mus.toFixed(2).replace(".",",")}</span> <span class="muted">kg/Woche</span> <span class="muted small">(≈ <span id="mslmonth">${(mus*4.345).toFixed(2).replace(".",",")}</span> kg/Monat)</span></span></div>
+      <input id="msl" type="range" min="0" max="${cap||0.01}" step="0.01" value="${mus}" ${cap<=0?"disabled":""}
+        oninput="recompMus(this)" onchange="renderApp()" aria-label="Gewünschter Muskelaufbau pro Woche">
+      <div class="muted small" style="margin-top:8px">Realistisches, dopingfreies Maximum für Trainingsstand, Körperfett (${r1(kfaEst)} %) und das gewählte Tempo: <b>+<span id="mcap">${cap.toFixed(2).replace(".",",")}</span> kg/Woche</b> (≈ <span id="mcapM">${(cap*4.345).toFixed(2).replace(".",",")}</span> kg/Monat). Schiebst du den Fettabbau höher, sinkt dieses Maximum automatisch mit.</div>
+    </div>`;
+  } else if(z&&z!=="halten"){
+    const lossLike=z==="abnehmen";
+    const min=lossLike?-1.0:0, max=lossLike?-0.1:0.5;
+    const rate=clamp(num(s.rate)??(lossLike?-0.35:0.2),Math.min(min,max),Math.max(min,max));
+    const recLo=lossLike?-0.5:0.1, recHi=lossLike?-0.25:0.25;
+    const pos=v=>((v-min)/(max-min)*100).toFixed(1);
+    const pct=Math.abs(rate)/kg*100;
+    const rating=lossLike?(pct<=0.5?["moderat","ok"]:pct<=0.85?["ambitioniert","warn"]:["aggressiv","bad"]):(rate<=0.25?["moderat","ok"]:rate<=0.4?["ambitioniert","warn"]:["aggressiv","bad"]);
+    slider=`<div class="rangebox" style="margin-top:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <label for="rate" style="font-weight:600;color:var(--pine-deep)">Gewünschte Veränderung pro Woche</label>
+        <span><span class="val" id="rateval">${rate>0?"+":""}${rate.toFixed(2).replace(".",",")}</span> <span class="muted">kg/Woche</span> <span class="pill ${rating[1]}" id="ratepill" style="margin-left:8px">${rating[0]}</span></span></div>
+      <input id="rate" type="range" min="${min}" max="${max}" step="0.05" value="${rate}"
+        oninput="U('s2.rate',+this.value);$('#rateval').textContent=(this.value>0?'+':'')+(+this.value).toFixed(2).replace('.',',')"
+        onchange="renderApp()" aria-label="Gewichtsveränderung pro Woche">
+      <div class="scalebar" aria-hidden="true">
+        <div style="position:absolute;top:0;bottom:0;border-radius:6px;background:rgba(46,140,107,.35);left:${pos(Math.min(recLo,recHi))}%;width:${Math.abs(pos(recHi)-pos(recLo))}%"></div>
+        <span class="mk" style="left:calc(${pos(rate)}% - 2px)"></span>
+      </div>
+      <div class="muted small" style="margin-top:8px">Grün markiert: empfohlener Bereich (${lossLike?"−0,25 bis −0,5":"+0,1 bis +0,25"} kg/Woche).</div>
+    </div>`;
+  }
+  return `<h2 style="font-size:24px">Stufe 2 · Dein Ziel</h2>
+    <p class="muted" style="margin:6px 0 18px">Wähle dein Hauptziel – das Tempo stellst du mit dem Regler ein.</p>
+    <div class="field"><label>Ziel *</label>${seg("s2.ziel",ziele,z)}</div>
+    ${slider}
+    ${z==="beides"?note("<b>Recomposition</b> = Fett abbauen und gleichzeitig Muskeln aufbauen. Stell mit Regler&nbsp;1 dein Fettabbau-Tempo ein – Regler&nbsp;2 zeigt dir, wie viel Muskelaufbau dabei <b>natürlich (ohne Doping)</b> realistisch ist. Das gelingt am besten mit hohem Protein und regelmäßigem <b>Krafttraining</b> (in Stufe&nbsp;4).","info"):""}
+    ${saveBar(2,d)}`;
+}
+
+/* ---- Stufe 3 ---- */
+function step3(d){
+  const s=d.s3,steps=num(s.schritte)||0;
+  const lvl=steps<5000?["Wenig aktiv","bad"]:steps<8000?["Solide Basis","warn"]:steps<12000?["Aktiv","ok"]:["Sehr aktiv","ok"];
+  return `<h2 style="font-size:24px">Stufe 3 · Alltag &amp; Aktivität</h2>
+  <p class="muted" style="margin:6px 0 18px">Alltagsbewegung ist oft der größte unsichtbare Kalorienposten.</p>
+  <div class="field"><label>Aktivitätslevel im Alltag</label>${seg("s3.aktiv",[["niedrig","Niedrig"],["mittel","Mittel"],["hoch","Hoch"]],s.aktiv)}</div>
+  <div class="rangebox" style="margin-top:18px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <label for="steps" style="font-weight:600;color:var(--pine-deep)">Schritte pro Tag <span class="muted" style="font-weight:400;font-size:13px">· Durchschnittswert</span></label>
+      <span><span class="val" id="stepval">${steps.toLocaleString("de-DE")}</span> <span class="muted">Schritte ⌀</span> <span class="pill ${lvl[1]}" style="margin-left:8px">${lvl[0]}</span></span></div>
+    <input id="steps" type="range" min="0" max="50000" step="500" value="${steps}"
+      oninput="U('s3.schritte',+this.value);$('#stepval').textContent=(+this.value).toLocaleString('de-DE')" onchange="renderApp()" aria-label="Durchschnittliche Schritte pro Tag">
+    <div style="display:flex;justify-content:space-between" class="muted small"><span>0</span><span>10.000</span><span>25.000</span><span>50.000</span></div>
+  </div>
+  ${note("<b>Bitte den Durchschnitt über typische Wochen angeben</b> – nicht deinen besten Tag. Faule Tage, Regentage und Wochenenden zählen mit. Am genauesten ist der <b>Wochen-/Monatsschnitt aus der Schritt-/Health-App deines Smartphones</b> (z. B. Apple Health, Google Fit, Fitbit). Alternativ: wie viele Schritte du dir realistisch <b>im Schnitt pro Tag</b> vornimmst.","info")}
+  <div class="field" style="margin-top:18px"><label>Berufsprofil (optional)</label>${seg("s3.beruf",[["sitzend","Sitzend"],["gemischt","Gemischt"],["aktiv","Körperlich aktiv"]],s.beruf)}</div>
+  ${saveBar(3,d)}`;
+}
+
+/* ---- Stufe 4 ---- */
+function addCardio(){cur().s4.cardio.push({art:"gehen",min:30,int:"moderat"});if(DB.active)persist();renderApp();}
+function rmCardio(i){cur().s4.cardio.splice(i,1);if(DB.active)persist();renderApp();}
+function updCardio(i,k,v){cur().s4.cardio[i][k]=v;if(DB.active)persist();renderApp();}
+function step4(d){
+  const s=d.s4,kid=d.s1.mode==="kind",kg=num(d.s1.gewicht)||70;
+  const week=s.cardio.reduce((a,u)=>a+cardioKcal(u,kg),0);
+  const steps=num(d.s3.schritte)||0, stepK=r0(steps*kg*0.00045);
+  const zielLabel={abnehmen:"Abnehmen (Fettabnahme)",muskel:"Muskelaufbau",beides:"Muskelaufbau + Fettabnahme (Recomposition)",halten:"Gewicht halten",zunehmen:"Zunehmen"}[d.s2.ziel];
+  return `<h2 style="font-size:24px">Stufe 4 · Ernährung &amp; Sport</h2>
+  ${kid?"":`<div class="card flat" style="margin:18px 0 12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+    <div><span class="muted small" style="text-transform:uppercase;letter-spacing:.05em">Dein Ziel · aus Stufe 2</span><div style="font-weight:600;color:var(--pine-deep);font-size:16px;margin-top:3px">${zielLabel||"Noch kein Ziel gewählt"}</div></div>
+    <a class="btn ghost sm" href="javascript:go(2)">Ziel ändern</a>
+  </div>
+  ${zielLabel?"":note("Bitte zuerst in <b>Stufe 2</b> dein Ziel wählen – darauf baut die gesamte Berechnung auf.","warn")}
+  <div class="card flat" style="margin:0 0 8px;background:var(--mint-soft);border-color:#C8E6D6;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+    <div><span class="muted small" style="text-transform:uppercase;letter-spacing:.05em">Alltagsbewegung · aus Stufe 3</span><div style="margin-top:3px"><b class="mono" style="color:var(--pine-deep)">${steps.toLocaleString("de-DE")}</b> Schritte/Tag ≈ <b class="mono" style="color:var(--pine-deep)">${stepK} kcal/Tag</b> <span class="muted small">sind bereits in deinem Tagesbedarf enthalten</span></div></div>
+    <a class="btn ghost sm" href="javascript:go(3)">Schritte ändern</a>
+  </div>`}
+
+  <h3 style="margin:26px 0 4px;font-size:18px">Cardio-Einheiten pro Woche</h3>
+  <p class="muted" style="margin-bottom:12px">Füge Einheiten mit <b>+</b> hinzu – der geschätzte Verbrauch erscheint sofort. Mehrere Einheiten pro Tag sind möglich.</p>
+  ${s.cardio.map((u,i)=>{const kc=r0(cardioKcal(u,kg));return `<div class="card flat cardiorow" style="margin-bottom:10px;padding:14px">
+    <div class="field"><label>Art</label><select onchange="updCardio(${i},'art',this.value)">${Object.entries(MET).map(([v,[l]])=>`<option value="${v}" ${u.art===v?"selected":""}>${l}</option>`).join("")}</select></div>
+    <div class="field"><label>Dauer</label><div class="unit"><input type="number" min="5" max="300" value="${esc(u.min)}" onchange="updCardio(${i},'min',this.value)"><em>min</em></div></div>
+    <div class="field"><label>Intensität</label><select onchange="updCardio(${i},'int',this.value)">${Object.entries(INT).map(([v,[l]])=>`<option value="${v}" ${u.int===v?"selected":""}>${l}</option>`).join("")}</select></div>
+    <div><span class="pill amber mono">≈ ${kc} kcal</span></div>
+    <button class="btn ghost sm" onclick="rmCardio(${i})" aria-label="Einheit entfernen">✕</button>
+  </div>`}).join("")}
+  <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+    <button class="btn ghost sm" onclick="addCardio()">＋ Cardio-Einheit hinzufügen</button>
+    ${s.cardio.length?`<span class="muted">Summe: <b class="mono" style="color:var(--pine-deep)">≈ ${r0(week)} kcal/Woche</b> (≈ ${r0(week/7)} kcal/Tag)</span>`:""}
+  </div>
+
+  <h3 style="margin:26px 0 10px;font-size:18px">Krafttraining (optional)</h3>
+  <label class="chk ${s.kraft?"on":""}" style="max-width:520px"><input type="checkbox" ${s.kraft?"checked":""} onchange="Ur('s4.kraft',this.checked)"><span><b>Ich mache regelmäßig Krafttraining</b><span>Erhöht die Proteinempfehlung und den Verbrauch.</span></span></label>
+  ${s.kraft?`<div class="field" style="max-width:240px;margin-top:12px"><label>Einheiten pro Woche</label><div class="unit"><input type="number" min="1" max="7" value="${esc(s.krafttage)}" onchange="Ur('s4.krafttage',this.value)"><em>×/Woche</em></div></div>`:""}
+  ${saveBar(4,d)}`;
+}
+</script>
+<script>
+/* ---- Ergebnisbereich ---- */
+function liveAdj(v){U("adj",+v);const o=calc(cur());if(!o.ok||o.isKid)return;const A=o.adult;
+  const set=(id,t)=>{const e=$(id);if(e)e.textContent=t};
+  set("#r-target",fmt(A.target));set("#r-diff",(A.diff>0?"+":"")+fmt(A.diff));
+  const wkShow=o.ziel==="beides"?A.netWk:A.wkChange;
+  set("#r-wk",(wkShow>0?"+":"")+wkShow.toFixed(2).replace(".",","));
+  set("#r-prot",A.prot);set("#r-carb",A.carb);set("#r-fat",A.fat);set("#r-sug",A.sugar[1]);
+  const h=$("#adjhint");if(h)h.style.display=Math.abs(+v)>250?"flex":"none";
+}
+function openTracking(){
+  const d=cur(),o=calc(d);
+  if(!o.ok||o.isKid){alert("Bitte zuerst Stufe 1–4 vollständig ausfüllen.");return;}
+  const A=o.adult,s1=d.s1;
+  const zielMap={abnehmen:"Abnehmen",muskel:"Muskelaufbau",beides:"Definition",halten:"Gesundheit",zunehmen:"Muskelaufbau"};
+  const payload={
+    source:"super-health",
+    goals:{k:A.target,p:A.prot,c:A.carb,f:A.fat,maint:r0(A.tdee)},
+    prof:{name:(DB&&DB.active)||null,age:num(s1.alter)||null,sex:s1.geschlecht==="m"?"Männlich":"Weiblich",height:num(s1.groesse)||null,weight:num(s1.gewicht)||null,bf:r1(o.kfa)||null,goals:[zielMap[o.ziel]||"Gesundheit"]}
+  };
+  const b64=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
+  const url=(location.protocol==="https:"?"/tracking":"https://su-per-health.vercel.app/tracking")+"#import="+b64;
+  const w=window.open(url,"_blank");
+  if(!w)location.href=url;
+}
+function resultArea(d){
+  const o=calc(d);
+  if(!o.ok)return `<div class="card" style="margin-top:26px"><h3>Ergebnis – noch nicht bereit</h3>
+    <p class="muted" style="margin:8px 0 12px">Sobald Stufe 1 bis 4 vollständig sind, erscheint hier dein großer Ergebnisbereich.</p>
+    ${o.miss.map(m=>note(m,"warn")).join('<div style="height:8px"></div>')}</div>`;
+
+  if(o.isKid){const k=o.kid;
+    return `<div class="sheet" style="margin-top:30px">
+      <span class="pill" style="background:rgba(255,255,255,.14);color:#fff">Kindermodus · ${o.grp} Jahre</span>
+      <h3 style="margin:12px 0 2px">Orientierung für einen gesunden Tag</h3>
+      <p style="color:#BFD6CB;font-size:14px">Keine Diätwerte – ein Bereich für Entwicklung, Bewegung und ausgewogene Ernährung.</p>
+      <div class="kpis">
+        <div class="kpi"><div class="l">Energie (Bereich)</div><div class="v">${fmt(k.lo)}–${fmt(k.hi)}</div><div class="u">kcal/Tag</div></div>
+        <div class="kpi"><div class="l">Protein</div><div class="v">${k.prot[0]}–${k.prot[1]}</div><div class="u">g/Tag (≈ ${k.pkg} g/kg)</div></div>
+        <div class="kpi"><div class="l">Fett</div><div class="v">${k.fat[0]}–${k.fat[1]}</div><div class="u">g/Tag</div></div>
+        <div class="kpi"><div class="l">Freier Zucker</div><div class="v">&lt; ${k.sugar[1]}</div><div class="u">g/Tag · besser &lt; ${k.sugar[0]} g</div></div>
+      </div></div>
+    <div class="tblwrap" style="margin-top:18px"><table class="tbl">
+      <tr><th>Wert</th><th>Empfehlung</th><th>Bereich</th><th>Obergrenze</th><th>Hinweis</th></tr>
+      <tr><td>Energie</td><td class="num">≈ ${fmt(k.tdee)} kcal</td><td class="num">${fmt(k.lo)}–${fmt(k.hi)} kcal</td><td class="num">—</td><td>Orientierung nach Alter, Geschlecht &amp; Aktivität – Appetit darf schwanken.</td></tr>
+      <tr><td>Protein</td><td class="num">${k.prot[0]} g</td><td class="num">${k.prot[0]}–${k.prot[1]} g</td><td class="num">—</td><td>Sichere, altersgerechte Versorgung für Wachstum &amp; Entwicklung.</td></tr>
+      <tr><td>Kohlenhydrate</td><td class="num">≈ ${k.carb[0]} g</td><td class="num">${Math.min(...k.carb)}–${Math.max(...k.carb)} g</td><td class="num">—</td><td>Bevorzugt Vollkorn, Obst, Gemüse.</td></tr>
+      <tr><td>Fett</td><td class="num">≈ ${k.fat[0]} g</td><td class="num">${k.fat[0]}–${k.fat[1]} g</td><td class="num">—</td><td>30–35 % der Energie; gute Fettquellen bevorzugen.</td></tr>
+      <tr><td>Freier Zucker</td><td class="num">&lt; ${k.sugar[0]} g</td><td class="num">bis ${k.sugar[0]} g ideal</td><td class="num">${k.sugar[1]} g</td><td>Weniger ist günstiger – v. a. Softdrinks &amp; Süßigkeiten begrenzen.</td></tr>
+    </table></div>
+    ${o.info.map(t=>`<div style="margin-top:10px">${note(t,"info")}</div>`).join("")}`;
+  }
+
+  const A=o.adult;const sugP=(A.sugar[1]*4/A.target*100).toFixed(0);
+  const mp=(A.prot*4/A.target*100),mc=(A.carb*4/A.target*100),mf=(A.fat*9/A.target*100);
+  const adj=num(d.adj)||0;
+  return `
+  <div class="sheet" style="margin-top:30px" id="ergebnis">
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h3>Dein Tagesblatt</h3>
+      <span class="pill" style="background:rgba(255,255,255,.14);color:#fff">${o.sex==="m"?"Männlich":"Weiblich"} · ${o.grp} J. · KFA ${r1(o.kfa)} % · LBM ${A.lbm} kg${o.still?" · Stillzeit":""}</span>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="l">Täglicher Bedarf (TDEE)*</div><div class="v">${fmt(A.tdee)}</div><div class="u">kcal/Tag${o.still?" · davon Stillen +"+fmt(o.still.kcal):""}</div></div>
+      <div class="kpi" style="outline:2px solid var(--amber)"><div class="l">Empfohlene Kalorien</div><div class="v" id="r-target">${fmt(A.target)}</div><div class="u">kcal/Tag</div></div>
+      <div class="kpi"><div class="l">${A.diff<=0?"Defizit":"Überschuss"}</div><div class="v" id="r-diff">${A.diff>0?"+":""}${fmt(A.diff)}</div><div class="u">kcal/Tag</div></div>
+      <div class="kpi"><div class="l">Erwartet pro Woche</div><div class="v"><span id="r-wk">${(o.ziel==="beides"?A.netWk:A.wkChange)>0?"+":""}${(o.ziel==="beides"?A.netWk:A.wkChange).toFixed(2).replace(".",",")}</span></div><div class="u">kg/Woche · ${o.ziel==="beides"?"netto (Fett −, Muskel +)":"Ziel: "+A.zielRating}</div></div>
+    </div>
+    ${o.ziel==="beides"?`<div style="margin-top:16px;padding:13px 15px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:13px;font-size:13.5px;color:#D7E8E0;line-height:1.55">
+      <b style="color:#fff">Recomposition pro Woche:</b> ≈ <b style="color:#fff">−${A.fatLoss.toFixed(2).replace(".",",")} kg Fett</b>${A.muscle>0?` und gleichzeitig <b style="color:#fff">+${A.muscle.toFixed(2).replace(".",",")} kg Muskeln</b>`:""} → netto <b style="color:#fff">${A.netWk>0?"+":""}${A.netWk.toFixed(2).replace(".",",")} kg</b> auf der Waage (≈ ${(A.muscle*4.345).toFixed(2).replace(".",",")} kg Muskeln/Monat). ${A.muscle<=0.01?"Bei diesem Tempo ist gleichzeitiger Aufbau kaum möglich – Fokus auf <b>Muskelerhalt</b>.":"Realistisch und dopingfrei für deinen Trainingsstand – <b>Krafttraining vorausgesetzt</b>. Auf der Waage tut sich wenig, deine Körperzusammensetzung verbessert sich aber deutlich."}
+    </div>`:""}
+    <div class="macrobar" aria-hidden="true"><i style="width:${mp}%;background:#E8B768"></i><i style="width:${mc}%;background:#7FC8A9"></i><i style="width:${mf}%;background:#5B8FA8"></i></div>
+    <div class="legend">
+      <span><i style="background:#E8B768"></i>Protein <b class="mono" style="color:#fff"><span id="r-prot">${A.prot}</span> g</b> (${A.protKg} g/kg)</span>
+      <span><i style="background:#7FC8A9"></i>Kohlenhydrate <b class="mono" style="color:#fff"><span id="r-carb">${A.carb}</span> g</b></span>
+      <span><i style="background:#5B8FA8"></i>Fett <b class="mono" style="color:#fff"><span id="r-fat">${A.fat}</span> g</b></span>
+      <span>Freier Zucker <b class="mono" style="color:#fff">&lt; <span id="r-sug">${A.sugar[1]}</span> g</b></span>
+    </div>
+    <p style="margin-top:14px;font-size:12px;color:rgba(234,244,239,.62);line-height:1.5">* TDEE = <b style="color:rgba(234,244,239,.85)">Total Daily Energy Expenditure</b>, dein gesamter täglicher Energieverbrauch: Grundumsatz (Energie in völliger Ruhe) + Beruf &amp; Alltag + Schritte + Sport${o.still?" + Stillen":""}. Isst du genau so viel, bleibt dein Gewicht stabil – darunter nimmst du ab, darüber zu.</p>
+    <p style="margin-top:8px;font-size:12px;color:rgba(234,244,239,.62);line-height:1.5"><b style="color:rgba(234,244,239,.85)">KFA</b> = Körperfettanteil, der Anteil deines Gewichts, der aus Fett besteht (in %). <b style="color:rgba(234,244,239,.85)">LBM</b> = Lean Body Mass (fettfreie Masse): dein Gewicht ohne Fett – Muskeln, Knochen, Organe und Wasser. Auf ihr basiert deine Proteinempfehlung.</p>
+  </div>
+
+  <div class="card" style="margin-top:16px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--mint-soft);border-color:#C8E6D6">
+    <div><b style="color:var(--pine-deep);font-size:16px">In SuPER Health Tracking übernehmen</b><p class="small" style="margin-top:4px;color:var(--ink-2)">Übergibt Kalorienziel (${fmt(A.target)} kcal), Makros und dein Profil per Klick an die Tracking-App.</p></div>
+    <button class="btn amber" onclick="openTracking()" style="white-space:nowrap">→ An Tracking senden</button>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+      <b style="color:var(--pine-deep)">Kalorien fein anpassen</b>
+      <span class="muted small">verschiebt Empfehlung, Defizit/Überschuss &amp; Prognose live</span></div>
+    <input type="range" min="-500" max="500" step="10" value="${adj}" aria-label="Kalorienanpassung"
+      oninput="liveAdj(this.value)" onchange="renderApp()">
+    <div style="display:flex;justify-content:space-between" class="muted small"><span>−500 kcal</span><span>Empfehlung</span><span>+500 kcal</span></div>
+    <div class="note warn" id="adjhint" style="display:${Math.abs(adj)>250?"flex":"none"};margin-top:10px">${ico.warn}<div>Große manuelle Abweichung – vielleicht passt dein Plan nicht mehr zur Eingabe. <b>Stufe 2, 3 oder 4 anpassen?</b> <a href="javascript:go(2)">Ziel</a> · <a href="javascript:go(3)">Alltag</a> · <a href="javascript:go(4)">Sport</a></div></div>
+  </div>
+
+  ${A.empf?`<div style="margin-top:14px">${note("<b>Empfehlung:</b> "+A.empf,"ok")}</div>`:""}
+  ${o.info.map(t=>`<div style="margin-top:10px">${note(t,"info")}</div>`).join("")}
+  ${o.warn.map(t=>`<div style="margin-top:10px">${note(t,"bad")}</div>`).join("")}
+
+  <h3 style="margin:26px 0 10px">Deine Tageswerte im Überblick</h3>
+  <div class="tblwrap"><table class="tbl">
+    <tr><th>Wert</th><th>Empfehlung</th><th>% der Kalorien</th><th>Sinnvoller Bereich</th><th>Obergrenze</th><th>Hinweis</th></tr>
+    <tr><td>Kalorien</td><td class="num">${fmt(A.target)} kcal</td><td class="num">100 %</td><td class="num">${fmt(A.target-120)}–${fmt(A.target+120)} kcal</td><td class="num">${A.diff<0?fmt(A.tdee)+" kcal":"—"}</td><td>${A.diff<0?"Unter Erhaltungsbedarf = Fettabnahme; das Tempo bestimmt das Defizit.":A.diff>0?"Leichter Überschuss unterstützt den Aufbau – mehr bringt v. a. Fett.":"Erhaltungsbedarf – Gewicht bleibt stabil."}</td></tr>
+    <tr><td>Protein</td><td class="num">${A.prot} g</td><td class="num">${mp.toFixed(0)} %</td><td class="num">${r0(A.prot*0.9)}–${r0(A.prot*1.1)} g</td><td class="num">${r0(o.kg*(d.s4.kraft?2.0:1.7))} g</td><td>Berechnet über fettfreie Masse (${A.protLbm} g/kg LBM)${d.s4.kraft?" – Kraftsport: bis 2,0 g/kg Körpergewicht sinnvoll.":"."}</td></tr>
+    <tr><td>Kohlenhydrate</td><td class="num">${A.carb} g</td><td class="num">${mc.toFixed(0)} %</td><td class="num">${r0(A.carb*0.85)}–${r0(A.carb*1.15)} g</td><td class="num">—</td><td>Füllen den Rest der Energie – flexibel je nach Vorliebe &amp; Training.</td></tr>
+    <tr><td>Fett</td><td class="num">${A.fat} g</td><td class="num">${mf.toFixed(0)} %</td><td class="num">${r0(A.target*0.25/9)}–${r0(A.target*0.35/9)} g</td><td class="num">${r0(A.target*0.40/9)} g</td><td>Nicht unter ~0,6 g/kg – wichtig für Hormone &amp; Vitamine.</td></tr>
+    <tr><td>Freier Zucker</td><td class="num">&lt; ${A.sugar[0]} g</td><td class="num">≤ ${sugP} %</td><td class="num">0–${A.sugar[0]} g ideal</td><td class="num">${A.sugar[1]} g</td><td>Weniger ist günstiger: Obergrenze ≈ 10 % der Kalorien, ideal &lt; 5 % (WHO-Orientierung).</td></tr>
+  </table></div>
+  <p class="muted small" style="margin-top:10px">Alle Werte sind Orientierungswerte für gesunde Erwachsene – keine medizinische Beratung.</p>`;
+}
+
+/* ---- Stufe 5 ---- */
+function step5(d){
+  const o=calc(d);
+  if(!o.ok)return `<h2 style="font-size:24px">Stufe 5 · Prognose</h2>${note("Bitte zuerst Stufe 1–4 vervollständigen:","warn")}<div style="height:8px"></div>${o.miss.map(m=>note(m,"warn")).join('<div style="height:8px"></div>')}${saveBar(5,d)}`;
+  if(o.isKid)return `<h2 style="font-size:24px">Stufe 5 · Entwicklung statt Prognose</h2>
+    ${note("Für Kinder zeigen wir bewusst <b>keine Gewichtsprognose</b>: Kinder wachsen, und das Gewicht folgt der Entwicklung – nicht einem Kalorienplan. Sinnvoller sind ärztliche Perzentilkurven und ein Blick auf Bewegung, Schlaf und ausgewogene Mahlzeiten.","info")}
+    <div style="margin-top:14px">${note("Tipp: Die Orientierungswerte aus dem Ergebnisbereich helfen, den Alltag grob einzuordnen – ganz ohne Zählen oder Druck.","ok")}</div>${saveBar(5,d)}`;
+  const A=o.adult;
+  const extra=clamp(Math.round((num(d.cmp)??0)/50)*50,0,800);
+  const stepK=A.stepK, kraft=r0(o.kraftDay), cardio=r0(o.cardioDay);
+  const planAdd=stepK+kraft+cardio;  // gesamter Aktivitätsanteil (über Grundumsatz/Beruf hinaus)
+  const gain=o.ziel==="zunehmen"||o.ziel==="muskel";
+  /* Aktivitäts-Komponenten (nur was > 0 ist). Die letzte vollständige Stufe IST dein Plan –
+     so entsteht nie eine versteckte Linie hinter dem Plan. */
+  const comps=[];
+  if(stepK>0)comps.push({key:"schritte",label:"tägliche Schritte ("+fmt(o.steps)+"/Tag)",val:stepK,color:"#1F6FD0",dash:"2 6"});
+  if(kraft>0)comps.push({key:"kraft",label:"Krafttraining",val:kraft,color:"#9A2FB8",dash:"2 5"});
+  if(cardio>0)comps.push({key:"cardio",label:"Cardio-Einheiten",val:cardio,color:"#0E8FA8",dash:"7 4"});
+  const lv=[{key:"base",label:"Grundumsatz + Beruf/Alltag (ohne Schritte & Sport)",delta:-planAdd,color:"#6B7280",dash:"2 6",thin:true}];
+  let cum=-planAdd;
+  comps.forEach((c,i)=>{ cum+=c.val; const isLast=i===comps.length-1;
+    if(isLast)lv.push({key:"plan",label:"+ "+c.label+" · dein Plan ("+fmt(A.target)+" kcal)",delta:0,color:"#0C3A33",area:true});
+    else lv.push({key:c.key,label:"+ "+c.label,delta:Math.round(cum),color:c.color,dash:c.dash,thin:true});
+  });
+  if(!comps.length)lv.push({key:"plan",label:"dein Plan ("+fmt(A.target)+" kcal)",delta:0,color:"#0C3A33",area:true});
+  if(extra>0)lv.push({key:"extra",label:"+ zusätzliche Aktivität (+"+extra+" kcal/Tag)",delta:extra,color:"#E0741A",dash:"11 6"});
+  const series=lv.map(l=>({label:l.label,color:l.color,dash:l.dash,thin:l.thin,area:l.area,rows:forecast(o,12,l.delta)}));
+  const endOf=s=>s.rows[s.rows.length-1].weight;
+  const planSeries=series.find(s=>s.area), baseSeries=series[0], extraSeries=extra>0?series[series.length-1]:null;
+  const endPlan=endOf(planSeries), endBase=endOf(baseSeries);
+  const stepsSportKg=r1((endBase-endPlan)*10)/10;             // Beitrag aller Aktivität ggü. reinem Grundumsatz
+  const extraKg=extraSeries?r1((endPlan-endOf(extraSeries))*10)/10:0;
+  const walkMin=r0(extra/(4.3*3.5*o.kg/200)||0), jogMin=r0(extra/(9.8*3.5*o.kg/200)||0);
+  /* Erklärung je Linie: Richtung aus Prognose berechnet, Begründung an Einstellungen angepasst */
+  const berufW={sitzend:"sitzenden",gemischt:"gemischten",aktiv:"körperlich aktiven"}[d.s3.beruf]||"";
+  const dirOf=endW=>{const df=endW-o.kg; return df>0.3?["↑ steigt","#C0392B"]:df<-0.3?["↓ sinkt","#15803D"]:["≈ bleibt etwa gleich","#8A7B2B"];};
+  const reasonFor=(l,endW)=>{ const up=endW-o.kg>0.3, down=endW-o.kg<-0.3;
+    if(l.key==="base")return `nur Grundumsatz und dein${berufW?"en "+berufW:""} Berufsalltag – ohne Schritte und ohne Sport. ${up?`Hier verbrennst du am wenigsten${d.s3.beruf==="sitzend"?" (sitzender Beruf = wenig Bewegung)":""}; isst du wie geplant, nimmst du eher zu.`:down?"Schon dieser Grundverbrauch liegt über deinem geplanten Essen, daher sinkt es leicht.":"Verbrauch und geplantes Essen halten sich etwa die Waage."}`;
+    if(l.key==="schritte")return `deine ~${fmt(o.steps)} Schritte/Tag verbrennen ≈ ${stepK} kcal zusätzlich – dadurch liegt die Linie spürbar tiefer als der reine Grundumsatz.`;
+    if(l.key==="kraft")return `Krafttraining verbrennt zusätzlich Energie und schützt deine Muskeln – die Linie sinkt weiter.`;
+    if(l.key==="cardio")return `deine Cardio-Einheiten erhöhen den Verbrauch zusätzlich – die Linie sinkt weiter.`;
+    if(l.key==="plan")return `dein vollständiger Plan inklusive ${comps.map(c=>c.label.replace(/\s*\(.*\)/,"")).join(", ")||"deiner Aktivität"}. Das ist deine realistische Prognose${down?" – stetige Abnahme bei diesem Tempo.":up?" – bei diesem Plan nimmst du zu.":"."}`;
+    if(l.key==="extra")return `mit +${extra} kcal zusätzlicher Bewegung pro Tag (z. B. mehr Cardio) verbrennst du am meisten – die Linie sinkt am stärksten.`;
+    return ""; };
+  const lineExpl=`<div class="card flat" style="margin:14px 0">
+    <b style="color:var(--pine-deep)">Was bedeuten die Linien?</b>
+    <ul style="list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:10px">
+      ${lv.map((l,i)=>{const endW=endOf(series[i]),dr=dirOf(endW),dp=l.dash?(l.dash===true?"7 6":l.dash):"";return `<li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.5;color:var(--ink-2)">
+        <svg width="28" height="14" style="flex:none;margin-top:2px;overflow:visible"><line x1="1" y1="7" x2="27" y2="7" stroke="${l.color}" stroke-width="${l.thin?2.6:3.4}" stroke-linecap="round"${dp?` stroke-dasharray="${dp}"`:""}/></svg>
+        <span><b style="color:var(--pine-deep)">${l.label}</b> · <b style="color:${dr[1]}">${dr[0]}</b> – ${reasonFor(l,endW)}</span></li>`;}).join("")}
+    </ul>
+  </div>`;
+  return `<h2 style="font-size:24px">Stufe 5 · Prognose</h2>
+  <p class="muted" style="margin:6px 0 16px">Erwartete Entwicklung über 12 Wochen bei ${fmt(A.target)} kcal/Tag. Jede Linie zeigt <b>dasselbe Essen, aber ein anderes Aktivitätsniveau</b> – mehr Bewegung = mehr Verbrauch = ${gain?"langsamere Zunahme":"schnellerer Fettabbau"}. Die unterste Linie verändert sich am stärksten.</p>
+  <div class="card flat" style="background:var(--amber-soft);border-color:#EBD9BF;display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+    <b style="color:var(--amber-deep);font-size:14.5px">Zusätzliche Aktivität einplanen</b>
+    <label class="small" style="display:inline-flex;align-items:center;gap:8px;color:var(--ink-2)">extra Verbrauch:
+      <select style="width:auto;padding:7px 10px" onchange="Ur('cmp',+this.value)">
+        ${[0,100,200,300,400,500,600,800].map(v=>`<option value="${v}" ${v===extra?"selected":""}>+${v} kcal/Tag</option>`).join("")}
+      </select>
+    </label>
+    ${extra>0?`<span class="small muted">≈ ${walkMin} Min zügiges Spazieren oder ${jogMin} Min Joggen täglich</span>`:`<span class="small muted">z. B. zusätzliche Cardio-Einheiten oben drauf – als eigene Linie</span>`}
+  </div>
+  <div class="chart">${lineChart(series,o.kg)}</div>
+  ${lineExpl}
+  <div class="grid g4" style="margin:16px 0">
+    <div class="card flat"><span class="muted small">Start</span><div class="mono" style="font-size:22px;font-weight:600;color:var(--pine-deep)">${r1(o.kg).toLocaleString("de-DE")} kg</div></div>
+    <div class="card flat"><span class="muted small">Dein Plan nach 12 Wochen</span><div class="mono" style="font-size:22px;font-weight:600;color:var(--pine-deep)">≈ ${endPlan.toLocaleString("de-DE")} kg</div></div>
+    <div class="card flat"><span class="muted small">Ohne Schritte &amp; Sport</span><div class="mono" style="font-size:22px;font-weight:600;color:var(--ink-3)">≈ ${endBase.toLocaleString("de-DE")} kg</div></div>
+    ${extraSeries
+      ?`<div class="card flat" style="border-color:#EBD9BF"><span class="muted small">Mit +${extra} kcal Aktivität</span><div class="mono" style="font-size:22px;font-weight:600;color:var(--amber-deep)">≈ ${endOf(extraSeries).toLocaleString("de-DE")} kg</div></div>`
+      :`<div class="card flat"><span class="muted small">Beitrag Schritte &amp; Sport</span><div class="mono" style="font-size:22px;font-weight:600;color:var(--pine-deep)">${gain?"+":"−"}${Math.abs(stepsSportKg).toLocaleString("de-DE")} kg</div></div>`}
+  </div>
+  ${note("Über 12 Wochen sorgen <b>deine täglichen Schritte"+(kraft>0?", dein Krafttraining":"")+(cardio>0?" und deine Cardio-Einheiten":"")+"</b> zusammen für ≈ <b>"+Math.abs(stepsSportKg).toLocaleString("de-DE")+" kg</b> "+(gain?"weniger Zunahme":"mehr Fettabbau")+" gegenüber reinem Grundumsatz."+(extraSeries?" Mit <b>+"+extra+" kcal</b> zusätzlicher Aktivität pro Tag kämen nochmals ≈ <b>"+Math.abs(extraKg).toLocaleString("de-DE")+" kg</b> dazu.":" Stelle oben zusätzliche Aktivität ein, um eine weitere Linie zu sehen."), gain?"info":"ok")}
+  <div style="height:14px"></div>
+  <div class="tblwrap"><table class="tbl">
+    <tr><th>Woche</th><th>Veränderung (Plan)</th><th>Dein Plan</th><th>Ohne Schritte &amp; Sport</th>${extraSeries?`<th>+${extra} kcal Aktivität</th>`:""}</tr>
+    ${planSeries.rows.map((r,i)=>`<tr><td class="num">W${r.wk}</td><td class="num">${r.change>0?"+":""}${r.change.toFixed(2).replace(".",",")} kg</td><td class="num">${r.weight.toFixed(1).replace(".",",")} kg</td><td class="num" style="color:var(--ink-3)">${baseSeries.rows[i].weight.toFixed(1).replace(".",",")} kg</td>${extraSeries?`<td class="num" style="color:var(--amber-deep)">${extraSeries.rows[i].weight.toFixed(1).replace(".",",")} kg</td>`:""}</tr>`).join("")}
+  </table></div>
+  ${note("Prognosen sind Modellrechnungen: Wasser, Salz, Zyklus und Alltag lassen die Waage kurzfristig schwanken. Entscheidend ist der Trend über Wochen.","info")}
+  ${saveBar(5,d)}`;
+}
+
+/* ---- App rendering ---- */
+function renderApp(){
+  const host=$("#appbody");if(!host)return;
+  const d=cur();
+  const stepsHtml=[step1,step2,step3,step4,step5][APPSTEP-1](d);
+  host.innerHTML=`
+    <span class="eyebrow">App &amp; Rechner</span>
+    <h1 style="font-size:clamp(28px,4vw,40px);margin:10px 0 6px">Dein Plan in fünf Stufen</h1>
+    <p class="lead" style="margin-bottom:18px">Kalorien, Makros, Aktivität und Prognose – für Kinder und Erwachsene getrennt gerechnet.</p>
+    ${accountBox(d)}
+    <div class="appshell" style="margin-top:22px">
+      <aside class="appside">
+        <nav class="stepnav" aria-label="Stufen">
+          ${STEPS.map((s,i)=>{const n=i+1;const done=stepValid(n,d)&&(d.saved[n]||n<APPSTEP);return `<button class="${APPSTEP===n?"on":""} ${done?"done":""}" onclick="go(${n})"><span class="n">${done?"✓":n}</span><span><b>Stufe ${n}</b><span>${s[0]}</span></span></button>`}).join("")}
+        </nav>
+        ${storageOK?"":'<p class="muted small" style="margin-top:10px">Hinweis: Dauerhafte Speicherung ist in dieser Umgebung nicht verfügbar – Daten gelten für diese Sitzung.</p>'}
+      </aside>
+      <div>
+        ${APPSTEP===5?resultArea(d):""}
+        <div class="card" id="apppanel">${stepsHtml}</div>
+        ${APPSTEP===5?"":resultArea(d)}
+      </div>
+    </div>`;
+}
+
+/* ================= router ================= */
+const ROUTES={"":Home,"app":AppPage,"so-funktionierts":HowPage,"sixpack":Sixpack,"kraftsport":Kraft,"ueber":About,"faq":FAQ,"impressum":Impressum,"datenschutz":Datenschutz,"probleme":ProblemeHub,"cheat-days":CheatDays,"gewohnheiten":Gewohnheiten,"bewusst-essen":BewusstEssen};
+let lastRoute=null;
+function render(){
+  if(location.hash&&location.hash!==CURHASH)CURHASH=location.hash;
+  const r=CURHASH.replace(/^#\/?/,"").split("?")[0];
+  _renderRoute(r);
+}
+window.addEventListener("hashchange",render);
+
+/* In-App-Navigation abfangen: mobile Viewer behandeln Link-Klicks sonst als externe Navigation ("Link öffnen?") */
+let CURHASH=location.hash||"#/";
+document.addEventListener("click",e=>{
+  const a=e.target&&e.target.closest?e.target.closest('a[href^="#"]'):null;
+  if(!a)return;
+  e.preventDefault();e.stopPropagation();
+  const h=a.getAttribute("href")||"#/";
+  CURHASH=h;
+  try{if(location.hash!==h)location.hash=h;}catch(err){}
+  render();
+},true);
+/* Fallback, falls der Viewer auch programmatische Hash-Änderungen blockiert: render() arbeitet immer über CURHASH */
+function _renderRoute(r){
+  $("#view").innerHTML=(ROUTES[r]||NotFound)();
+  document.querySelectorAll(".navlinks a").forEach(a=>a.classList.toggle("on",a.dataset.r===r));
+  document.querySelectorAll(".navdrop").forEach(dd=>{dd.classList.toggle("act",(dd.dataset.rgroup||"").split(" ").includes(r));dd.classList.remove("open");});
+  $("#navlinks").classList.remove("open");
+  if(r==="app"){
+    const d=cur();
+    if(lastRoute!=="app"){let n=1;for(let i=1;i<=5;i++){if(d.saved[i])n=Math.min(i+1,5)}APPSTEP=n;}
+    renderApp();
+  }
+  if(lastRoute!==r)window.scrollTo(0,0);
+  lastRoute=r;
+  document.title=({"":"SuPER Health – Kalorien, Makros & Fitness verstehen","app":"App & Rechner – SuPER Health","so-funktionierts":"So funktioniert’s – SuPER Health","sixpack":"Einfacher Weg zum Sixpack – SuPER Health","kraftsport":"Stärke durch Kraftsport – SuPER Health","ueber":"Über SuPER Health","faq":"FAQ – SuPER Health","impressum":"Impressum – SuPER Health","datenschutz":"Datenschutz – SuPER Health","probleme":"Probleme & Lösungen – SuPER Health","cheat-days":"Cheat Days – SuPER Health","gewohnheiten":"Tägliche Gewohnheiten – SuPER Health","bewusst-essen":"Bewusstes Ernähren & FODMAP – SuPER Health"})[r]||"SuPER Health";
+}
+(async()=>{await loadDB();render();})();
+</script>
+</body>
+</html>

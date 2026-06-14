@@ -1,6 +1,19 @@
-# SuPER Health Tracking
+# SuPER Health – Plattform
 
-Kalorien- & Fitness-Tracker (Single-File-Frontend `SuPER-Health-Tracking.html`) mit:
+Gesamte Plattform als **ein** Vercel-Projekt:
+
+| Pfad | Inhalt |
+|------|--------|
+| `/` | **SuPER Health** Hauptseite (`SuPER-Health.html`): Landing, Rechner (Werte & Ziele, Stufe 1–5), Wissen/„Probleme & Lösungen", FAQ |
+| `/tracking` | **Tracking-App** (`SuPER-Health-Tracking.html`): Kalorien-/Fitness-Tracker |
+| `/api/analyze-meal` | Serverless-Funktion (Claude Vision) für die Foto-Analyse |
+| `/bilder/…` | Körpertypen-Grafiken für den Rechner |
+
+Im Rechner stellt man unter „Stufe 1–5" seine Werte & Ziele ein und schickt sie per **„→ An Tracking senden"** an `/tracking`.
+
+---
+
+Der Tracking-Teil (`SuPER-Health-Tracking.html`):
 - Tracking, Tages-Balken & Wochen-Diagramm
 - **Barcode-Scanner** (Open Food Facts, kostenlos, kein Backend nötig)
 - **KI-Mahlzeit-Analyse per Foto** (Claude Vision) → erkennt Zutaten, schätzt Mengen & Nährwerte, per Klick ins Tagebuch
