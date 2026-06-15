@@ -88,6 +88,18 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 .pf{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.4,0,.2,1)}
 .pf.grn{background:linear-gradient(90deg,var(--acc2),var(--acc))}.pf.org{background:linear-gradient(90deg,#e65100,var(--ora))}
 .pf.bl{background:linear-gradient(90deg,#1565c0,var(--blu))}.pf.prp{background:linear-gradient(90deg,#7c4dff,var(--pur))}
+/* Makro-Balken mit Soll-Bereich + rotem Überschuss */
+.mpb{position:relative;height:15px;background:rgba(17,64,58,.08);border-radius:8px;overflow:hidden;margin-top:3px}
+.mpb .mband{position:absolute;top:0;bottom:0;background:rgba(46,140,107,.20);z-index:1}
+.mpb .mpf{position:absolute;left:0;top:0;bottom:0;border-radius:8px 0 0 8px;z-index:2;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.mpb .mpf.grn{background:linear-gradient(90deg,var(--acc2),var(--acc))}
+.mpb .mpf.bl{background:linear-gradient(90deg,#1565c0,var(--blu))}
+.mpb .mpf.org{background:linear-gradient(90deg,#e65100,var(--ora))}
+.mpb .mpf.prp{background:linear-gradient(90deg,#7c4dff,var(--pur))}
+.mpb .mover{position:absolute;top:0;bottom:0;z-index:3;background:repeating-linear-gradient(45deg,#C0392B,#C0392B 6px,#9e2b22 6px,#9e2b22 12px);transition:width .8s,left .8s}
+.mpb .msoll{position:absolute;top:0;bottom:0;width:2px;background:var(--pine-deep);z-index:4;transition:left .8s}
+.mlg{font-size:11px;color:var(--t3);display:flex;gap:14px;flex-wrap:wrap;margin-top:2px}
+.mlg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin-right:4px}
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:16px}.fgp{margin-bottom:16px}
 .fl{display:block;font-size:12px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
 .fi,.fs{width:100%;padding:12px 16px;border-radius:var(--rs);border:1px solid var(--bdr);background:var(--bg2);color:var(--t1);font-family:'Instrument Sans',sans-serif;font-size:14px;transition:all var(--tr);outline:none}
@@ -189,20 +201,24 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 .daybar .dseg{position:absolute;left:0;right:0;border-top:1px solid rgba(255,255,255,.55);transition:height .6s,bottom .6s}
 .daybar .dline{position:absolute;left:0;right:0;border-top:2px dashed var(--acc);z-index:3}
 .daybar .dline.max{border-top-color:var(--ora)}
-.daybar .dline span{position:absolute;right:5px;top:-15px;font-size:9px;font-weight:700;color:var(--t2);background:var(--bg3);padding:1px 5px;border-radius:5px;border:1px solid var(--bdr)}
-.daybar .dtot{position:absolute;top:10px;left:0;right:0;text-align:center;z-index:4}
+.daybar .dline span{position:absolute;right:5px;top:3px;font-size:9px;font-weight:700;color:var(--t2);background:var(--bg3);padding:1px 5px;border-radius:5px;border:1px solid var(--bdr)}
+.daycol{display:flex;flex-direction:column;gap:8px;flex:none}
+.daytotcap{text-align:center;width:104px}
+.daytotcap b{font-family:var(--mono);font-size:20px;color:var(--t1);display:block;line-height:1.05}
+.daytotcap span{font-size:10px;color:var(--t3)}
 .daybar .dtot b{font-family:var(--mono);font-size:19px;color:var(--t1)}.daybar .dtot span{display:block;font-size:9px;color:var(--t3);margin-top:1px}
 .daybar .dempty{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:var(--t3)}
-@media(max-width:600px){.dwrap{flex-direction:column}.daybar{width:100%;min-height:160px;display:flex}}
+@media(max-width:600px){.dwrap{flex-direction:column}.daycol{width:100%}.daytotcap{width:100%}.daybar{width:100%;min-height:160px;display:flex}}
 /* Wochen-Balken */
-.weekcal{position:relative;display:flex;align-items:flex-end;gap:10px;height:190px;margin-bottom:24px}
+.weekcal{position:relative;display:flex;align-items:flex-end;gap:10px;height:210px;margin-bottom:30px;padding-left:64px}
 .wcb{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;position:relative}
 .wcb .bar{width:100%;border-radius:6px 6px 0 0;min-height:3px;transition:height .8s cubic-bezier(.4,0,.2,1)}
-.wcb .lbl{position:absolute;bottom:-22px;left:0;right:0;text-align:center;font-size:11px;color:var(--t3);font-weight:600}
-.wcb .val{position:absolute;left:0;right:0;text-align:center;font-size:10px;font-weight:700;color:var(--t2);font-family:var(--mono)}
+.wcb .lbl{position:absolute;bottom:-24px;left:0;right:0;text-align:center;font-size:11px;color:var(--t3);font-weight:600}
+.wcb .val{position:absolute;left:0;right:0;text-align:center;font-size:10px;font-weight:700;color:var(--t1);font-family:var(--mono);z-index:6}
+.wcb .val span{background:var(--bg3);padding:1px 5px;border-radius:5px;border:1px solid var(--bdr);white-space:nowrap}
 .weekcal .wline{position:absolute;left:0;right:0;border-top:2px dashed var(--acc);z-index:2;pointer-events:none}
 .weekcal .wline.max{border-top-color:var(--ora)}
-.weekcal .wline span{position:absolute;right:0;top:-16px;font-size:9px;font-weight:700;color:var(--t2);background:var(--bg3);padding:1px 6px;border-radius:5px;border:1px solid var(--bdr)}
+.weekcal .wline span{position:absolute;left:2px;top:-9px;font-size:9px;font-weight:700;color:var(--t2);background:var(--bg3);padding:1px 5px;border-radius:5px;border:1px solid var(--bdr);line-height:1.3}
 .lgi{display:inline-flex;align-items:center;gap:6px}.lgi i{width:11px;height:11px;border-radius:3px;display:inline-block}
 </style>
 </head>
@@ -272,7 +288,7 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 
 <!-- WOCHENÜBERSICHT -->
 <section class="pg" id="pg-week">
-<div class="hd"><div class="hd-l"><h1>📅 Wochenübersicht</h1><p>Verlauf deiner Tage – Diagramm &amp; alle Einträge, mit Pfeilen blätterbar</p></div></div>
+<div class="hd"><div class="hd-l"><h1>📅 Wochenübersicht</h1><p>Verlauf deiner Tage – Diagramm &amp; alle Einträge. Mit ← → (oder den Pfeiltasten) durch Vergangenheit & Zukunft blättern · Tage kopieren oder löschen</p></div></div>
 <div class="cd">
 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px">
 <button class="btn" onclick="weekNav(-1)">←</button>
@@ -313,13 +329,14 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 </div></div>
 <div>
 <div class="cd"><div class="ch"><div class="ct">📋 Heutiges Tagebuch</div><div style="display:flex;gap:8px;align-items:center"><div class="cb cb-g" id="logN">0 Einträge</div><button class="btn sm pr" onclick="goAddMeal()">＋ Mahlzeit</button></div></div>
-<div class="dwrap"><div id="dayBar" class="daybar"></div>
+<div class="dwrap"><div class="daycol"><div id="dayTotCap" class="daytotcap"></div><div id="dayBar" class="daybar"></div></div>
 <div id="logL" style="flex:1;max-height:420px;overflow-y:auto"><div style="text-align:center;padding:40px 20px;color:var(--t3)"><div style="font-size:48px;margin-bottom:12px">🍽️</div><div style="font-weight:600">Noch keine Einträge</div></div></div></div></div>
 <div class="cd"><div class="ch"><div class="ct">Makro-Verteilung</div></div>
-<div class="pbc"><div class="pbl"><span>🔥 Kalorien</span><span id="bC">0 / 1.800</span></div><div class="pb"><div class="pf grn" style="width:0%" id="fC"></div></div></div>
-<div class="pbc"><div class="pbl"><span>🥩 Protein</span><span id="bP">0 / 180g</span></div><div class="pb"><div class="pf bl" style="width:0%" id="fP"></div></div></div>
-<div class="pbc"><div class="pbl"><span>🍞 Carbs</span><span id="bCb">0 / 200g</span></div><div class="pb"><div class="pf org" style="width:0%" id="fCb"></div></div></div>
-<div class="pbc"><div class="pbl"><span>🧈 Fett</span><span id="bF">0 / 65g</span></div><div class="pb"><div class="pf prp" style="width:0%" id="fF"></div></div></div>
+<div class="pbc"><div class="pbl"><span>🔥 Kalorien</span><span id="bC">0 / 1.800</span></div><div class="mpb" id="mbC"><div class="mband"></div><div class="mpf grn"></div><div class="mover"></div><div class="msoll"></div></div></div>
+<div class="pbc"><div class="pbl"><span>🥩 Protein</span><span id="bP">0 / 180g</span></div><div class="mpb" id="mbP"><div class="mband"></div><div class="mpf bl"></div><div class="mover"></div><div class="msoll"></div></div></div>
+<div class="pbc"><div class="pbl"><span>🍞 Carbs</span><span id="bCb">0 / 200g</span></div><div class="mpb" id="mbCb"><div class="mband"></div><div class="mpf org"></div><div class="mover"></div><div class="msoll"></div></div></div>
+<div class="pbc"><div class="pbl"><span>🧈 Fett</span><span id="bF">0 / 65g</span></div><div class="mpb" id="mbF"><div class="mband"></div><div class="mpf prp"></div><div class="mover"></div><div class="msoll"></div></div></div>
+<div class="mlg"><span><i style="background:rgba(46,140,107,.5)"></i>Soll-Bereich</span><span><i style="background:var(--pine-deep)"></i>Ziel (Soll)</span><span><i style="background:#C0392B"></i>über Ziel</span></div>
 </div></div></div>
 </section>
 
@@ -685,15 +702,28 @@ saveAll();['mN','mA','mK','mP','mC','mF'].forEach(i=>document.getElementById(i).
 function delLog(i){log.splice(i,1);saveAll();updUI();}
 function clrLog(){log=[];saveAll();updUI();toast('Zurückgesetzt');}
 // === UPDATE UI ===
+// Makro-Balken: Soll-Bereich (Band) + Ziel-Marker + roter Überschuss
+function setMacroBar(id,cur,goal){const el=document.getElementById(id);if(!el)return;goal=goal||1;cur=Math.max(0,cur||0);
+  const maxS=Math.max(goal*1.25,cur*1.02,1);
+  const gp=goal/maxS*100;                       // Position Ziel/Soll
+  const lo=Math.max(0,goal*0.9)/maxS*100;       // untere Kante Soll-Bereich (90–100% vom Ziel)
+  const cp=Math.min(cur,goal)/maxS*100;         // Füllung bis max. Ziel
+  const op=Math.max(0,cur-goal)/maxS*100;       // Überschuss über Ziel
+  const band=el.querySelector('.mband'),pf=el.querySelector('.mpf'),ov=el.querySelector('.mover'),so=el.querySelector('.msoll');
+  if(band){band.style.left=lo+'%';band.style.width=(gp-lo)+'%';}
+  if(pf)pf.style.width=cp+'%';
+  if(ov){ov.style.left=gp+'%';ov.style.width=op+'%';}
+  if(so)so.style.left=gp+'%';
+  el.title=Math.round(cur)+' von '+Math.round(goal)+(op>0?' · '+Math.round(cur-goal)+' über Ziel':'');}
 function updUI(){const t=log.reduce((a,e)=>({k:a.k+e.k,p:a.p+e.p,c:a.c+e.c,f:a.f+e.f}),{k:0,p:0,c:0,f:0});
 {const tl=document.getElementById('trackDayLbl');if(tl)tl.textContent=(activeDate===todayKey()?'Heute':'📅 '+fmtDay(activeDate))+' · '+log.length+' Einträge';}
 const pc=(v,g)=>Math.min(100,v/g*100).toFixed(1);
 document.getElementById('tCal').textContent=t.k.toLocaleString('de-DE');document.getElementById('tPro').textContent=Math.round(t.p)+'g';document.getElementById('tCrb').textContent=Math.round(t.c)+'g';document.getElementById('tFat').textContent=Math.round(t.f)+'g';
 document.getElementById('tCalG').textContent='Ziel: '+goals.k.toLocaleString('de-DE');document.getElementById('tProG').textContent='Ziel: '+goals.p+'g';document.getElementById('tCrbG').textContent='Ziel: '+goals.c+'g';document.getElementById('tFatG').textContent='Ziel: '+goals.f+'g';
-document.getElementById('fC').style.width=pc(t.k,goals.k)+'%';document.getElementById('bC').textContent=t.k.toLocaleString('de-DE')+' / '+goals.k.toLocaleString('de-DE');
-document.getElementById('fP').style.width=pc(t.p,goals.p)+'%';document.getElementById('bP').textContent=Math.round(t.p)+' / '+goals.p+'g';
-document.getElementById('fCb').style.width=pc(t.c,goals.c)+'%';document.getElementById('bCb').textContent=Math.round(t.c)+' / '+goals.c+'g';
-document.getElementById('fF').style.width=pc(t.f,goals.f)+'%';document.getElementById('bF').textContent=Math.round(t.f)+' / '+goals.f+'g';
+setMacroBar('mbC',t.k,goals.k);document.getElementById('bC').textContent=t.k.toLocaleString('de-DE')+' / '+goals.k.toLocaleString('de-DE');
+setMacroBar('mbP',t.p,goals.p);document.getElementById('bP').textContent=Math.round(t.p)+' / '+goals.p+'g';
+setMacroBar('mbCb',t.c,goals.c);document.getElementById('bCb').textContent=Math.round(t.c)+' / '+goals.c+'g';
+setMacroBar('mbF',t.f,goals.f);document.getElementById('bF').textContent=Math.round(t.f)+' / '+goals.f+'g';
 // Dashboard
 document.getElementById('dC').textContent=t.k.toLocaleString('de-DE');document.getElementById('dP').textContent=Math.round(t.p)+'g';
 const rem=Math.max(0,goals.k-t.k);document.getElementById('dCR').textContent=rem>0?rem.toLocaleString('de-DE')+' verbleibend':'✓ Ziel erreicht!';
@@ -943,7 +973,7 @@ function escAttr(s){return(s||'').replace(/"/g,'&quot;');}
 function goAddMeal(){go('track',document.getElementById('niTrack')||document.querySelectorAll('.ni')[1]);setTimeout(()=>{const i=document.getElementById('fInp');if(i){i.scrollIntoView({block:'center'});i.focus();}},120);}
 function renDailyBar(){const el=document.getElementById('dayBar');if(!el)return;
   const eaten=log.reduce((a,e)=>a+e.k,0),target=goals.k||1,maint=maintK(),dir=goalDir();
-  const top=Math.max(target,maint,eaten,1)*1.12;const P=v=>Math.max(0,Math.min(100,v/top*100));
+  const top=Math.max(target,maint,eaten,1)*1.3;const P=v=>Math.max(0,Math.min(100,v/top*100));
   const cols=['#2E8C6B','#1A574E','#4E8E72','#6FA98C','#8FC2A8','#3E7E63'];
   let html='',run=0;
   if(!log.length)html='<div class="dempty">Noch nichts getrackt –<br>füge oben eine Mahlzeit hinzu</div>';
@@ -953,17 +983,17 @@ function renDailyBar(){const el=document.getElementById('dayBar');if(!el)return;
     else if(y0>=target){html+='<div class="dseg" style="bottom:'+P(y0)+'%;height:'+P(e.k)+'%;background:'+over+'" title="'+escAttr(e.n)+' (über Ziel)"></div>';}
     else html+='<div class="dseg" style="bottom:'+P(y0)+'%;height:'+P(e.k)+'%;background:'+col+'" title="'+tt+'"></div>';});
   html+='<div class="dline" style="bottom:'+P(target)+'%"><span>Ziel '+fmtN(target)+'</span></div>';
-  if(Math.abs(maint-target)>40)html+='<div class="dline max" style="bottom:'+P(maint)+'%"><span>'+(dir==='bulk'?'Erhaltung':'Max')+' '+fmtN(maint)+'</span></div>';
-  html+='<div class="dtot"><b>'+fmtN(eaten)+'</b><span>/ '+fmtN(target)+' kcal</span></div>';
+  if(Math.abs(maint-target)>40)html+='<div class="dline max" style="bottom:'+P(maint)+'%"><span>'+(dir==='bulk'?'Erh.':'Max')+' '+fmtN(maint)+'</span></div>';
+  const cap=document.getElementById('dayTotCap');if(cap)cap.innerHTML='<b>'+fmtN(eaten)+'</b><span>von '+fmtN(target)+' kcal</span>';
   el.innerHTML=html;}
 function renWeekCal(){const el=document.getElementById('weekCal');if(!el)return;
   const dir=goalDir(),target=goals.k||1,maint=maintK();const nm=['So','Mo','Di','Mi','Do','Fr','Sa'];const days=[];
   for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const key=keyOf(d);let v=key===activeDate?log.reduce((a,e)=>a+e.k,0):(hist[key]?hist[key].k:0);days.push({l:nm[d.getDay()],v});}
-  const top=Math.max(maint,target,Math.max.apply(null,days.map(d=>d.v)),1)*1.15;const P=v=>v/top*100;
+  const top=Math.max(maint,target,Math.max.apply(null,days.map(d=>d.v)),1)*1.3;const P=v=>v/top*100;
   const colorFor=v=>{if(!v)return 'var(--bg4)';if(dir==='cut')return v<=target?'#2E8C6B':v<=maint?'#C99A2B':'#C0392B';if(dir==='bulk')return v>=target?'#2E8C6B':v>=maint?'#88C2A8':'#C99A2B';return v<=target*1.05?'#2E8C6B':'#C99A2B';};
-  let bars=days.map(d=>'<div class="wcb"><div class="val" style="bottom:calc('+P(d.v)+'% + 4px)">'+(d.v?fmtN(d.v):'')+'</div><div class="bar" style="height:'+Math.max(d.v?4:0,P(d.v))+'%;background:'+colorFor(d.v)+'"></div><div class="lbl">'+d.l+'</div></div>').join('');
+  let bars=days.map(d=>'<div class="wcb"><div class="val" style="bottom:calc('+P(d.v)+'% + 6px)">'+(d.v?'<span>'+fmtN(d.v)+'</span>':'')+'</div><div class="bar" style="height:'+Math.max(d.v?4:0,P(d.v))+'%;background:'+colorFor(d.v)+'"></div><div class="lbl">'+d.l+'</div></div>').join('');
   let lines='<div class="wline" style="bottom:'+P(target)+'%"><span>Ziel '+fmtN(target)+'</span></div>';
-  if(Math.abs(maint-target)>40)lines+='<div class="wline max" style="bottom:'+P(maint)+'%"><span>'+(dir==='bulk'?'Erhaltung':'Max')+' '+fmtN(maint)+'</span></div>';
+  if(Math.abs(maint-target)>40)lines+='<div class="wline max" style="bottom:'+P(maint)+'%"><span>'+(dir==='bulk'?'Erh.':'Max')+' '+fmtN(maint)+'</span></div>';
   el.innerHTML=bars+lines;
   const valid=days.filter(d=>d.v>0);const avg=valid.length?Math.round(valid.reduce((a,d)=>a+d.v,0)/valid.length):0;
   const wa=document.getElementById('weekAvg');if(wa)wa.textContent='⌀ '+fmtN(avg)+' kcal';
@@ -975,26 +1005,39 @@ let weekOffset=0;
 function weekDays(off){const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i+off*7);days.push(d);}return days;}
 function dayTotalK(key){return key===activeDate?log.reduce((a,e)=>a+e.k,0):(hist[key]?hist[key].k:0);}
 function dayEntries(key){return key===activeDate?log:((hist[key]&&hist[key].entries)||[]);}
-function weekNav(d){weekOffset=Math.min(0,weekOffset+d);renWeekView();}
+function weekNav(d){weekOffset=Math.max(-520,Math.min(52,weekOffset+d));renWeekView();}
 function renWeekView(){const el=document.getElementById('weekCal2');if(!el)return;
   const dir=goalDir(),target=goals.k||1,maint=maintK();const nm=['So','Mo','Di','Mi','Do','Fr','Sa'];
   const ds=weekDays(weekOffset);const days=ds.map(d=>{const key=keyOf(d);return{key,l:nm[d.getDay()],v:dayTotalK(key)};});
-  const top=Math.max(maint,target,Math.max.apply(null,days.map(x=>x.v)),1)*1.15;const P=v=>v/top*100;
+  const top=Math.max(maint,target,Math.max.apply(null,days.map(x=>x.v)),1)*1.3;const P=v=>v/top*100;
   const colorFor=v=>{if(!v)return 'var(--bg4)';if(dir==='cut')return v<=target?'#2E8C6B':v<=maint?'#C99A2B':'#C0392B';if(dir==='bulk')return v>=target?'#2E8C6B':v>=maint?'#88C2A8':'#C99A2B';return v<=target*1.05?'#2E8C6B':'#C99A2B';};
-  el.innerHTML=days.map(x=>'<div class="wcb"><div class="val" style="bottom:calc('+P(x.v)+'% + 4px)">'+(x.v?fmtN(x.v):'')+'</div><div class="bar" style="height:'+Math.max(x.v?4:0,P(x.v))+'%;background:'+colorFor(x.v)+'"></div><div class="lbl">'+x.l+'</div></div>').join('')+
-    '<div class="wline" style="bottom:'+P(target)+'%"><span>Ziel '+fmtN(target)+'</span></div>'+(Math.abs(maint-target)>40?'<div class="wline max" style="bottom:'+P(maint)+'%"><span>'+(dir==='bulk'?'Erhaltung':'Max')+' '+fmtN(maint)+'</span></div>':'');
+  el.innerHTML=days.map(x=>'<div class="wcb"><div class="val" style="bottom:calc('+P(x.v)+'% + 6px)">'+(x.v?'<span>'+fmtN(x.v)+'</span>':'')+'</div><div class="bar" style="height:'+Math.max(x.v?4:0,P(x.v))+'%;background:'+colorFor(x.v)+'"></div><div class="lbl">'+x.l+'</div></div>').join('')+
+    '<div class="wline" style="bottom:'+P(target)+'%"><span>Ziel '+fmtN(target)+'</span></div>'+(Math.abs(maint-target)>40?'<div class="wline max" style="bottom:'+P(maint)+'%"><span>'+(dir==='bulk'?'Erh.':'Max')+' '+fmtN(maint)+'</span></div>':'');
   document.getElementById('weekRange').textContent=fmtDay(keyOf(ds[0]))+' – '+fmtDay(keyOf(ds[6]));
   const valid=days.filter(x=>x.v>0),avg=valid.length?Math.round(valid.reduce((a,x)=>a+x.v,0)/valid.length):0;
-  document.getElementById('weekAvg2').textContent='⌀ '+fmtN(avg)+' kcal/Tag'+(weekOffset===0?' · diese Woche':weekOffset===-1?' · letzte Woche':' · vor '+(-weekOffset)+' Wochen');
-  const fwd=document.getElementById('weekFwd');if(fwd){fwd.disabled=weekOffset>=0;fwd.style.opacity=weekOffset>=0?.4:1;}
+  document.getElementById('weekAvg2').textContent='⌀ '+fmtN(avg)+' kcal/Tag'+(weekOffset===0?' · diese Woche':weekOffset===-1?' · letzte Woche':weekOffset<0?' · vor '+(-weekOffset)+' Wochen':weekOffset===1?' · nächste Woche':' · in '+weekOffset+' Wochen');
   const leg=document.getElementById('weekLeg2');if(leg)leg.innerHTML=(dir==='bulk'?'<span class="lgi"><i style="background:#2E8C6B"></i>im Aufbau-Ziel</span> <span class="lgi"><i style="background:#88C2A8"></i>über Erhaltung</span> <span class="lgi"><i style="background:#C99A2B"></i>zu wenig</span>':'<span class="lgi"><i style="background:#2E8C6B"></i>im Defizit-Ziel</span> <span class="lgi"><i style="background:#C99A2B"></i>über Ziel</span> <span class="lgi"><i style="background:#C0392B"></i>Überschuss</span>');
   const ent=document.getElementById('weekEntries');if(!ent)return;
   ent.innerHTML=days.slice().reverse().map(x=>{const es=dayEntries(x.key),tot=dayTotalK(x.key);
-    const head='<div style="display:flex;justify-content:space-between;align-items:baseline;margin:16px 0 4px"><b style="color:var(--pine-deep)">'+fmtDay(x.key)+(x.key===todayKey()?' · heute':'')+(x.key===activeDate&&x.key!==todayKey()?' · aktiv':'')+'</b><span class="mono" style="color:var(--t2);font-size:13px">'+fmtN(tot)+' kcal</span></div>';
+    const acts='<span style="display:inline-flex;gap:6px;margin-left:10px">'+(es.length&&x.key!==activeDate?'<button class="btn sm" title="Diesen Tag auf den aktiven Tag übernehmen" onclick="copyDay(\''+x.key+'\')">📋 Kopieren</button>':'')+((es.length||tot>0)?'<button class="btn sm dn" title="Tagesdaten löschen" onclick="deleteDay(\''+x.key+'\')">🗑️</button>':'')+'</span>';
+    const head='<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:16px 0 4px;flex-wrap:wrap"><b style="color:var(--pine-deep)">'+fmtDay(x.key)+(x.key===todayKey()?' · heute':'')+(x.key===activeDate&&x.key!==todayKey()?' · aktiv':'')+'</b><span style="display:inline-flex;align-items:center"><span class="mono" style="color:var(--t2);font-size:13px">'+fmtN(tot)+' kcal</span>'+acts+'</span></div>';
     if(!es.length)return head+'<div class="small" style="color:var(--t3)">keine Einträge</div>';
     return head+es.map(e=>'<div style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--bdr)"><span style="font-size:18px">'+(e.e||'🍽️')+'</span><span style="flex:1;font-size:13px;min-width:0">'+escHtml(e.n)+' <span style="color:var(--t3)">'+e.a+' '+(e.u||'g')+'</span></span><span class="mono" style="font-size:13px;color:var(--acc)">'+e.k+' kcal</span></div>').join('');
   }).join('');
 }
+function deleteDay(key){
+  if(!confirm('Daten für '+fmtDay(key)+' löschen?'))return;
+  if(!confirm('Daten löschen? Diese sind nicht wiederherstellbar.'))return;
+  if(key===activeDate){log=[];water=0;}else{delete hist[key];}
+  saveAll();updUI();renWeekView();if(typeof renDailyBar==='function')renDailyBar();if(typeof renWeekCal==='function')renWeekCal();
+  toast('🗑️ Daten für '+fmtDay(key)+' gelöscht');}
+function copyDay(key){
+  if(key===activeDate){toast('Das ist bereits der aktive Tag');return;}
+  const es=dayEntries(key);if(!es.length){toast('Keine Einträge zum Kopieren');return;}
+  if(!confirm(fmtDay(key)+': '+es.length+' Einträge auf den aktiven Tag ('+fmtDay(activeDate)+') übernehmen?'))return;
+  es.forEach(e=>log.push(Object.assign({},e,{t:new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})})));
+  saveAll();updUI();renWeekView();if(typeof renDailyBar==='function')renDailyBar();if(typeof renWeekCal==='function')renWeekCal();
+  toast(es.length+' Einträge übernommen ✓');}
 function seedHist(){if(Object.keys(hist).length>1)return;const tgt=goals.k||1800,dir=goalDir();const offs=dir==='bulk'?[40,-120,180,-60,90,-200]:[-60,120,-180,40,-90,210];for(let i=6;i>=1;i--){const d=new Date();d.setDate(d.getDate()-i);const key=keyOf(d);if(hist[key]==null){const v=Math.max(0,Math.round(tgt+offs[6-i]));hist[key]={k:v,p:Math.round(v*0.3/4),c:Math.round(v*0.4/4),f:Math.round(v*0.3/9),entries:[],water:Math.floor(Math.random()*5)+3};}}}
 
 // === INIT ===
@@ -1010,6 +1053,11 @@ checkImport();checkShared();
 window.addEventListener('hashchange',checkImport);
 window.addEventListener('focus',function(){checkShared();});
 document.addEventListener('visibilitychange',function(){if(!document.hidden)checkShared();});
+// Pfeiltasten: Wochendiagramm blättern (nur auf der Wochenübersicht, nicht in Eingabefeldern)
+document.addEventListener('keydown',function(e){
+  const wk=document.getElementById('pg-week');if(!wk||!wk.classList.contains('act'))return;
+  const tag=(e.target&&e.target.tagName)||'';if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT')return;
+  if(e.key==='ArrowLeft'){e.preventDefault();weekNav(-1);}else if(e.key==='ArrowRight'){e.preventDefault();weekNav(1);}});
 }
 init();
 </script></body></html>
