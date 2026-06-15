@@ -298,6 +298,7 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 <div id="weekCal2" class="weekcal"></div>
 <div id="weekLeg2" style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--t2);margin-top:18px"></div>
 </div>
+<div class="cd"><div class="ct" style="margin-bottom:10px">⚖️ Kalorien-Bilanz dieser Woche</div><div id="weekBalance"></div></div>
 <div class="cd"><div class="ct" style="margin-bottom:6px">Einträge dieser Woche</div><div id="weekEntries"></div></div>
 </section>
 
@@ -1021,6 +1022,7 @@ function renWeekView(){const el=document.getElementById('weekCal2');if(!el)retur
   const valid=days.filter(x=>x.v>0),avg=valid.length?Math.round(valid.reduce((a,x)=>a+x.v,0)/valid.length):0;
   document.getElementById('weekAvg2').textContent='⌀ '+fmtN(avg)+' kcal/Tag'+(weekOffset===0?' · diese Woche':weekOffset===-1?' · letzte Woche':weekOffset<0?' · vor '+(-weekOffset)+' Wochen':weekOffset===1?' · nächste Woche':' · in '+weekOffset+' Wochen');
   const leg=document.getElementById('weekLeg2');if(leg)leg.innerHTML=(dir==='bulk'?'<span class="lgi"><i style="background:#2E8C6B"></i>im Aufbau-Ziel</span> <span class="lgi"><i style="background:#88C2A8"></i>über Erhaltung</span> <span class="lgi"><i style="background:#C99A2B"></i>zu wenig</span>':'<span class="lgi"><i style="background:#2E8C6B"></i>im Defizit-Ziel</span> <span class="lgi"><i style="background:#C99A2B"></i>über Ziel</span> <span class="lgi"><i style="background:#C0392B"></i>Überschuss</span>');
+  renWeekBalance(days,maint);
   const ent=document.getElementById('weekEntries');if(!ent)return;
   ent.innerHTML=days.slice().reverse().map(x=>{const es=dayEntries(x.key),tot=dayTotalK(x.key);
     const acts='<span style="display:inline-flex;gap:6px;margin-left:10px">'+(es.length&&x.key!==activeDate?'<button class="btn sm" title="Diesen Tag auf den aktiven Tag übernehmen" onclick="copyDay(\''+x.key+'\')">📋 Kopieren</button>':'')+((es.length||tot>0)?'<button class="btn sm dn" title="Tagesdaten löschen" onclick="deleteDay(\''+x.key+'\')">🗑️</button>':'')+'</span>';
@@ -1029,6 +1031,21 @@ function renWeekView(){const el=document.getElementById('weekCal2');if(!el)retur
     return head+es.map(e=>'<div style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--bdr)"><span style="font-size:18px">'+(e.e||'🍽️')+'</span><span style="flex:1;font-size:13px;min-width:0">'+escHtml(e.n)+' <span style="color:var(--t3)">'+e.a+' '+(e.u||'g')+'</span></span><span class="mono" style="font-size:13px;color:var(--acc)">'+e.k+' kcal</span></div>').join('');
   }).join('');
 }
+// Kalorien-Bilanz der angezeigten Woche: Summe (Erhaltungsbedarf − gegessen) über nur die getrackten Tage.
+function renWeekBalance(days,maint){const bal=document.getElementById('weekBalance');if(!bal)return;
+  let tracked=0,net=0,eatenSum=0;
+  days.forEach(x=>{const es=dayEntries(x.key);if(es&&es.length){tracked++;const eaten=dayTotalK(x.key);eatenSum+=eaten;net+=(maint-eaten);}});
+  if(!tracked){bal.innerHTML='<div class="small" style="color:var(--t3)">In dieser Woche sind noch keine Tage getrackt. Sobald du etwas einträgst, erscheint hier dein Defizit bzw. Überschuss gegenüber deinem Erhaltungsbedarf ('+fmtN(maint)+' kcal/Tag). Tage ohne Einträge werden nicht mitgerechnet.</div>';return;}
+  const saved=net>=0,abs=Math.abs(Math.round(net)),perDay=Math.round(abs/tracked);
+  const kg=Math.abs(net)/7700,kgTxt=(kg<0.01?'<0,01':kg.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}));
+  const col=saved?'var(--acc)':'#C0392B';
+  bal.innerHTML='<div class="cgrid">'
+    +'<div class="gc"><div class="v" style="color:'+col+'">'+fmtN(abs)+'</div><div class="l">kcal '+(saved?'gespart':'Überschuss')+'</div></div>'
+    +'<div class="gc"><div class="v">'+tracked+'</div><div class="l">getrackte Tage</div></div>'
+    +'<div class="gc"><div class="v" style="color:'+col+'">'+fmtN(perDay)+'</div><div class="l">Ø '+(saved?'Defizit':'Überschuss')+'/Tag</div></div>'
+    +'<div class="gc"><div class="v" style="color:'+col+'">'+kgTxt+'</div><div class="l">≈ kg Körperfett '+(saved?'weg':'drauf')+'</div></div>'
+    +'</div>'
+    +'<div class="small" style="color:var(--t3);margin-top:10px">Berechnet gegenüber deinem Erhaltungsbedarf von <b>'+fmtN(maint)+' kcal/Tag</b>. Nur Tage mit Einträgen zählen. Faustregel: 1 kg Körperfett ≈ 7.700 kcal – die Schätzung ist ein Richtwert, kein exakter Wert.</div>';}
 function deleteDay(key){
   if(!confirm('Daten für '+fmtDay(key)+' löschen?'))return;
   if(!confirm('Daten löschen? Diese sind nicht wiederherstellbar.'))return;
