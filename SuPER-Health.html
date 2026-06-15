@@ -1190,9 +1190,9 @@ function saveBar(n,d){
   const ts=d.saved[n];
   return `<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:22px">
     <button class="btn sm" onclick="saveStep(${n})">Stufe ${n} speichern</button>
-    ${n<5?`<button class="btn amber sm" onclick="go(${n+1})">Weiter zu Stufe ${n+1} →</button>`:""}
+    ${n<5?`<button class="btn amber sm" onclick="go(${n+1})">Weiter zu Stufe ${n+1} →</button>`:`<button class="btn amber sm" onclick="openTracking()" style="white-space:nowrap">→ An Tracking App schicken</button>`}
     ${ts?`<span class="pill ok">${ico.ok} gespeichert ${new Date(ts).toLocaleDateString("de-DE")}</span>`:`<span class="muted">Noch nicht gespeichert</span>`}
-    ${!DB.active?`<span class="muted">(Tipp: Profil anlegen für dauerhafte Speicherung)</span>`:""}
+    ${!DB.active?`<span class="muted">(wird automatisch in diesem Browser gespeichert)</span>`:""}
   </div>`;
 }
 
@@ -1482,6 +1482,13 @@ function openTracking(){
   const w=window.open(url,"_blank");
   if(!w)location.href=url;
 }
+// Direkt zur Tracking-App (ohne Pflicht-Check) – aktuelle Werte werden vorher best-effort übertragen.
+function gotoTracking(){
+  if(typeof writeHandoff==="function")writeHandoff();
+  const url=(location.protocol==="https:"?"/tracking":"https://su-per-health.vercel.app/tracking");
+  const w=window.open(url,"_blank");
+  if(!w)location.href=url;
+}
 function resultArea(d){
   const o=calc(d);
   if(!o.ok)return `<div class="card" style="margin-top:26px"><h3>Ergebnis – noch nicht bereit</h3>
@@ -1668,6 +1675,7 @@ function renderApp(){
         <nav class="stepnav" aria-label="Stufen">
           ${STEPS.map((s,i)=>{const n=i+1;const done=stepValid(n,d)&&(d.saved[n]||n<APPSTEP);return `<button class="${APPSTEP===n?"on":""} ${done?"done":""}" onclick="go(${n})"><span class="n">${done?"✓":n}</span><span><b>Stufe ${n}</b><span>${s[0]}</span></span></button>`}).join("")}
         </nav>
+        <button class="btn amber" onclick="gotoTracking()" style="width:100%;justify-content:center;margin-top:14px;white-space:nowrap">📲 Tracking App öffnen</button>
         ${storageOK?"":'<p class="muted small" style="margin-top:10px">Hinweis: Dauerhafte Speicherung ist in dieser Umgebung nicht verfügbar – Daten gelten für diese Sitzung.</p>'}
       </aside>
       <div>
