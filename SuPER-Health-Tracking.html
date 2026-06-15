@@ -303,7 +303,7 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 
 <!-- TRACKER -->
 <section class="pg" id="pg-track">
-<div class="hd"><div class="hd-l"><h1>🔥 Kalorien Tracker</h1><p id="trackDayLbl">Suche Lebensmittel und tracke Makros</p></div><div class="hd-r"><button class="btn" onclick="clrLog()">🗑️ Zurücksetzen</button><button class="btn pr" onclick="endDay()">✓ Tag beenden</button></div></div>
+<div class="hd"><div class="hd-l"><h1>🔥 Kalorien Tracker</h1><p id="trackDayLbl">Suche Lebensmittel und tracke Makros</p></div><div class="hd-r"><input type="date" id="trackDate" onchange="setActiveDate(this.value)" title="Tag wählen" style="padding:9px 11px;border:1px solid var(--bdr);border-radius:10px;background:var(--card);color:var(--t1);font-family:inherit;font-size:14px"><button class="btn" onclick="setActiveDate(todayKey())" title="Zum heutigen Tag springen">Heute</button><button class="btn" onclick="clrLog()">🗑️ Zurücksetzen</button><button class="btn pr" onclick="endDay()">✓ Tag beenden</button></div></div>
 <div class="sg">
 <div class="sc"><div class="si grn">🔥</div><div class="sl">Kalorien</div><div class="sv" id="tCal">0</div><div class="sch" id="tCalG">Ziel: 1.800</div></div>
 <div class="sc"><div class="si bl">🥩</div><div class="sl">Protein</div><div class="sv" id="tPro">0g</div><div class="sch" id="tProG">Ziel: 180g</div></div>
@@ -642,8 +642,7 @@ if(d.prof)prof=Object.assign(prof,d.prof);if(d.goals)goals=Object.assign(goals,d
 if(d.TP)TP=d.TP;if(d.tpDone)tpDone=d.tpDone;if(d.tpNames)for(let i=0;i<d.tpNames.length;i++)tpNames[i]=d.tpNames[i];
 if(d.hist)hist=d.hist;
 for(const k in hist){if(typeof hist[k]==='number')hist[k]={k:hist[k],p:0,c:0,f:0,entries:[],water:0};} // alt: Zahl -> Objekt
-activeDate=d.activeDate||todayKey();
-if(activeDate<todayKey())activeDate=todayKey(); // realer Tag ist weitergewandert
+activeDate=todayKey(); // beim Laden immer automatisch den heutigen Tag wählen (manuell änderbar im Header)
 if(d.dt===new Date().toDateString()&&d.log&&!hist[activeDate])hist[activeDate]={k:0,p:0,c:0,f:0,entries:d.log,water:d.w||0}; // Altformat übernehmen
 const day=hist[activeDate];log=(day&&day.entries)?day.entries.slice():[];water=day?(day.water||0):0;
 }catch(e){console.error(e);activeDate=todayKey();}}
@@ -652,6 +651,10 @@ localStorage.setItem('vf4',JSON.stringify({v:5,activeDate,prof,goals,bodyM,prefs
 function endDay(){const cur=activeDate||todayKey();saveAll();activeDate=nextKey(cur);log=[];water=0;saveAll();
 renW();const wc=document.getElementById('wC');if(wc)wc.textContent=water;updUI();updDash();if(typeof renDailyBar==='function')renDailyBar();if(typeof renWeekCal==='function')renWeekCal();if(typeof renWeekView==='function')renWeekView();
 toast('✓ '+fmtDay(cur)+' abgeschlossen → jetzt '+fmtDay(activeDate));}
+// Tag manuell wechseln (Datums-Wähler im Header). Aktuellen Tag sichern, dann gewählten Tag laden.
+function setActiveDate(k){if(!k||k===activeDate)return;saveAll();activeDate=k;const day=hist[k];log=(day&&day.entries)?day.entries.slice():[];water=day?(day.water||0):0;saveAll();
+renW();const wc=document.getElementById('wC');if(wc)wc.textContent=water;updUI();updDash();if(typeof renDailyBar==='function')renDailyBar();if(typeof renWeekCal==='function')renWeekCal();if(typeof renWeekView==='function')renWeekView();
+toast(k===todayKey()?'📅 Heute ('+fmtDay(k)+')':'📅 Tag gewechselt: '+fmtDay(k));}
 // === NAV ===
 function go(p,el){document.querySelectorAll('.pg').forEach(s=>s.classList.remove('act'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));document.getElementById('pg-'+p).classList.add('act');if(el)el.classList.add('act');if(window.innerWidth<900)document.getElementById('sb').classList.remove('open');}
 function goT(){go('track',document.getElementById('niTrack')||document.querySelectorAll('.ni')[1]);setTimeout(()=>document.getElementById('fInp').focus(),100);}
@@ -716,7 +719,8 @@ function setMacroBar(id,cur,goal){const el=document.getElementById(id);if(!el)re
   if(so)so.style.left=gp+'%';
   el.title=Math.round(cur)+' von '+Math.round(goal)+(op>0?' · '+Math.round(cur-goal)+' über Ziel':'');}
 function updUI(){const t=log.reduce((a,e)=>({k:a.k+e.k,p:a.p+e.p,c:a.c+e.c,f:a.f+e.f}),{k:0,p:0,c:0,f:0});
-{const tl=document.getElementById('trackDayLbl');if(tl)tl.textContent=(activeDate===todayKey()?'Heute':'📅 '+fmtDay(activeDate))+' · '+log.length+' Einträge';}
+{const tl=document.getElementById('trackDayLbl');if(tl)tl.textContent=(activeDate===todayKey()?'Heute':'📅 '+fmtDay(activeDate))+' · '+log.length+' Einträge';
+ const td=document.getElementById('trackDate');if(td&&td.value!==activeDate)td.value=activeDate;}
 const pc=(v,g)=>Math.min(100,v/g*100).toFixed(1);
 document.getElementById('tCal').textContent=t.k.toLocaleString('de-DE');document.getElementById('tPro').textContent=Math.round(t.p)+'g';document.getElementById('tCrb').textContent=Math.round(t.c)+'g';document.getElementById('tFat').textContent=Math.round(t.f)+'g';
 document.getElementById('tCalG').textContent='Ziel: '+goals.k.toLocaleString('de-DE');document.getElementById('tProG').textContent='Ziel: '+goals.p+'g';document.getElementById('tCrbG').textContent='Ziel: '+goals.c+'g';document.getElementById('tFatG').textContent='Ziel: '+goals.f+'g';
