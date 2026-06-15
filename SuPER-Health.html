@@ -395,8 +395,15 @@ const note=(t,k="info")=>`<div class="note ${k}">${ico[k==="bad"?"warn":k]}<div>
 
 /* ================= storage (Geräte-Speicher) ================= */
 const MEMORY={}; let storageOK=true;
-async function stGet(k){try{if(window.storage){const r=await window.storage.get(k);return r?r.value:null}}catch(e){} storageOK=false; return MEMORY[k]??null;}
-async function stSet(k,v){try{if(window.storage){await window.storage.set(k,v);return}}catch(e){} storageOK=false; MEMORY[k]=v;}
+async function stGet(k){
+  try{if(window.localStorage){const v=localStorage.getItem(k);if(v!=null)return v;}}catch(e){}
+  try{if(window.storage){const r=await window.storage.get(k);return r?r.value:null}}catch(e){}
+  storageOK=false; return MEMORY[k]??null;}
+async function stSet(k,v){
+  let ok=false;
+  try{if(window.localStorage){localStorage.setItem(k,v);ok=true;}}catch(e){}
+  try{if(!ok&&window.storage){await window.storage.set(k,v);ok=true;}}catch(e){}
+  if(!ok){storageOK=false; MEMORY[k]=v;}}
 
 /* ================= state ================= */
 function newData(){return{
@@ -410,18 +417,20 @@ let DB={profiles:{},active:null};
 let GUEST=newData();
 const KEY="superhealth:v1";
 function cur(){return DB.active&&DB.profiles[DB.active]?DB.profiles[DB.active]:GUEST;}
-async function loadDB(){const raw=await stGet(KEY);if(raw){try{const d=JSON.parse(raw);DB=Object.assign({profiles:{},active:null},d);}catch(e){}}}
+// flach-tiefe Zusammenführung gespeicherter Daten auf das aktuelle Schema (verhindert undefined-Felder bei späteren Erweiterungen)
+function mergeData(saved){const base=newData();if(!saved||typeof saved!=="object")return base;for(const k in base){const b=base[k];if(b&&typeof b==="object"&&!Array.isArray(b)){base[k]=Object.assign(b,saved[k]||{});}else if(saved[k]!==undefined){base[k]=saved[k];}}return base;}
+async function loadDB(){const raw=await stGet(KEY);if(raw){try{const d=JSON.parse(raw);DB=Object.assign({profiles:{},active:null},d);GUEST=mergeData(DB.guest);}catch(e){}}}
 let saveT=null;
-function persist(){clearTimeout(saveT);saveT=setTimeout(()=>stSet(KEY,JSON.stringify(DB)),300);}
+function persist(){clearTimeout(saveT);saveT=setTimeout(()=>{if(!DB.active)DB.guest=GUEST;stSet(KEY,JSON.stringify(DB));},300);}
 function U(path,val){ // update deep path on current data
   const d=cur(); const p=path.split("."); let o=d;
   for(let i=0;i<p.length-1;i++)o=o[p[i]];
   o[p[p.length-1]]=val;
-  if(DB.active)persist();
+  persist();
 }
 function Ur(path,val){U(path,val);renderApp();}
-function saveStep(n){const d=cur();d.saved[n]=new Date().toISOString();if(DB.active)persist();if(typeof writeHandoff==="function")writeHandoff();renderApp();}
-function toggleArr(path,val){const d=cur();const p=path.split(".");let o=d;for(let i=0;i<p.length-1;i++)o=o[p[i]];const arr=o[p[p.length-1]];const i=arr.indexOf(val);i>=0?arr.splice(i,1):arr.push(val);if(DB.active)persist();renderApp();}
+function saveStep(n){const d=cur();d.saved[n]=new Date().toISOString();persist();if(typeof writeHandoff==="function")writeHandoff();renderApp();}
+function toggleArr(path,val){const d=cur();const p=path.split(".");let o=d;for(let i=0;i<p.length-1;i++)o=o[p[i]];const arr=o[p[p.length-1]];const i=arr.indexOf(val);i>=0?arr.splice(i,1):arr.push(val);persist();renderApp();}
 
 /* account actions */
 function createProfile(){const inp=$("#newprof");const name=(inp?.value||"").trim();const msg=$("#accmsg");
@@ -1173,7 +1182,7 @@ function accountBox(d){
       <button class="btn sm" onclick="createProfile()">Profil anlegen &amp; speichern</button>
       ${names.map(n=>`<button class="btn ghost sm" onclick="loginProfile('${esc(n)}')">Anmelden: ${esc(n)}</button>`).join("")}
     </div>
-    <div class="muted" id="accmsg" style="margin-top:8px">Ohne Profil bleiben Eingaben nur für diese Sitzung erhalten. Mit Profil wird jede Stufe gespeichert und du machst später genau dort weiter.</div>
+    <div class="muted" id="accmsg" style="margin-top:8px">Deine Eingaben werden automatisch in diesem Browser gespeichert – sie bleiben also erhalten, wenn du die Seite verlässt und zurückkommst (nur auf diesem Gerät, niemand sonst sieht sie). Ein benanntes Profil brauchst du nur, wenn du <b>mehrere</b> Profile auf demselben Gerät getrennt verwalten willst.</div>
   </div>`;
 }
 
@@ -1402,9 +1411,9 @@ function step3(d){
 }
 
 /* ---- Stufe 4 ---- */
-function addCardio(){cur().s4.cardio.push({art:"gehen",min:30,int:"moderat"});if(DB.active)persist();renderApp();}
-function rmCardio(i){cur().s4.cardio.splice(i,1);if(DB.active)persist();renderApp();}
-function updCardio(i,k,v){cur().s4.cardio[i][k]=v;if(DB.active)persist();renderApp();}
+function addCardio(){cur().s4.cardio.push({art:"gehen",min:30,int:"moderat"});persist();renderApp();}
+function rmCardio(i){cur().s4.cardio.splice(i,1);persist();renderApp();}
+function updCardio(i,k,v){cur().s4.cardio[i][k]=v;persist();renderApp();}
 function step4(d){
   const s=d.s4,kid=d.s1.mode==="kind",kg=num(d.s1.gewicht)||70;
   const week=s.cardio.reduce((a,u)=>a+cardioKcal(u,kg),0);

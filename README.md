@@ -7,6 +7,7 @@ Gesamte Plattform als **ein** Vercel-Projekt:
 | `/` | **SuPER Health** Hauptseite (`SuPER-Health.html`): Landing, Rechner (Werte & Ziele, Stufe 1–5), Wissen/„Probleme & Lösungen", FAQ |
 | `/tracking` | **Tracking-App** (`SuPER-Health-Tracking.html`): Kalorien-/Fitness-Tracker |
 | `/api/analyze-meal` | Serverless-Funktion (Claude Vision) für die Foto-Analyse |
+| `/api/food-search` | Serverless-Funktion (Open Food Facts Proxy) für die Online-Lebensmittelsuche – **kein API-Key nötig** |
 | `/bilder/…` | Körpertypen-Grafiken für den Rechner |
 
 Im Rechner stellt man unter „Stufe 1–5" seine Werte & Ziele ein und schickt sie per **„→ An Tracking senden"** an `/tracking`.
@@ -16,6 +17,7 @@ Im Rechner stellt man unter „Stufe 1–5" seine Werte & Ziele ein und schickt 
 Der Tracking-Teil (`SuPER-Health-Tracking.html`):
 - Tracking, Tages-Balken & Wochen-Diagramm
 - **Barcode-Scanner** (Open Food Facts, kostenlos, kein Backend nötig)
+- **Große Lebensmittel-DB** (500+ Einträge: Marken-Riegel, Pizzen in Größen, Bowls, Meal-Prep, Fast Food …) **+ Online-Suche** über Open Food Facts (`/api/food-search`, ohne Key) für beliebige Produkte
 - **KI-Mahlzeit-Analyse per Foto** (Claude Vision) → erkennt Zutaten, schätzt Mengen & Nährwerte, per Klick ins Tagebuch
 - On-Device-Assistent
 - Übernahme der Werte aus dem SuPER-Health-Rechner

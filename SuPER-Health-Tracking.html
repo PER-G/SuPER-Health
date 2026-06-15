@@ -298,7 +298,7 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 <div class="cd">
 <div class="ch"><div class="ct">🔍 Lebensmittel suchen</div></div>
 <div class="fsc"><span class="fsic">🔍</span>
-<input class="fsi" type="text" id="fInp" placeholder="Tippe z.B. Hühnchen, Whey, Banane..." autocomplete="off">
+<input class="fsi" type="text" id="fInp" placeholder="Suche: Hühnchen, Ahead Riegel, Pizza, Prep My Meal… (auch online)" autocomplete="off">
 <div class="fdd" id="fDD"></div></div>
 <div id="aBox"></div>
 <div style="margin-top:24px"><div class="ct" style="margin-bottom:4px">Manuell eingeben</div><p style="font-size:12px;color:var(--t3);margin-bottom:12px">Falls ein Lebensmittel nicht gefunden wird</p>
@@ -556,7 +556,29 @@ const DB=[
 // VEGETARISCH / VEGAN FERTIG
 {n:"Veganer Burger-Patty",e:"🍔",cat:"Pflanzl. Protein",k:230,p:17,c:6,f:15},{n:"Vegane Bratwurst",e:"🌭",cat:"Pflanzl. Protein",k:230,p:15,c:8,f:15},{n:"Sojaschnetzel (zubereitet)",e:"🫘",cat:"Pflanzl. Protein",k:140,p:17,c:8,f:4},{n:"Falafel (Ofen)",e:"🧆",cat:"Pflanzl. Protein",k:200,p:10,c:24,f:7},{n:"Veganer Käse",e:"🧀",cat:"Pflanzl. Protein",k:280,p:2,c:22,f:21},
 // MEAL PREP / BEILAGEN
-{n:"Ofenkartoffeln / Wedges",e:"🥔",cat:"Gemüse",k:150,p:2.5,c:24,f:5},{n:"Kartoffelsalat",e:"🥗",cat:"Fertig",k:145,p:2.5,c:15,f:8},{n:"Nudelsalat",e:"🥗",cat:"Fertig",k:180,p:4,c:22,f:8},{n:"Gemüsepfanne",e:"🥘",cat:"Fertig",k:75,p:3,c:9,f:3},{n:"Rührtofu",e:"🍳",cat:"Pflanzl. Protein",k:120,p:12,c:3,f:7},{n:"Bratkartoffeln",e:"🥔",cat:"Gemüse",k:155,p:3,c:23,f:6},{n:"Gnocchi",e:"🥟",cat:"Getreide",k:160,p:4,c:32,f:1.5}
+{n:"Ofenkartoffeln / Wedges",e:"🥔",cat:"Gemüse",k:150,p:2.5,c:24,f:5},{n:"Kartoffelsalat",e:"🥗",cat:"Fertig",k:145,p:2.5,c:15,f:8},{n:"Nudelsalat",e:"🥗",cat:"Fertig",k:180,p:4,c:22,f:8},{n:"Gemüsepfanne",e:"🥘",cat:"Fertig",k:75,p:3,c:9,f:3},{n:"Rührtofu",e:"🍳",cat:"Pflanzl. Protein",k:120,p:12,c:3,f:7},{n:"Bratkartoffeln",e:"🥔",cat:"Gemüse",k:155,p:3,c:23,f:6},{n:"Gnocchi",e:"🥟",cat:"Getreide",k:160,p:4,c:32,f:1.5},
+// === PROTEIN-RIEGEL (Marken) ===  g = ein Riegel
+{n:"Ahead Protein Bar",e:"🍫",cat:"Protein-Riegel",k:340,p:38,c:34,f:9,g:50},{n:"Barebells Protein Bar",e:"🍫",cat:"Protein-Riegel",k:364,p:36,c:29,f:14,g:55},{n:"ESN Protein Bar",e:"🍫",cat:"Protein-Riegel",k:350,p:33,c:36,f:11,g:60},{n:"More Nutrition Protein Bar",e:"🍫",cat:"Protein-Riegel",k:375,p:31,c:38,f:12,g:50},{n:"Foodspring Protein Bar",e:"🍫",cat:"Protein-Riegel",k:345,p:33,c:30,f:11,g:60},{n:"Got7 Protein Bar",e:"🍫",cat:"Protein-Riegel",k:340,p:33,c:30,f:10,g:60},{n:"Quest Bar",e:"🍫",cat:"Protein-Riegel",k:330,p:33,c:40,f:12,g:60},{n:"Optimum Nutrition Crisp Bar",e:"🍫",cat:"Protein-Riegel",k:370,p:31,c:38,f:13,g:65},{n:"Corny Protein Riegel",e:"🍫",cat:"Protein-Riegel",k:400,p:30,c:42,f:12,g:50},{n:"Powerbar Protein Plus",e:"🍫",cat:"Protein-Riegel",k:350,p:30,c:35,f:11,g:55},{n:"Lyl/IronMaxx Protein Bar",e:"🍫",cat:"Protein-Riegel",k:355,p:34,c:33,f:11,g:60},{n:"Müsliriegel klassisch",e:"🍫",cat:"Riegel",k:430,p:7,c:65,f:15,g:25},{n:"Hafer-Energieriegel",e:"🍫",cat:"Riegel",k:400,p:8,c:60,f:14,g:45},
+// === PROTEIN-SHAKES / RTD (pro 100 ml) ===  g = eine Flasche
+{n:"Barebells Milkshake",e:"🥤",cat:"Protein-Drink",k:61,p:9,c:5,f:1.3,g:330},{n:"ESN Protein Shake RTD",e:"🥤",cat:"Protein-Drink",k:55,p:9,c:3,f:0.8,g:330},{n:"More Smart Protein Shake",e:"🥤",cat:"Protein-Drink",k:50,p:9,c:2,f:0.5,g:300},{n:"Whey Shake (Wasser)",e:"🥤",cat:"Protein-Drink",k:40,p:8,c:1,f:0.5,g:400},{n:"Whey Shake (Milch)",e:"🥤",cat:"Protein-Drink",k:75,p:11,c:6,f:2,g:400},
+// === PROTEIN-PUDDING / QUARK (Marken) ===
+{n:"Ehrmann High Protein Pudding",e:"🍮",cat:"Protein-Snack",k:80,p:10,c:7,f:1.5,g:200},{n:"More Protein Pudding",e:"🍮",cat:"Protein-Snack",k:78,p:10,c:6,f:1.5,g:200},{n:"Skyr Protein Drink",e:"🥤",cat:"Protein-Drink",k:55,p:9,c:5,f:0.2,g:250},{n:"Protein Quark Vanille",e:"🥛",cat:"Protein-Snack",k:90,p:11,c:9,f:0.5,g:250},
+// === PIZZA (klein/mittel/groß · pro 100 g) ===
+{n:"Pizza Margherita (klein Ø26)",e:"🍕",cat:"Pizza",k:240,p:10,c:30,f:8,g:250},{n:"Pizza Margherita (mittel Ø30)",e:"🍕",cat:"Pizza",k:240,p:10,c:30,f:8,g:400},{n:"Pizza Margherita (groß Ø40)",e:"🍕",cat:"Pizza",k:240,p:10,c:30,f:8,g:550},{n:"Pizza Salami (klein)",e:"🍕",cat:"Pizza",k:270,p:12,c:28,f:12,g:260},{n:"Pizza Salami (mittel)",e:"🍕",cat:"Pizza",k:270,p:12,c:28,f:12,g:410},{n:"Pizza Salami (groß)",e:"🍕",cat:"Pizza",k:270,p:12,c:28,f:12,g:560},{n:"Pizza Thunfisch",e:"🍕",cat:"Pizza",k:230,p:13,c:27,f:7,g:400},{n:"Pizza Hawaii",e:"🍕",cat:"Pizza",k:235,p:11,c:30,f:8,g:400},{n:"Pizza Funghi",e:"🍕",cat:"Pizza",k:225,p:10,c:29,f:7,g:400},{n:"Pizza Vegetariana",e:"🍕",cat:"Pizza",k:215,p:9,c:29,f:6,g:400},{n:"Pizza Diavola (scharf)",e:"🍕",cat:"Pizza",k:265,p:12,c:28,f:11,g:400},{n:"Pizza Quattro Formaggi",e:"🍕",cat:"Pizza",k:285,p:14,c:27,f:13,g:400},{n:"Pizza glutenfrei (Margherita)",e:"🍕",cat:"Pizza",k:230,p:7,c:32,f:8,g:320},{n:"High Protein Pizza",e:"🍕",cat:"Pizza",k:200,p:18,c:16,f:7,g:350},{n:"Steinofen-Pizza TK",e:"🍕",cat:"Pizza",k:250,p:11,c:30,f:9,g:350},{n:"Pizzabrötchen",e:"🍕",cat:"Pizza",k:280,p:9,c:32,f:12,g:150},{n:"Calzone",e:"🥟",cat:"Pizza",k:260,p:12,c:30,f:10,g:350},{n:"Flammkuchen",e:"🫓",cat:"Pizza",k:230,p:8,c:24,f:11,g:300},
+// === BOWLS ===  g = eine Bowl
+{n:"Poke Bowl Lachs",e:"🥗",cat:"Bowl",k:150,p:9,c:18,f:5,g:450},{n:"Poke Bowl Hähnchen",e:"🥗",cat:"Bowl",k:140,p:11,c:17,f:3.5,g:450},{n:"Poke Bowl Tofu",e:"🥗",cat:"Bowl",k:135,p:7,c:19,f:4,g:450},{n:"Burrito Bowl",e:"🥗",cat:"Bowl",k:160,p:9,c:18,f:6,g:500},{n:"Acai Bowl",e:"🫐",cat:"Bowl",k:130,p:3,c:24,f:4,g:350},{n:"Protein Bowl",e:"🥗",cat:"Bowl",k:150,p:13,c:14,f:5,g:400},{n:"Buddha Bowl",e:"🥗",cat:"Bowl",k:140,p:6,c:18,f:5,g:400},{n:"Falafel Bowl",e:"🥗",cat:"Bowl",k:165,p:8,c:20,f:6,g:400},
+// === MEAL PREP / FERTIGGERICHTE (Prep-My-Meal-Stil) ===  g = eine Schale
+{n:"Hähnchen Reis Brokkoli",e:"🍱",cat:"Meal Prep",k:130,p:11,c:15,f:2.5,g:400},{n:"Pulled Beef Süßkartoffel",e:"🍱",cat:"Meal Prep",k:120,p:10,c:12,f:3.5,g:400},{n:"Chili con Carne",e:"🍱",cat:"Meal Prep",k:115,p:8,c:11,f:4,g:400},{n:"Rindergulasch mit Nudeln",e:"🍱",cat:"Meal Prep",k:140,p:9,c:15,f:5,g:400},{n:"Lachs Gemüse Reis",e:"🍱",cat:"Meal Prep",k:135,p:10,c:13,f:4.5,g:400},{n:"Hähnchen Curry Reis",e:"🍱",cat:"Meal Prep",k:140,p:9,c:16,f:4,g:400},{n:"Putenstreifen Gemüse",e:"🍱",cat:"Meal Prep",k:110,p:12,c:8,f:3,g:400},{n:"Veggie Linsen-Dal",e:"🍱",cat:"Meal Prep",k:120,p:6,c:16,f:3.5,g:400},{n:"Hackbällchen Kartoffel",e:"🍱",cat:"Meal Prep",k:145,p:9,c:13,f:6,g:400},
+// === FAST FOOD ===  g = ein Produkt
+{n:"Big Mac",e:"🍔",cat:"Fast Food",k:257,p:13,c:20,f:14,g:215},{n:"Cheeseburger",e:"🍔",cat:"Fast Food",k:280,p:15,c:30,f:12,g:115},{n:"Hamburger",e:"🍔",cat:"Fast Food",k:270,p:13,c:31,f:10,g:105},{n:"Whopper",e:"🍔",cat:"Fast Food",k:230,p:12,c:18,f:13,g:270},{n:"Chicken Nuggets",e:"🍗",cat:"Fast Food",k:280,p:15,c:16,f:17,g:100},{n:"Pommes Frites",e:"🍟",cat:"Fast Food",k:312,p:3.4,c:41,f:15,g:115},{n:"Döner Tasche",e:"🥙",cat:"Fast Food",k:215,p:14,c:18,f:9,g:400},{n:"Dürüm",e:"🌯",cat:"Fast Food",k:230,p:13,c:22,f:10,g:350},{n:"Falafel Dürüm",e:"🌯",cat:"Fast Food",k:210,p:8,c:24,f:9,g:350},{n:"Currywurst mit Pommes",e:"🌭",cat:"Fast Food",k:240,p:7,c:20,f:15,g:400},{n:"Pizza-Stück",e:"🍕",cat:"Fast Food",k:266,p:11,c:33,f:10,g:125},{n:"Hotdog",e:"🌭",cat:"Fast Food",k:250,p:10,c:22,f:14,g:150},{n:"Fish & Chips",e:"🍤",cat:"Fast Food",k:230,p:13,c:24,f:9,g:300},
+// === BÄCKEREI ===  g = ein Stück
+{n:"Weizenbrötchen",e:"🥖",cat:"Bäckerei",k:270,p:9,c:54,f:2,g:50},{n:"Vollkornbrötchen",e:"🥖",cat:"Bäckerei",k:240,p:9,c:42,f:3,g:60},{n:"Croissant",e:"🥐",cat:"Bäckerei",k:406,p:8,c:46,f:21,g:60},{n:"Schoko-Croissant",e:"🥐",cat:"Bäckerei",k:430,p:7,c:48,f:23,g:70},{n:"Laugenbrezel",e:"🥨",cat:"Bäckerei",k:330,p:9,c:62,f:4,g:80},{n:"Laugenstange",e:"🥨",cat:"Bäckerei",k:320,p:9,c:60,f:4,g:90},{n:"Franzbrötchen",e:"🥐",cat:"Bäckerei",k:380,p:6,c:50,f:18,g:90},{n:"Berliner / Krapfen",e:"🍩",cat:"Bäckerei",k:330,p:5,c:44,f:15,g:80},{n:"Käsebrötchen",e:"🧀",cat:"Bäckerei",k:330,p:13,c:40,f:13,g:90},{n:"Apfeltasche",e:"🥧",cat:"Bäckerei",k:300,p:4,c:42,f:13,g:120},{n:"Donut glasiert",e:"🍩",cat:"Bäckerei",k:400,p:5,c:51,f:20,g:60},
+// === SÜSSES / MARKEN ===  g = eine Packung/Riegel
+{n:"Snickers",e:"🍫",cat:"Süßes",k:484,p:8,c:60,f:24,g:50},{n:"KitKat",e:"🍫",cat:"Süßes",k:518,p:6,c:60,f:27,g:42},{n:"Milka Alpenmilch",e:"🍫",cat:"Süßes",k:534,p:6,c:58,f:30,g:100},{n:"Oreo Kekse",e:"🍪",cat:"Süßes",k:480,p:5,c:69,f:20,g:44},{n:"Haribo Goldbären",e:"🐻",cat:"Süßes",k:343,p:7,c:77,f:0.5,g:100},{n:"Ben & Jerry's Eis",e:"🍦",cat:"Süßes",k:260,p:4,c:30,f:13,g:100},{n:"Pringles",e:"🥔",cat:"Süßes",k:534,p:4,c:51,f:34,g:100},{n:"M&M's",e:"🍫",cat:"Süßes",k:484,p:5,c:69,f:20,g:45},{n:"Nutella",e:"🍫",cat:"Süßes",k:539,p:6,c:57,f:31,g:15},{n:"Duplo",e:"🍫",cat:"Süßes",k:560,p:6,c:55,f:34,g:18},{n:"Kinder Riegel",e:"🍫",cat:"Süßes",k:566,p:8,c:53,f:35,g:21},
+// === PASTA / ITALIENISCH ===  g = ein Teller
+{n:"Spaghetti Bolognese",e:"🍝",cat:"Pasta",k:130,p:7,c:15,f:4,g:400},{n:"Spaghetti Carbonara",e:"🍝",cat:"Pasta",k:180,p:8,c:18,f:9,g:400},{n:"Lasagne",e:"🍝",cat:"Pasta",k:160,p:9,c:14,f:8,g:400},{n:"Penne Arrabiata",e:"🍝",cat:"Pasta",k:130,p:4,c:22,f:3,g:400},{n:"Tortellini Sahne",e:"🍝",cat:"Pasta",k:200,p:8,c:24,f:8,g:350},{n:"Risotto",e:"🍚",cat:"Pasta",k:150,p:4,c:22,f:5,g:350},{n:"Gnocchi Gorgonzola",e:"🥟",cat:"Pasta",k:190,p:6,c:24,f:8,g:350},
+// === ASIATISCH ===
+{n:"Pad Thai",e:"🍜",cat:"Asiatisch",k:150,p:7,c:20,f:5,g:400},{n:"Gebratener Reis",e:"🍚",cat:"Asiatisch",k:170,p:6,c:25,f:5,g:350},{n:"Chicken Teriyaki",e:"🍗",cat:"Asiatisch",k:160,p:13,c:14,f:5,g:350},{n:"Ramen",e:"🍜",cat:"Asiatisch",k:90,p:5,c:11,f:3,g:500},{n:"Frühlingsrolle",e:"🥢",cat:"Asiatisch",k:220,p:5,c:24,f:11,g:80},{n:"Gyoza / Dumplings",e:"🥟",cat:"Asiatisch",k:200,p:8,c:22,f:8,g:150},{n:"Sushi Box (8 Stk.)",e:"🍣",cat:"Asiatisch",k:140,p:5,c:28,f:1.5,g:250},{n:"Bibimbap",e:"🍚",cat:"Asiatisch",k:140,p:7,c:18,f:4,g:450}
 ];
 
 // === RECIPES ===
@@ -619,17 +641,40 @@ function goT(){go('track',document.getElementById('niTrack')||document.querySele
 // === FOOD SEARCH ===
 function initSearch(){
 const inp=document.getElementById('fInp'),dd=document.getElementById('fDD');
-inp.addEventListener('input',()=>{const q=inp.value.trim().toLowerCase();if(q.length<2){dd.classList.remove('sh');filt=[];hlI=-1;return;}filt=DB.filter(f=>q.split(/\s+/).every(w=>f.n.toLowerCase().includes(w)||f.cat.toLowerCase().includes(w))).slice(0,20);hlI=-1;renDD(q);});
+inp.addEventListener('input',()=>{const raw=inp.value.trim(),q=raw.toLowerCase();if(q.length<2){dd.classList.remove('sh');filt=[];hlI=-1;return;}filt=DB.filter(f=>q.split(/\s+/).every(w=>f.n.toLowerCase().includes(w)||f.cat.toLowerCase().includes(w))).slice(0,25);hlI=-1;const online=raw.length>=3;renDD(q,online);if(online){clearTimeout(offT);offT=setTimeout(()=>fetchOnline(raw,q),450);}});
 inp.addEventListener('keydown',e=>{if(!dd.classList.contains('sh'))return;if(e.key==='ArrowDown'){e.preventDefault();hlI=Math.min(hlI+1,filt.length-1);updHL();}else if(e.key==='ArrowUp'){e.preventDefault();hlI=Math.max(hlI-1,0);updHL();}else if(e.key==='Enter'&&hlI>=0){e.preventDefault();pickF(filt[hlI]);}else if(e.key==='Escape')dd.classList.remove('sh');});
 document.addEventListener('click',e=>{if(!e.target.closest('.fsc'))dd.classList.remove('sh');});}
-function renDD(q){const dd=document.getElementById('fDD');if(!filt.length){dd.innerHTML='<div style="padding:24px;text-align:center;color:var(--t3)"><div style="font-size:32px;margin-bottom:8px">🔍</div><div>Kein Treffer</div></div>';dd.classList.add('sh');return;}
-const cats={};filt.forEach(f=>{if(!cats[f.cat])cats[f.cat]=[];cats[f.cat].push(f);});let h='',gi=0;
-for(const c in cats){h+='<div class="fdh">'+c+'</div>';cats[c].forEach(f=>{const hl=hlN(f.n,q);h+='<div class="fdi'+(gi===hlI?' hl':'')+'" onclick="pickF(filt['+gi+'])"><div class="fdi-e">'+f.e+'</div><div class="fdi-inf"><div class="fdi-n">'+hl+'</div><div class="fdi-d">pro 100g · '+f.cat+'</div></div><div class="fdi-m"><div class="fdi-mc"><div class="fv" style="color:var(--acc)">'+f.k+'</div><div class="fl2">kcal</div></div><div class="fdi-mc"><div class="fv" style="color:var(--blu)">'+f.p+'g</div><div class="fl2">P</div></div><div class="fdi-mc"><div class="fv" style="color:var(--ora)">'+f.c+'g</div><div class="fl2">C</div></div><div class="fdi-mc"><div class="fv" style="color:var(--pur)">'+f.f+'g</div><div class="fl2">F</div></div></div></div>';gi++;});}
+function renDD(q,loading){const dd=document.getElementById('fDD');
+if(!filt.length){dd.innerHTML=loading?'<div style="padding:24px;text-align:center;color:var(--t3)"><div style="font-size:28px;margin-bottom:8px">🌐</div><div>Online-Datenbank wird durchsucht…</div></div>':'<div style="padding:24px;text-align:center;color:var(--t3)"><div style="font-size:32px;margin-bottom:8px">🔍</div><div>Kein Treffer</div></div>';dd.classList.add('sh');return;}
+// nach Kategorie gruppieren UND filt in dieselbe Reihenfolge bringen, damit Index == Anzeige stimmt
+const cats={};filt.forEach(f=>{if(!cats[f.cat])cats[f.cat]=[];cats[f.cat].push(f);});
+const ordered=[];for(const c in cats)cats[c].forEach(f=>ordered.push(f));filt=ordered;
+let h='',gi=0;
+for(const c in cats){h+='<div class="fdh">'+c+'</div>';cats[c].forEach(f=>{const hl=hlN(f.n,q);const port=f.g?' · '+f.g+' g':'';h+='<div class="fdi'+(gi===hlI?' hl':'')+'" onclick="pickF(filt['+gi+'])"><div class="fdi-e">'+f.e+'</div><div class="fdi-inf"><div class="fdi-n">'+hl+'</div><div class="fdi-d">pro 100g · '+f.cat+port+'</div></div><div class="fdi-m"><div class="fdi-mc"><div class="fv" style="color:var(--acc)">'+f.k+'</div><div class="fl2">kcal</div></div><div class="fdi-mc"><div class="fv" style="color:var(--blu)">'+f.p+'g</div><div class="fl2">P</div></div><div class="fdi-mc"><div class="fv" style="color:var(--ora)">'+f.c+'g</div><div class="fl2">C</div></div><div class="fdi-mc"><div class="fv" style="color:var(--pur)">'+f.f+'g</div><div class="fl2">F</div></div></div></div>';gi++;});}
+if(loading)h+='<div class="fdh" style="opacity:.65;display:flex;align-items:center;gap:6px">🌐 Online-Treffer werden geladen…</div>';
 dd.innerHTML=h;dd.classList.add('sh');}
+// === ONLINE-SUCHE (Open Food Facts – offene Datenbank, gleiche Quelle wie der Scanner) ===
+let offT=null,offReq=0;const offCache={};
+async function fetchOnline(raw,q){const inp=document.getElementById('fInp');if(raw.length<3)return;const my=++offReq;
+  let online=offCache[q];
+  if(!online){online=await searchOFF(raw);if(online&&online.length)offCache[q]=online;}
+  if(my!==offReq)return; // neuere Eingabe vorhanden
+  if(!inp||inp.value.trim().toLowerCase()!==q)return; // Query geändert
+  if(!online||!online.length){renDD(q,false);return;}
+  const have=new Set(filt.map(f=>f.n.toLowerCase()));
+  const add=online.filter(f=>!have.has(f.n.toLowerCase()));
+  if(!add.length){renDD(q,false);return;}
+  filt=filt.concat(add).slice(0,45);renDD(q,false);}
+async function searchOFF(q){try{
+  // eigener Proxy (Vercel-Funktion) – fragt Open Food Facts serverseitig ab (im Browser CORS-blockiert).
+  const r=await fetch('/api/food-search?q='+encodeURIComponent(q));if(!r.ok)return [];
+  const j=await r.json();const res=(j&&j.results)||[];
+  return res.map(f=>({n:f.n,e:'🌐',cat:'Online',k:f.k,p:f.p,c:f.c,f:f.f,online:true}));
+}catch(e){return [];}}
 function hlN(n,q){let r=n;q.split(/\s+/).forEach(w=>{if(w)r=r.replace(new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');});return r;}
 function updHL(){document.querySelectorAll('.fdi').forEach((el,i)=>{el.classList.toggle('hl',i===hlI);if(i===hlI)el.scrollIntoView({block:'nearest'});});}
 function pickF(f){selF=f;document.getElementById('fDD').classList.remove('sh');document.getElementById('fInp').value=f.n;
-document.getElementById('aBox').innerHTML='<div class="ar"><div style="font-size:22px">'+f.e+'</div><div style="flex:1"><div style="font-weight:700">'+f.n+'</div><div style="font-size:11px;color:var(--t2)">'+f.k+' kcal / 100g</div></div><input type="number" id="fAmt" value="100" min="1" max="5000" onkeydown="if(event.key===\'Enter\')addSel()"><div class="ul">g</div><button class="aab" onclick="addSel()">+ Hinzufügen</button></div>';
+document.getElementById('aBox').innerHTML='<div class="ar"><div style="font-size:22px">'+f.e+'</div><div style="flex:1"><div style="font-weight:700">'+f.n+'</div><div style="font-size:11px;color:var(--t2)">'+f.k+' kcal / 100g'+(f.g?' · übliche Portion '+f.g+' g':'')+'</div></div><input type="number" id="fAmt" value="'+(f.g||100)+'" min="1" max="5000" onkeydown="if(event.key===\'Enter\')addSel()"><div class="ul">g</div><button class="aab" onclick="addSel()">+ Hinzufügen</button></div>';
 setTimeout(()=>document.getElementById('fAmt')?.focus(),100);}
 function addSel(){if(!selF)return;const a=parseFloat(document.getElementById('fAmt')?.value)||100,x=a/100;
 log.push({n:selF.n,e:selF.e,a,k:Math.round(selF.k*x),p:+(selF.p*x).toFixed(1),c:+(selF.c*x).toFixed(1),f:+(selF.f*x).toFixed(1),t:new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})});
