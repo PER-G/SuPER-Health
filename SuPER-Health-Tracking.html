@@ -219,7 +219,7 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 </div>
 <div class="ns"><div class="ns-t">Übersicht</div>
 <div class="ni act" onclick="go('dash',this)"><span class="ni-i">📊</span> Dashboard</div>
-<div class="ni" onclick="go('track',this)"><span class="ni-i">🔥</span> Kalorien Tracker</div>
+<div class="ni" id="niTrack" onclick="go('track',this)"><span class="ni-i">🔥</span> Kalorien Tracker</div>
 <div class="ni" onclick="go('scan',this)"><span class="ni-i">📷</span> Scanner</div>
 <div class="ni" onclick="go('asst',this)"><span class="ni-i">💬</span> Assistent</div>
 <div class="ni" onclick="go('week',this);renWeekView()"><span class="ni-i">📅</span> Wochenübersicht</div>
@@ -615,7 +615,7 @@ renW();const wc=document.getElementById('wC');if(wc)wc.textContent=water;updUI()
 toast('✓ '+fmtDay(cur)+' abgeschlossen → jetzt '+fmtDay(activeDate));}
 // === NAV ===
 function go(p,el){document.querySelectorAll('.pg').forEach(s=>s.classList.remove('act'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));document.getElementById('pg-'+p).classList.add('act');if(el)el.classList.add('act');if(window.innerWidth<900)document.getElementById('sb').classList.remove('open');}
-function goT(){go('track',document.querySelectorAll('.ni')[1]);setTimeout(()=>document.getElementById('fInp').focus(),100);}
+function goT(){go('track',document.getElementById('niTrack')||document.querySelectorAll('.ni')[1]);setTimeout(()=>document.getElementById('fInp').focus(),100);}
 // === FOOD SEARCH ===
 function initSearch(){
 const inp=document.getElementById('fInp'),dd=document.getElementById('fDD');
@@ -879,7 +879,7 @@ function checkImport(){
   // WICHTIG: Import ANWENDEN, bevor wir die URL aufräumen – history.replaceState wirft bei file:// und darf den Import nicht blockieren.
   const ok=applyImport(d);
   if(ok){if(typeof loadProf==='function')loadProf();if(typeof loadPref==='function')loadPref();updUI();updDash();renDailyBar&&renDailyBar();renWeekCal&&renWeekCal();
-    go('track',document.querySelectorAll('.ni')[1]);toast('Daten aus dem Rechner übernommen ✓');}
+    go('track',document.getElementById('niTrack')||document.querySelectorAll('.ni')[1]);toast('Daten aus dem Rechner übernommen ✓');}
   try{history.replaceState(null,'',location.pathname+location.search);}catch(e){try{location.hash='';}catch(e2){}}
 }
 // Automatische Übernahme aus dem gemeinsamen Speicher (gleiche Origin wie der Rechner).
@@ -895,7 +895,7 @@ function checkShared(silent){try{
 
 // === DIAGRAMME: Tages-Balken + Wochen-Chart ===
 function escAttr(s){return(s||'').replace(/"/g,'&quot;');}
-function goAddMeal(){go('track',document.querySelectorAll('.ni')[1]);setTimeout(()=>{const i=document.getElementById('fInp');if(i){i.scrollIntoView({block:'center'});i.focus();}},120);}
+function goAddMeal(){go('track',document.getElementById('niTrack')||document.querySelectorAll('.ni')[1]);setTimeout(()=>{const i=document.getElementById('fInp');if(i){i.scrollIntoView({block:'center'});i.focus();}},120);}
 function renDailyBar(){const el=document.getElementById('dayBar');if(!el)return;
   const eaten=log.reduce((a,e)=>a+e.k,0),target=goals.k||1,maint=maintK(),dir=goalDir();
   const top=Math.max(target,maint,eaten,1)*1.12;const P=v=>Math.max(0,Math.min(100,v/top*100));
