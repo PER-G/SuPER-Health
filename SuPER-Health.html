@@ -420,7 +420,7 @@ function U(path,val){ // update deep path on current data
   if(DB.active)persist();
 }
 function Ur(path,val){U(path,val);renderApp();}
-function saveStep(n){const d=cur();d.saved[n]=new Date().toISOString();if(DB.active)persist();renderApp();}
+function saveStep(n){const d=cur();d.saved[n]=new Date().toISOString();if(DB.active)persist();if(typeof writeHandoff==="function")writeHandoff();renderApp();}
 function toggleArr(path,val){const d=cur();const p=path.split(".");let o=d;for(let i=0;i<p.length-1;i++)o=o[p[i]];const arr=o[p[p.length-1]];const i=arr.indexOf(val);i>=0?arr.splice(i,1):arr.push(val);if(DB.active)persist();renderApp();}
 
 /* account actions */
@@ -1451,17 +1451,24 @@ function liveAdj(v){U("adj",+v);const o=calc(cur());if(!o.ok||o.isKid)return;con
   set("#r-prot",A.prot);set("#r-carb",A.carb);set("#r-fat",A.fat);set("#r-sug",A.sugar[1]);
   const h=$("#adjhint");if(h)h.style.display=Math.abs(+v)>250?"flex":"none";
 }
-function openTracking(){
+function trackPayload(){
   const d=cur(),o=calc(d);
-  if(!o.ok||o.isKid){alert("Bitte zuerst Stufe 1–4 vollständig ausfüllen.");return;}
+  if(!o.ok||o.isKid)return null;
   const A=o.adult,s1=d.s1;
   const zielMap={abnehmen:"Abnehmen",muskel:"Muskelaufbau",beides:"Definition",halten:"Gesundheit",zunehmen:"Muskelaufbau"};
-  const payload={
+  return {
     source:"super-health",
     goals:{k:A.target,p:A.prot,c:A.carb,f:A.fat,maint:r0(A.tdee)},
     prof:{name:(DB&&DB.active)||null,age:num(s1.alter)||null,sex:s1.geschlecht==="m"?"Männlich":"Weiblich",height:num(s1.groesse)||null,weight:num(s1.gewicht)||null,bf:r1(o.kfa)||null,goals:[zielMap[o.ziel]||"Gesundheit"]}
   };
-  const b64=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
+}
+/* Bei jedem Speichern in den gemeinsamen Speicher schreiben (gleiche Origin → Tracker liest es automatisch). */
+function writeHandoff(){try{const p=trackPayload();if(p){p.ts=Date.now();localStorage.setItem("shp2track",JSON.stringify(p));return true;}}catch(e){}return false;}
+function openTracking(){
+  const p=trackPayload();
+  if(!p){alert("Bitte zuerst Stufe 1–4 vollständig ausfüllen.");return;}
+  writeHandoff();
+  const b64=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(p)))));
   const url=(location.protocol==="https:"?"/tracking":"https://su-per-health.vercel.app/tracking")+"#import="+b64;
   const w=window.open(url,"_blank");
   if(!w)location.href=url;

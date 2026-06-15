@@ -211,8 +211,12 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 <div class="ham" onclick="document.getElementById('sb').classList.toggle('open')">☰</div>
 <div class="app">
 <aside class="sb" id="sb">
-<div class="sb-logo"><div class="logo-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 13h4l2.4-6 3.6 10 2.4-6.5L17 13h4" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="logo-t">SuPER <span>Health</span></div><div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--t3);text-transform:uppercase">Tracking</div></div></div>
+<a href="/" class="sb-logo" style="text-decoration:none;color:inherit" title="Zur SuPER Health Startseite"><div class="logo-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 13h4l2.4-6 3.6 10 2.4-6.5L17 13h4" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="logo-t">SuPER <span>Health</span></div><div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--t3);text-transform:uppercase">Tracking</div></div></a>
 <nav>
+<div class="ns"><div class="ns-t">SuPER Health</div>
+<a href="/" class="ni" style="text-decoration:none"><span class="ni-i">🏠</span> Zur Startseite</a>
+<a href="/#/app" class="ni" style="text-decoration:none"><span class="ni-i">⚙️</span> Ziele &amp; Rechner</a>
+</div>
 <div class="ns"><div class="ns-t">Übersicht</div>
 <div class="ni act" onclick="go('dash',this)"><span class="ni-i">📊</span> Dashboard</div>
 <div class="ni" onclick="go('track',this)"><span class="ni-i">🔥</span> Kalorien Tracker</div>
@@ -878,6 +882,16 @@ function checkImport(){
     go('track',document.querySelectorAll('.ni')[1]);toast('Daten aus dem Rechner übernommen ✓');}
   try{history.replaceState(null,'',location.pathname+location.search);}catch(e){try{location.hash='';}catch(e2){}}
 }
+// Automatische Übernahme aus dem gemeinsamen Speicher (gleiche Origin wie der Rechner).
+function checkShared(silent){try{
+  const raw=localStorage.getItem('shp2track');if(!raw)return;
+  const d=JSON.parse(raw);if(!d||!d.ts)return;
+  const seen=+(localStorage.getItem('shp2track_seen')||0);
+  if(d.ts<=seen)return; // nichts Neues
+  if(applyImport(d)){localStorage.setItem('shp2track_seen',String(d.ts));
+    if(typeof loadProf==='function')loadProf();if(typeof loadPref==='function')loadPref();updUI();updDash();renDailyBar&&renDailyBar();renWeekCal&&renWeekCal();renWeekView&&renWeekView();
+    if(!silent)toast('Werte aus dem Rechner übernommen ✓');}
+}catch(e){console.warn('checkShared',e);}}
 
 // === DIAGRAMME: Tages-Balken + Wochen-Chart ===
 function escAttr(s){return(s||'').replace(/"/g,'&quot;');}
@@ -947,8 +961,10 @@ renBC('armCh',[{l:'Jan',v:36},{l:'Feb',v:36.5},{l:'Mär',v:37},{l:'Apr',v:37.2},
 renBC('pWC',[{l:'W1',v:81.3},{l:'W2',v:80.8},{l:'W3',v:80.5},{l:'W4',v:80.1},{l:'W5',v:79.6},{l:'W6',v:79.2},{l:'W7',v:78.8},{l:'W8',v:78.5}],'var(--acc)');
 renderChatChips();chatGreet();renWeekView();
 {const mu=document.getElementById('mealApiUrl');if(mu)mu.value=localStorage.getItem('vfMealApi')||'';const mt=document.getElementById('mealApiToken');if(mt)mt.value=localStorage.getItem('vfMealTok')||'';}
-checkImport();
+checkImport();checkShared();
 window.addEventListener('hashchange',checkImport);
+window.addEventListener('focus',function(){checkShared();});
+document.addEventListener('visibilitychange',function(){if(!document.hidden)checkShared();});
 }
 init();
 </script></body></html>
