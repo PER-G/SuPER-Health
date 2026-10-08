@@ -206,6 +206,15 @@
   function wdOf(off) { return (addDays(weekStart, off).getDay() + 6) % 7; } // Wochentag (0 = Montag) eines Fenstertags
   function dayName(off) { return DAYS[wdOf(off)]; }
   function dayLabel(off) { const x = addDays(weekStart, off); return DAYS[wdOf(off)] + ' ' + x.getDate() + '.' + (x.getMonth() + 1) + '.'; }
+  function rangeNavHtml(compact) {
+    const t = startOfDay(new Date()), tom = addDays(t, 1), mon = addDays(t, ((8 - t.getDay()) % 7) || 7), fmt = d => d.toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'numeric' });
+    const cur = keyOf(weekStart), chip = (d, label, act) => '<button class="fchip ' + (keyOf(d) === cur ? 'on' : '') + '" data-act="' + act + '">' + label + '</button>';
+    return '<div class="week-nav range-nav"><button class="icon-btn" data-act="wprev" title="7 Tage zurück" aria-label="7 Tage zurück">«</button><button class="icon-btn" data-act="dprev" title="1 Tag zurück" aria-label="1 Tag zurück">' + ic('left') + '</button>' +
+      '<span class="lbl">' + (todayIndex() === 0 ? 'Ab heute' : todayIndex() === -1 && Math.round((startOfDay(weekStart) - t) / 864e5) === 1 ? 'Ab morgen' : '7 Tage') + '<br><b>' + fmt(weekStart) + ' – ' + fmt(addDays(weekStart, 6)) + '</b></span>' +
+      '<button class="icon-btn" data-act="dnext" title="1 Tag weiter" aria-label="1 Tag weiter">' + ic('right') + '</button><button class="icon-btn" data-act="wnext" title="7 Tage weiter" aria-label="7 Tage weiter">»</button></div>' +
+      '<div class="filter-row" style="justify-content:center;flex-wrap:wrap;margin-top:6px">' + chip(t, 'Ab heute', 'thisweek') + chip(tom, 'Ab morgen', 'fromtomorrow') + chip(mon, 'Ab Montag ' + mon.getDate() + '.' + (mon.getMonth() + 1) + '. (ganze Woche)', 'nextmonday') + '</div>';
+  }
+  function shiftRange(days, abs) { weekStart = abs ? startOfDay(abs) : addDays(weekStart, days); if ($('#wzcount')) planWizard(!!$('#wizKeep')); renderPlan(); }
   function shopKeyOf(off, key) { return keyOf(addDays(weekStart, off)) + '|' + key; }
   // plan() liefert eine Sicht auf das aktuelle Fenster; Lesen/Schreiben geht direkt in den Datums-Kalender S.cal
   function plan() {
@@ -547,7 +556,7 @@
     const fmt = d => d.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
     let html = '<div class="greet"><div class="eyebrow">' + hello + '</div><h1>' + (S.name ? 'Chefkoch ' + esc(S.name) + '!' : 'Deine Familienküche') + '</h1>' +
       '<span class="pill"><span class="dot" style="color:' + mk.c + '">🛒</span>geplant für ' + mk.n + ' · ' + persons() + ' Pers.</span>' + healthLinks() + '</div>' +
-      '<div class="week-nav"><button class="icon-btn" data-act="wprev" aria-label="Vorige Woche">' + ic('left') + '</button><span class="lbl">' + (todayIndex() === 0 ? 'Ab heute · ' : isThisWeek ? 'Diese 7 Tage · ' : '') + fmt(weekStart) + ' – ' + fmt(wEnd) + '</span><button class="icon-btn" data-act="wnext" aria-label="Nächste Woche">' + ic('right') + '</button></div>';
+      rangeNavHtml();
 
     const n = Object.keys(p.slots).length;
     if (tIdx === 7) html += '<div class="diet-row" style="margin-top:12px;background:var(--soft)">🕘 <span>Diese Woche liegt in der Vergangenheit – nur zur Ansicht. <a href="#" data-act="thisweek" style="color:var(--acc2);font-weight:700">Zur aktuellen Woche</a></span></div>';
@@ -1158,6 +1167,7 @@
     let h = '<div class="sheet-pad"><div class="ob-hero" style="padding-top:0"><div class="big">🗓️</div><h2>Wochenplan erstellen</h2><p>Kurz prüfen – dann stellen wir die Woche passend zusammen.</p></div>';
     h += '<div class="set-block" style="margin-top:18px"><div class="field-l">Wer isst mit?</div><div class="members">' +
       Object.keys(MEMBER_TYPES).map(t => '<div class="card member" style="padding:9px 14px"><span class="e" style="font-size:22px">' + MEMBER_TYPES[t].e + '</span><span class="tx"><b>' + MEMBER_TYPES[t].n + '</b><span>' + MEMBER_TYPES[t].age + '</span></span><div class="stepper sm"><button data-wz="hh:' + t + ':-1">−</button><b>' + (S.household[t] || 0) + '</b><button data-wz="hh:' + t + ':1">+</button></div></div>').join('') + '</div></div>';
+    h += '<div class="set-block"><div class="field-l">Zeitraum</div><div class="field-s">Mit den Pfeilen tageweise (‹ ›) oder wochenweise (« ») verschieben.</div>' + rangeNavHtml() + '</div>';
     h += '<div class="set-block"><div class="field-l">Kochtage & Mahlzeiten</div>' + dayPlannerHtml() + '</div>';
     h += '<div class="set-block"><div class="field-l">Ernährung</div><div class="toggles">' + [['gf', 'Glutenfrei'], ['lf', 'Laktosefrei'], ['fm', 'FODMAP-arm'], ['veg', 'Vegetarisch']].map(d => toggle(S.diet[d[0]], 'data-wz="diet:' + d[0] + '"', d[1])).join('') + '</div></div>';
     h += '<div class="set-block"><div class="field-l">Küchen</div><div data-pgscope="wizard">' + cuisinePickerHtml() + '</div></div>';
@@ -1312,9 +1322,13 @@
       case 'wizkeep': t.classList.toggle('on'); break;
       case 'regen-go': generateWeek(true); location.hash = '#plan'; toast('Neuer Plan erstellt ✓'); break;
       case 'clearweek': if (confirm('Alle Gerichte dieser 7 Tage entfernen?')) { plan().slots = {}; save(); renderPlan(); planWizard(false); } break;
-      case 'thisweek': ev.preventDefault(); weekStart = startOfDay(new Date()); renderPlan(); break;
-      case 'wprev': weekStart = addDays(weekStart, -7); renderPlan(); break;
-      case 'wnext': ev.preventDefault(); weekStart = addDays(weekStart, 7); renderPlan(); break;
+      case 'thisweek': ev.preventDefault(); shiftRange(0, new Date()); break;
+      case 'fromtomorrow': shiftRange(0, addDays(new Date(), 1)); break;
+      case 'nextmonday': { const t = new Date(); shiftRange(0, addDays(t, ((8 - t.getDay()) % 7) || 7)); break; }
+      case 'dprev': shiftRange(-1); break;
+      case 'dnext': shiftRange(1); break;
+      case 'wprev': ev.preventDefault(); shiftRange(-7); break;
+      case 'wnext': ev.preventDefault(); shiftRange(7); break;
       case 'moreRecipes': { const y = window.scrollY; RF.limit += 48; renderRecipes(); window.scrollTo(0, y); break; }
       case 'togglediet': ev.preventDefault(); RF.dietOnly = !RF.dietOnly; renderRecipes(); break;
       case 'addplan': pickSlotSheet(detail.id); break;

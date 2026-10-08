@@ -394,3 +394,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .dp-btn { aspect-ratio: auto; padding: 8px 0 6px; line-height: 1.1; }
 .dp-btn small { display: block; font-size: 10.5px; font-weight: 600; color: var(--t3); margin-top: 3px; }
 .dp-day.on .dp-btn small { color: var(--acc2); }
+.range-nav { gap: 6px; }
+.range-nav .icon-btn { font-size: 18px; font-weight: 700; }
+.range-nav .lbl { min-width: 0; flex: 1; max-width: 230px; font-size: 12px; font-weight: 600; color: var(--t3); line-height: 1.3; }
+.range-nav .lbl b { font-size: 14.5px; color: var(--t1); }
