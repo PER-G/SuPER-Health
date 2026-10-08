@@ -1,0 +1,12 @@
+{
+  "name": "SuPER Küche – Familien-Wochenplaner",
+  "short_name": "SuPER Küche",
+  "description": "Gesunde, proteinreiche Familienrezepte mit Wochenplan, Einkaufsplan und Nährwerten.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F4F6F2",
+  "theme_color": "#11403A",
+  "lang": "de",
+  "icons": [{ "src": "img/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

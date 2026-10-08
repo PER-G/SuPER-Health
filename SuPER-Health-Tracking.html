@@ -240,6 +240,7 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 <div class="ni" onclick="go('asst',this)"><span class="ni-i">💬</span> Assistent</div>
 <div class="ni" onclick="go('week',this);renWeekView()"><span class="ni-i">📅</span> Wochenübersicht</div>
 <div class="ni" onclick="go('meals',this)"><span class="ni-i">🍽️</span> Ernährungsplan</div>
+<a href="/wochenplaner/" class="ni" style="text-decoration:none"><span class="ni-i">🛒</span> Wochenplaner &amp; Einkauf</a>
 <div class="ni" onclick="go('train',this)"><span class="ni-i">💪</span> Training</div>
 </div>
 <div class="ns"><div class="ns-t">Profil</div>
@@ -973,6 +974,36 @@ function checkShared(silent){try{
     if(!silent)toast('Werte aus dem Rechner übernommen ✓');}
 }catch(e){console.warn('checkShared',e);}}
 
+// === HANDOFF (Mahlzeiten aus der SuPER Küche – Familien-Wochenplaner) ===
+// Gleiche Domain: Warteschlange 'kueche2track' im gemeinsamen Speicher. Andere Domain: Link mit #meals=<base64>.
+// Jeder Eintrag hat eine id und wird nur einmal übernommen ('kueche2track_done').
+function importMeals(list){
+  let done=[];try{done=JSON.parse(localStorage.getItem('kueche2track_done')||'[]');}catch(e){}
+  const tm=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});let n=0;
+  (list||[]).forEach(function(it){
+    if(!it||!it.id||!it.entry||done.indexOf(it.id)>=0)return;
+    const e=it.entry,num=v=>Math.max(0,+v||0);
+    const en={n:String(e.n||'Gericht').slice(0,90),e:String(e.e||'🍽️').slice(0,4),a:1,u:'Portion',k:Math.round(num(e.k)),p:+num(e.p).toFixed(1),c:+num(e.c).toFixed(1),f:+num(e.f).toFixed(1),t:tm,src:'SuPER Küche'};
+    const key=/^\d{4}-\d{2}-\d{2}$/.test(it.date||'')?it.date:todayKey();
+    if(key===activeDate)log.push(en);
+    else{const d=hist[key]||(hist[key]={k:0,p:0,c:0,f:0,entries:[],water:0});d.entries=(d.entries||[]).concat(en);
+      const t=d.entries.reduce((a,x)=>({k:a.k+x.k,p:a.p+x.p,c:a.c+x.c,f:a.f+x.f}),{k:0,p:0,c:0,f:0});d.k=Math.round(t.k);d.p=Math.round(t.p);d.c=Math.round(t.c);d.f=Math.round(t.f);}
+    done.push(it.id);n++;
+  });
+  localStorage.setItem('kueche2track_done',JSON.stringify(done.slice(-500)));
+  if(n){saveAll();updUI();updDash();if(typeof renDailyBar==='function')renDailyBar();if(typeof renWeekCal==='function')renWeekCal();if(typeof renWeekView==='function')renWeekView();
+    toast(n===1?'🍽️ Mahlzeit aus der SuPER Küche übernommen':'🍽️ '+n+' Mahlzeiten aus der SuPER Küche übernommen');}
+  return n;
+}
+function checkMeals(){try{
+  const h=location.hash||'';const m=h.match(/meals=([^&]+)/);
+  if(m){let d=null;try{d=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));}catch(e){console.warn('Mahlzeiten-Import fehlerhaft',e);}
+    if(Array.isArray(d))importMeals(d);
+    try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}}
+  const raw=localStorage.getItem('kueche2track');
+  if(raw){const q=JSON.parse(raw);if(Array.isArray(q)&&q.length){importMeals(q);localStorage.removeItem('kueche2track');}}
+}catch(e){console.warn('checkMeals',e);}}
+
 // === DIAGRAMME: Tages-Balken + Wochen-Chart ===
 function escAttr(s){return(s||'').replace(/"/g,'&quot;');}
 function goAddMeal(){go('track',document.getElementById('niTrack')||document.querySelectorAll('.ni')[1]);setTimeout(()=>{const i=document.getElementById('fInp');if(i){i.scrollIntoView({block:'center'});i.focus();}},120);}
@@ -1070,10 +1101,10 @@ renBC('armCh',[{l:'Jan',v:36},{l:'Feb',v:36.5},{l:'Mär',v:37},{l:'Apr',v:37.2},
 renBC('pWC',[{l:'W1',v:81.3},{l:'W2',v:80.8},{l:'W3',v:80.5},{l:'W4',v:80.1},{l:'W5',v:79.6},{l:'W6',v:79.2},{l:'W7',v:78.8},{l:'W8',v:78.5}],'var(--acc)');
 renderChatChips();chatGreet();renWeekView();
 {const mu=document.getElementById('mealApiUrl');if(mu)mu.value=localStorage.getItem('vfMealApi')||'';const mt=document.getElementById('mealApiToken');if(mt)mt.value=localStorage.getItem('vfMealTok')||'';}
-checkImport();checkShared();
-window.addEventListener('hashchange',checkImport);
-window.addEventListener('focus',function(){checkShared();});
-document.addEventListener('visibilitychange',function(){if(!document.hidden)checkShared();});
+checkImport();checkShared();checkMeals();
+window.addEventListener('hashchange',function(){checkImport();checkMeals();});
+window.addEventListener('focus',function(){checkShared();checkMeals();});
+document.addEventListener('visibilitychange',function(){if(!document.hidden){checkShared();checkMeals();}});
 // Pfeiltasten: Wochendiagramm blättern (nur auf der Wochenübersicht, nicht in Eingabefeldern)
 document.addEventListener('keydown',function(e){
   const wk=document.getElementById('pg-week');if(!wk||!wk.classList.contains('act'))return;

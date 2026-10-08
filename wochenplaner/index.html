@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SuPER Küche – Familien-Wochenplaner</title>
+<meta name="description" content="Gesunde, proteinreiche Familienrezepte für Erwachsene, Babys und Kleinkinder – mit Wochenplaner, Einkaufsliste, Nährwerten und Übertragung in SuPER Health. Glutenfrei, laktosefrei und FODMAP-arm möglich.">
+<meta name="theme-color" content="#11403A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="img/icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,420;9..144,560;9..144,640&family=Instrument+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="#plan"><span class="brand-mark">S</span><span><b>SuPER Küche</b><small>Familien-Wochenplaner</small></span></a>
+    <nav id="topnav"></nav>
+  </header>
+
+  <main>
+    <section class="page" id="pg-plan"></section>
+    <section class="page" id="pg-rezepte"></section>
+    <section class="page" id="pg-einkauf"></section>
+    <section class="page" id="pg-einstellungen"></section>
+    <section class="page" id="pg-konto"></section>
+  </main>
+</div>
+
+<nav class="bnav" id="bnav"></nav>
+<div class="overlay" id="overlay"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" role="status"></div>
+<input type="file" id="importFile" accept="application/json" class="sr">
+
+<script src="js/ingredients.js"></script>
+<script src="js/core.js"></script>
+<script src="js/packs.js"></script>
+<script src="js/recipes/fruehstueck.js"></script>
+<script src="js/recipes/mediterran.js"></script>
+<script src="js/recipes/asiatisch.js"></script>
+<script src="js/recipes/familie.js"></script>
+<script src="js/recipes/z-extra.js"></script>
+<script src="js/recipes/protein.js"></script>
+<script src="js/image-credits.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
