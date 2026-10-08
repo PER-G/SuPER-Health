@@ -8,7 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,420;0,9..144,560;0,9..144,640;1,9..144,460&family=Instrument+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{color-scheme:light;--bg:#EDF2EE;--bg2:#F3F7F4;--bg3:#FFFFFF;--bg4:#E8EFEA;--acc:#11403A;--acc2:#2E8C6B;--accg:rgba(46,140,107,0.12);--accgs:rgba(46,140,107,0.28);--ora:#C97A2B;--orag:rgba(201,122,43,0.14);--red:#A23A2E;--redg:rgba(162,58,46,0.12);--blu:#2F6FB0;--blug:rgba(47,111,176,0.13);--pur:#8A5CC0;--purg:rgba(138,92,192,0.13);--t1:#1B2421;--t2:#46544F;--t3:#6C7A75;--bdr:#DCE7E1;--bdra:rgba(46,140,107,0.4);--r:16px;--rs:10px;--rx:6px;--sh:0 1px 2px rgba(17,64,58,.06),0 8px 28px rgba(17,64,58,.08);--tr:0.3s cubic-bezier(0.4,0,0.2,1);--disp:'Fraunces',Georgia,serif;--mono:'Spline Sans Mono',ui-monospace,monospace}
+:root{color-scheme:light;--bg:#EDF2EE;--bg2:#F3F7F4;--bg3:#FFFFFF;--bg4:#E8EFEA;--acc:#11403A;--acc2:#2E8C6B;--accg:rgba(46,140,107,0.12);--accgs:rgba(46,140,107,0.28);--ora:#C97A2B;--orag:rgba(201,122,43,0.14);--red:#A23A2E;--redg:rgba(162,58,46,0.12);--blu:#2F6FB0;--blug:rgba(47,111,176,0.13);--pur:#8A5CC0;--purg:rgba(138,92,192,0.13);--t1:#1B2421;--t2:#46544F;--t3:#6C7A75;--bdr:#DCE7E1;--bdra:rgba(46,140,107,0.4);--r:16px;--rs:10px;--rx:6px;--sh:0 1px 2px rgba(17,64,58,.06),0 8px 28px rgba(17,64,58,.08);--tr:0.3s cubic-bezier(0.4,0,0.2,1);--disp:'Fraunces',Georgia,serif;--mono:'Spline Sans Mono',ui-monospace,monospace;--pine-deep:#11403A;--card:#FFFFFF}
+.small{font-size:12px}.mono{font-family:var(--mono)}
 html{scroll-behavior:smooth}body{font-family:'Instrument Sans',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden}
 h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);letter-spacing:-.01em}
 .st-v,.sv,.cc .vl,.ma-v,.bp-v,.fdi-mc .fv,.lf-k,#rTm,.fdi-mc .fv{font-family:var(--mono)}
@@ -220,13 +221,41 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 .weekcal .wline.max{border-top-color:var(--ora)}
 .weekcal .wline span{position:absolute;left:2px;top:-9px;font-size:9px;font-weight:700;color:var(--t2);background:var(--bg3);padding:1px 5px;border-radius:5px;border:1px solid var(--bdr);line-height:1.3}
 .lgi{display:inline-flex;align-items:center;gap:6px}.lgi i{width:11px;height:11px;border-radius:3px;display:inline-block}
+/* Mobiles Menü: eigener Scrollbereich, Abdunklung, Wischgesten */
+.sb{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.sb-x,.sb-bd{display:none}
+@media(max-width:900px){
+.sb{width:min(290px,84vw);padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+.sb.open{box-shadow:0 0 48px rgba(17,32,28,.28)}
+.sb-bd{display:block;position:fixed;inset:0;z-index:99;background:rgba(17,32,28,.4);opacity:0;pointer-events:none;transition:opacity var(--tr);touch-action:none}
+.sb-bd.sh{opacity:1;pointer-events:auto}
+.sb-x{display:flex;position:absolute;top:18px;right:12px;width:36px;height:36px;border-radius:10px;border:1px solid var(--bdr);background:var(--bg3);color:var(--t2);font-size:16px;align-items:center;justify-content:center;cursor:pointer}
+.sb-logo{padding-right:44px}
+body.nav-open{overflow:hidden}
+body.nav-open .ham{opacity:0;pointer-events:none}
+.mc{padding-top:72px}
+.ham{box-shadow:var(--sh)}
+body.nav-open .fab{opacity:0;pointer-events:none}}
+@media(max-width:600px){.sg{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}.sc{padding:14px}.sc .si{width:32px;height:32px;font-size:15px;margin-bottom:8px}.sv{font-size:22px}.sl{font-size:10.5px;letter-spacing:.6px}.cd{padding:18px}}
+/* Wochenplaner-Anbindung */
+.kp-i{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--rs);background:var(--bg2);border:1px solid var(--bdr);margin-bottom:8px}
+.kp-i img{width:46px;height:46px;border-radius:10px;object-fit:cover;flex:none;background:var(--bg4)}
+.kp-i .kp-t{flex:1;min-width:0}.kp-i .kp-n{font-weight:600;font-size:14px;line-height:1.3}
+.kp-i .kp-d{font-size:11px;color:var(--t2);margin-top:2px}
+.kp-ok{font-size:11px;font-weight:700;color:var(--acc);white-space:nowrap}
+.mc2-i img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mhint{padding:14px 16px;border-radius:var(--rs);background:var(--accg);color:var(--t2);font-size:13px;line-height:1.5;margin-bottom:16px}
+.mhint a{color:var(--acc);font-weight:700}
+.tb{scrollbar-width:none}.tb::-webkit-scrollbar{display:none}
 </style>
 </head>
 <body>
 <div class="amb"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
-<div class="ham" onclick="document.getElementById('sb').classList.toggle('open')">☰</div>
+<div class="ham" id="ham" onclick="toggleNav()" role="button" aria-label="Menü öffnen">☰</div>
+<div class="sb-bd" id="sbBd" onclick="closeNav()"></div>
 <div class="app">
 <aside class="sb" id="sb">
+<button class="sb-x" onclick="closeNav()" aria-label="Menü schließen">✕</button>
 <a href="/" class="sb-logo" style="text-decoration:none;color:inherit" title="Zur SuPER Health Startseite"><div class="logo-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 13h4l2.4-6 3.6 10 2.4-6.5L17 13h4" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="logo-t">SuPER <span>Health</span></div><div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--t3);text-transform:uppercase">Tracking</div></div></a>
 <nav>
 <div class="ns"><div class="ns-t">SuPER Health</div>
@@ -238,7 +267,7 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 <div class="ni" id="niTrack" onclick="go('track',this)"><span class="ni-i">🔥</span> Kalorien Tracker</div>
 <div class="ni" onclick="go('scan',this)"><span class="ni-i">📷</span> Scanner</div>
 <div class="ni" onclick="go('asst',this)"><span class="ni-i">💬</span> Assistent</div>
-<div class="ni" onclick="go('week',this);renWeekView()"><span class="ni-i">📅</span> Wochenübersicht</div>
+<div class="ni" id="niWeek" onclick="go('week',this);renWeekView()"><span class="ni-i">📅</span> Wochenübersicht</div>
 <div class="ni" onclick="go('meals',this)"><span class="ni-i">🍽️</span> Ernährungsplan</div>
 <a href="/wochenplaner/" class="ni" style="text-decoration:none"><span class="ni-i">🛒</span> Wochenplaner &amp; Einkauf</a>
 <div class="ni" onclick="go('train',this)"><span class="ni-i">💪</span> Training</div>
@@ -253,7 +282,7 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 <div class="ni" onclick="go('prog',this)"><span class="ni-i">📈</span> Fortschritt</div>
 </div>
 </nav>
-<div class="sb-ft"><div class="st-l">🔥 Aktuelle Streak</div><div class="st-v" id="streakV">12</div><div class="st-s">Tage in Folge aktiv</div></div>
+<div class="sb-ft"><div class="st-l">🔥 Aktuelle Streak</div><div class="st-v" id="streakV">0</div><div class="st-s" id="streakS">Tage in Folge getrackt</div></div>
 </aside>
 <main class="mc">
 <!-- DASHBOARD -->
@@ -313,6 +342,8 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 <div class="sc"><div class="si prp">🧈</div><div class="sl">Fett</div><div class="sv" id="tFat">0g</div><div class="sch" id="tFatG">Ziel: 65g</div></div>
 </div>
 <div class="dg">
+<div>
+<div class="cd" id="kpCard"></div>
 <div class="cd">
 <div class="ch"><div class="ct">🔍 Lebensmittel suchen</div></div>
 <div class="fsc"><span class="fsic">🔍</span>
@@ -328,7 +359,7 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 <div class="fgp"><label class="fl">Carbs</label><input class="fi" type="number" id="mC" placeholder="g"></div>
 <div class="fgp"><label class="fl">Fett</label><input class="fi" type="number" id="mF" placeholder="g"></div>
 </div><button class="btn pr" onclick="addMan()" style="width:100%;justify-content:center">+ Manuell hinzufügen</button>
-</div></div>
+</div></div></div>
 <div>
 <div class="cd"><div class="ch"><div class="ct">📋 Heutiges Tagebuch</div><div style="display:flex;gap:8px;align-items:center"><div class="cb cb-g" id="logN">0 Einträge</div><button class="btn sm pr" onclick="goAddMeal()">＋ Mahlzeit</button></div></div>
 <div class="dwrap"><div class="daycol"><div id="dayTotCap" class="daytotcap"></div><div id="dayBar" class="daybar"></div></div>
@@ -344,7 +375,8 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 
 <!-- MEALS -->
 <section class="pg" id="pg-meals">
-<div class="hd"><div class="hd-l"><h1>🍽️ Ernährungsplan</h1></div><div class="hd-r"><button class="btn pr" onclick="genM()">🤖 Plan generieren</button></div></div>
+<div class="hd"><div class="hd-l"><h1>🍽️ Ernährungsplan</h1><p id="mSub">Deine Mahlzeiten für diese Woche</p></div><div class="hd-r" id="mHdr"></div></div>
+<div id="mHint"></div>
 <div class="tb" id="mTb"><button class="tbn act" onclick="stb(this)">Mo</button><button class="tbn" onclick="stb(this)">Di</button><button class="tbn" onclick="stb(this)">Mi</button><button class="tbn" onclick="stb(this)">Do</button><button class="tbn" onclick="stb(this)">Fr</button><button class="tbn" onclick="stb(this)">Sa</button><button class="tbn" onclick="stb(this)">So</button></div>
 <div class="tg" id="mG"></div>
 </section>
@@ -415,10 +447,10 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 <section class="pg" id="pg-prog">
 <div class="hd"><div class="hd-l"><h1>📈 Fortschritt</h1></div></div>
 <div class="sg">
-<div class="sc"><div class="si grn">📅</div><div class="sl">Aktive Tage</div><div class="sv">47</div><div class="sch">von 60</div></div>
-<div class="sc"><div class="si org">🏋️</div><div class="sl">Trainings</div><div class="sv">38</div><div class="sch">↑ 12%</div></div>
-<div class="sc"><div class="si bl">⚖️</div><div class="sl">Abgenommen</div><div class="sv" id="prLost">—</div><div class="sch">8 Wochen</div></div>
-<div class="sc"><div class="si rd">🎯</div><div class="sl">Ziel</div><div class="sv">78%</div><div class="sch">↑ auf Kurs!</div></div>
+<div class="sc"><div class="si grn">📅</div><div class="sl">Aktive Tage</div><div class="sv" id="prAct">0</div><div class="sch">der letzten 30 Tage</div></div>
+<div class="sc"><div class="si org">🍽️</div><div class="sl">Einträge</div><div class="sv" id="prEnt">0</div><div class="sch">in 30 Tagen</div></div>
+<div class="sc"><div class="si bl">⚖️</div><div class="sl">Gewicht</div><div class="sv" id="prLost">—</div><div class="sch" id="prLostS">noch kein Verlauf</div></div>
+<div class="sc"><div class="si rd">🎯</div><div class="sl">Im Ziel</div><div class="sv" id="prGoal">—</div><div class="sch" id="prGoalS">der getrackten Tage</div></div>
 </div>
 <div class="dg">
 <div class="cd"><div class="ch"><div class="ct">Gewichtsverlauf</div></div><div class="cbr" id="pWC"></div></div>
@@ -625,6 +657,7 @@ let hist={};            // { 'YYYY-MM-DD': {k,p,c,f,entries:[],water} }
 let activeDate=null;    // aktuell bearbeiteter Tag
 let prof={name:'Alex',age:28,sex:'Männlich',height:182,weight:78.5,bf:16,bench:95,squat:120,dl:140,ohp:60,goals:['Muskelaufbau']};
 let goals={k:1800,p:180,c:200,f:65,maint:2200};
+let wHist={},bHist={};   // Gewichts- und Maß-Verlauf { 'YYYY-MM-DD': kg } / { 'YYYY-MM-DD': {arm,…} }
 function keyOf(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function todayKey(){return keyOf(new Date());}
 function nextKey(k){const d=new Date(k+'T12:00:00');d.setDate(d.getDate()+1);return keyOf(d);}
@@ -642,14 +675,14 @@ function loadAll(){try{
 const d=JSON.parse(localStorage.getItem('vf4'));if(!d){activeDate=todayKey();return;}
 if(d.prof)prof=Object.assign(prof,d.prof);if(d.goals)goals=Object.assign(goals,d.goals);if(d.bodyM)bodyM=d.bodyM;if(d.prefs)prefs=d.prefs;
 if(d.TP)TP=d.TP;if(d.tpDone)tpDone=d.tpDone;if(d.tpNames)for(let i=0;i<d.tpNames.length;i++)tpNames[i]=d.tpNames[i];
-if(d.hist)hist=d.hist;
+if(d.hist)hist=d.hist;if(d.wHist)wHist=d.wHist;if(d.bHist)bHist=d.bHist;
 for(const k in hist){if(typeof hist[k]==='number')hist[k]={k:hist[k],p:0,c:0,f:0,entries:[],water:0};} // alt: Zahl -> Objekt
 activeDate=todayKey(); // beim Laden immer automatisch den heutigen Tag wählen (manuell änderbar im Header)
 if(d.dt===new Date().toDateString()&&d.log&&!hist[activeDate])hist[activeDate]={k:0,p:0,c:0,f:0,entries:d.log,water:d.w||0}; // Altformat übernehmen
 const day=hist[activeDate];log=(day&&day.entries)?day.entries.slice():[];water=day?(day.water||0):0;
 }catch(e){console.error(e);activeDate=todayKey();}}
 function saveAll(){try{const t=log.reduce((a,e)=>({k:a.k+e.k,p:a.p+e.p,c:a.c+e.c,f:a.f+e.f}),{k:0,p:0,c:0,f:0});hist[activeDate||todayKey()]={k:Math.round(t.k),p:Math.round(t.p),c:Math.round(t.c),f:Math.round(t.f),entries:log.slice(),water};}catch(e){}
-localStorage.setItem('vf4',JSON.stringify({v:5,activeDate,prof,goals,bodyM,prefs,TP,tpDone,tpNames,hist}));}
+localStorage.setItem('vf4',JSON.stringify({v:5,activeDate,prof,goals,bodyM,prefs,TP,tpDone,tpNames,hist,wHist,bHist}));}
 function endDay(){const cur=activeDate||todayKey();saveAll();activeDate=nextKey(cur);log=[];water=0;saveAll();
 renW();const wc=document.getElementById('wC');if(wc)wc.textContent=water;updUI();updDash();if(typeof renDailyBar==='function')renDailyBar();if(typeof renWeekCal==='function')renWeekCal();if(typeof renWeekView==='function')renWeekView();
 toast('✓ '+fmtDay(cur)+' abgeschlossen → jetzt '+fmtDay(activeDate));}
@@ -658,7 +691,29 @@ function setActiveDate(k){if(!k||k===activeDate)return;saveAll();activeDate=k;co
 renW();const wc=document.getElementById('wC');if(wc)wc.textContent=water;updUI();updDash();if(typeof renDailyBar==='function')renDailyBar();if(typeof renWeekCal==='function')renWeekCal();if(typeof renWeekView==='function')renWeekView();
 toast(k===todayKey()?'📅 Heute ('+fmtDay(k)+')':'📅 Tag gewechselt: '+fmtDay(k));}
 // === NAV ===
-function go(p,el){document.querySelectorAll('.pg').forEach(s=>s.classList.remove('act'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));document.getElementById('pg-'+p).classList.add('act');if(el)el.classList.add('act');if(window.innerWidth<900)document.getElementById('sb').classList.remove('open');}
+function go(p,el){document.querySelectorAll('.pg').forEach(s=>s.classList.remove('act'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));document.getElementById('pg-'+p).classList.add('act');if(el)el.classList.add('act');if(window.innerWidth<900)closeNav();window.scrollTo(0,0);if(p==='meals')renMeals('mG');if(p==='prog')renProgStats();}
+function openNav(){document.getElementById('sb').classList.add('open');document.getElementById('sbBd').classList.add('sh');document.body.classList.add('nav-open');}
+function closeNav(){document.getElementById('sb').classList.remove('open');document.getElementById('sbBd').classList.remove('sh');document.body.classList.remove('nav-open');}
+function toggleNav(){if(document.getElementById('sb').classList.contains('open'))closeNav();else openNav();}
+// Wischgesten (Handy): Menü nach links zuwischen, vom linken Rand aufziehen. Vertikales Scrollen im Menü bleibt unberührt.
+function initNavSwipe(){
+  const sb=document.getElementById('sb'),bd=document.getElementById('sbBd');let sx=0,sy=0,mode=null,drag=false,w=280;
+  const mob=()=>window.innerWidth<900;
+  document.addEventListener('touchstart',function(e){mode=null;drag=false;if(!mob()||e.touches.length!==1)return;
+    const t=e.touches[0];sx=t.clientX;sy=t.clientY;w=sb.offsetWidth||280;const open=sb.classList.contains('open');
+    if(open&&(e.target.closest('#sb')||e.target===bd))mode='close';else if(!open&&sx<22&&!document.querySelector('.mo.sh'))mode='open';},{passive:true});
+  document.addEventListener('touchmove',function(e){if(!mode)return;const t=e.touches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+    if(!drag){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;if(Math.abs(dy)>=Math.abs(dx)){mode=null;return;}drag=true;sb.style.transition='none';bd.style.transition='none';bd.classList.add('sh');}
+    if(e.cancelable)e.preventDefault();
+    const off=mode==='close'?Math.min(0,dx):Math.min(0,-w+dx);sb.style.transform='translateX('+off+'px)';bd.style.opacity=String(Math.max(0,1+off/w));},{passive:false});
+  const end=function(e){if(!mode||!drag){mode=null;return;}const t=e.changedTouches&&e.changedTouches[0];const dx=t?t.clientX-sx:0;
+    sb.style.transition='';sb.style.transform='';bd.style.transition='';bd.style.opacity='';
+    if(mode==='close'){if(dx<-w*0.25)closeNav();else openNav();}else{if(dx>w*0.3)openNav();else closeNav();}
+    mode=null;drag=false;};
+  document.addEventListener('touchend',end);document.addEventListener('touchcancel',end);
+  bd.addEventListener('touchmove',function(e){if(e.cancelable)e.preventDefault();},{passive:false}); // Hintergrund nicht mitscrollen
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeNav();});
+  window.addEventListener('resize',function(){if(!mob())closeNav();});}
 function goT(){go('track',document.getElementById('niTrack')||document.querySelectorAll('.ni')[1]);setTimeout(()=>document.getElementById('fInp').focus(),100);}
 // === FOOD SEARCH ===
 function initSearch(){
@@ -721,6 +776,7 @@ function setMacroBar(id,cur,goal){const el=document.getElementById(id);if(!el)re
   if(so)so.style.left=gp+'%';
   el.title=Math.round(cur)+' von '+Math.round(goal)+(op>0?' · '+Math.round(cur-goal)+' über Ziel':'');}
 function updUI(){const t=log.reduce((a,e)=>({k:a.k+e.k,p:a.p+e.p,c:a.c+e.c,f:a.f+e.f}),{k:0,p:0,c:0,f:0});
+renKueche();renStreak();
 {const tl=document.getElementById('trackDayLbl');if(tl)tl.textContent=(activeDate===todayKey()?'Heute':'📅 '+fmtDay(activeDate))+' · '+log.length+' Einträge';
  const td=document.getElementById('trackDate');if(td&&td.value!==activeDate)td.value=activeDate;}
 const pc=(v,g)=>Math.min(100,v/g*100).toFixed(1);
@@ -741,15 +797,31 @@ document.getElementById('dW').textContent=prof.weight;document.getElementById('d
 document.getElementById('logN').textContent=log.length+' Einträge';
 const ll=document.getElementById('logL');
 if(!log.length){ll.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--t3)"><div style="font-size:48px;margin-bottom:12px">🍽️</div><div style="font-weight:600">Noch keine Einträge</div></div>';if(typeof renDailyBar==='function')renDailyBar();if(typeof renWeekCal==='function')renWeekCal();return;}
-ll.innerHTML=log.map((e,i)=>'<div class="lfi"><div class="lf-e">'+e.e+'</div><div class="lf-inf"><div class="lf-n">'+e.n+'</div><div class="lf-d">'+e.a+' '+(e.u||'g')+'· '+e.t+' · P:'+Math.round(e.p)+'g C:'+Math.round(e.c)+'g F:'+Math.round(e.f)+'g</div></div><div class="lf-k">'+e.k+' kcal</div><button class="lf-x" onclick="delLog('+i+')" title="Eintrag löschen">−</button></div>').join('');
+ll.innerHTML=log.map((e,i)=>'<div class="lfi"><div class="lf-e">'+e.e+'</div><div class="lf-inf"><div class="lf-n">'+escHtml(String(e.n))+'</div><div class="lf-d">'+e.a+' '+(e.u||'g')+' · '+(e.src?e.src+' · ':'')+e.t+' · P:'+Math.round(e.p)+'g C:'+Math.round(e.c)+'g F:'+Math.round(e.f)+'g</div></div><div class="lf-k">'+e.k+' kcal</div><button class="lf-x" onclick="delLog('+i+')" title="Eintrag löschen">−</button></div>').join('');
 if(typeof renDailyBar==='function')renDailyBar();if(typeof renWeekCal==='function')renWeekCal();}
 // === WATER ===
 function renW(){const c=document.getElementById('wT');c.innerHTML='';for(let i=0;i<8;i++){const d=document.createElement('div');d.className='wd'+(i<water?' fl':'');d.innerHTML='<span>💧</span>';d.onclick=()=>{water=i+1;saveAll();renW();document.getElementById('wC').textContent=water;toast('💧 Wasser geloggt!');};c.appendChild(d);}}
 // === MEALS ===
 const MP={b:[{n:'Protein Oats',e:'🥣',d:'Haferflocken, Protein, Beeren',k:420,p:38,c:52,f:8},{n:'Rührei Avocado Toast',e:'🍳',d:'3 Eier, Vollkorn, Avocado',k:480,p:32,c:35,f:22},{n:'Skyr Bowl',e:'🫐',d:'Skyr, Granola, Beeren',k:380,p:35,c:42,f:10}],l:[{n:'Hähnchen-Quinoa',e:'🍗',d:'Hähnchen, Quinoa, Brokkoli',k:620,p:52,c:58,f:16},{n:'Lachs mit Reis',e:'🐟',d:'Lachs, Wildreis, Spinat',k:580,p:48,c:45,f:20},{n:'Thunfisch-Wrap',e:'🌯',d:'Thunfisch, Salat, Tortilla',k:410,p:38,c:35,f:12}],d:[{n:'Steak Süßkartoffel',e:'🥩',d:'Rind, Gemüse, Süßkartoffel',k:650,p:48,c:42,f:24},{n:'Tofu Stir-Fry',e:'🥘',d:'Tofu, Wok-Gemüse, Reis',k:480,p:28,c:42,f:18},{n:'Puten-Spinat',e:'🦃',d:'Pute, Spinat, Feta',k:420,p:45,c:12,f:18}],s:[{n:'Protein Mug Cake',e:'🍫',d:'Whey, Ei, Haferflocken',k:220,p:25,c:18,f:6},{n:'Energy Balls',e:'🟤',d:'Datteln, Nüsse, Kakao',k:145,p:6,c:14,f:8},{n:'Griech. Salat',e:'🥗',d:'Feta, Tomaten, Gurke, Oliven',k:280,p:12,c:10,f:22}]};
-function renMeals(id){const c=document.getElementById(id);c.innerHTML='';[{k:'b',l:'Frühstück',t:'07:30',css:'bf'},{k:'l',l:'Mittagessen',t:'12:30',css:'lu'},{k:'d',l:'Abendessen',t:'19:00',css:'di'},{k:'s',l:'Snack',t:'15:30',css:'sn'}].forEach(t=>{const m=MP[t.k][Math.floor(Math.random()*MP[t.k].length)];c.innerHTML+='<div class="mc2"><div class="mc2-i '+t.css+'">'+m.e+'<div class="mbg">'+t.t+'</div></div><div class="mc2-b"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">'+t.l+'</div><h4>'+m.n+'</h4><p>'+m.d+'</p><div class="mm"><div class="ma kcl"><div class="ma-v">'+m.k+'</div><div class="ma-l">kcal</div></div><div class="ma pro"><div class="ma-v">'+m.p+'g</div><div class="ma-l">Protein</div></div><div class="ma crb"><div class="ma-v">'+m.c+'g</div><div class="ma-l">Carbs</div></div><div class="ma fat"><div class="ma-v">'+m.f+'g</div><div class="ma-l">Fett</div></div></div><div style="display:flex;gap:8px;margin-top:12px"><button class="mcb" style="margin-top:0;flex:1;background:var(--acc);color:#fff;border-color:var(--acc)" onclick="trackMeal(\''+m.n.replace(/'/g,'')+'\',\''+m.e+'\','+m.k+','+m.p+','+m.c+','+m.f+')">＋ Tracker</button><button class="mcb" style="margin-top:0;flex:1" onclick="this.classList.toggle(\'chk\');this.innerHTML=this.classList.contains(\'chk\')?\'✓ Erledigt\':\'○ Abhaken\'">○ Abhaken</button></div></div></div>';});}
+function renMeals(id){const c=document.getElementById(id);if(!c)return;
+  const tabs=[...document.querySelectorAll('#mTb .tbn')],idx=Math.max(0,tabs.findIndex(b=>b.classList.contains('act')));
+  const mon=mondayKey(todayKey()),kp=kuechePlan();
+  tabs.forEach((b,i)=>{const k=addDaysKey(mon,i);b.textContent=fmtDay(k).replace(',','');b.title=k===todayKey()?'heute':'';});
+  if(tabs[idx]&&tabs[idx].scrollIntoView)tabs[idx].parentNode.scrollLeft=Math.max(0,tabs[idx].offsetLeft-40);
+  const dk=addDaysKey(mon,idx),hdr=document.getElementById('mHdr'),hint=document.getElementById('mHint'),sub=document.getElementById('mSub');
+  if(kp){
+    if(hdr)hdr.innerHTML='<a class="btn pr" href="'+KP_URL+'" style="text-decoration:none">🛒 Im Wochenplaner bearbeiten</a>';
+    if(sub)sub.textContent='Aus deinem Wochenplaner (SuPER Küche) · Nährwerte pro Erwachsenen-Portion';
+    const list=kp.days[dk]||[];
+    if(hint)hint.innerHTML=list.length?'':'<div class="mhint">Für <b>'+fmtDay(dk)+'</b> ist im Wochenplaner nichts geplant. <a href="'+KP_URL+'">Jetzt planen →</a></div>';
+    c.innerHTML=list.map((m,i)=>{const done=hasKid(dk,kidOf(m));return '<div class="mc2"><div class="mc2-i '+({fruehstueck:'bf',mittag:'lu',abend:'di',snack:'sn'}[m.meal]||'lu')+'">'+(m.e||'🍽️')+(m.img?'<img src="'+KP_URL+escAttr(m.img)+'" alt="" loading="lazy" onerror="this.remove()">':'')+'<div class="mbg" style="z-index:1;color:#fff">'+escHtml(m.mealN||'')+'</div></div><div class="mc2-b"><h4>'+escHtml(m.n)+'</h4><div class="mm"><div class="ma kcl"><div class="ma-v">'+Math.round(m.k)+'</div><div class="ma-l">kcal</div></div><div class="ma pro"><div class="ma-v">'+Math.round(m.p)+'g</div><div class="ma-l">Protein</div></div><div class="ma crb"><div class="ma-v">'+Math.round(m.c)+'g</div><div class="ma-l">Carbs</div></div><div class="ma fat"><div class="ma-v">'+Math.round(m.f)+'g</div><div class="ma-l">Fett</div></div></div>'+(done?'<button class="mcb chk" disabled>✓ Im Tagebuch</button>':'<button class="mcb" style="background:var(--acc);color:#fff;border-color:var(--acc)" onclick="addPlanned(\''+dk+'\','+i+')">＋ Ins Tagebuch ('+(dk===todayKey()?'heute':fmtDay(dk))+')</button>')+'</div></div>';}).join('');
+    return;}
+  if(hdr)hdr.innerHTML='<button class="btn" onclick="genM()">🔄 Neue Vorschläge</button><a class="btn pr" href="'+KP_URL+'" style="text-decoration:none">🛒 Woche planen</a>';
+  if(sub)sub.textContent='Vorschläge für '+fmtDay(dk);
+  if(hint)hint.innerHTML='<div class="mhint">💡 Plane deine Woche im <a href="'+KP_URL+'">Wochenplaner (SuPER Küche)</a> – deine Gerichte erscheinen danach automatisch hier und im Kalorien-Tracker und lassen sich mit einem Tipp übernehmen.</div>';
+  c.innerHTML='';[{k:'b',l:'Frühstück',t:'07:30',css:'bf'},{k:'l',l:'Mittagessen',t:'12:30',css:'lu'},{k:'d',l:'Abendessen',t:'19:00',css:'di'},{k:'s',l:'Snack',t:'15:30',css:'sn'}].forEach(t=>{const m=MP[t.k][Math.floor(Math.random()*MP[t.k].length)];c.innerHTML+='<div class="mc2"><div class="mc2-i '+t.css+'">'+m.e+'<div class="mbg">'+t.t+'</div></div><div class="mc2-b"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">'+t.l+'</div><h4>'+m.n+'</h4><p>'+m.d+'</p><div class="mm"><div class="ma kcl"><div class="ma-v">'+m.k+'</div><div class="ma-l">kcal</div></div><div class="ma pro"><div class="ma-v">'+m.p+'g</div><div class="ma-l">Protein</div></div><div class="ma crb"><div class="ma-v">'+m.c+'g</div><div class="ma-l">Carbs</div></div><div class="ma fat"><div class="ma-v">'+m.f+'g</div><div class="ma-l">Fett</div></div></div><div style="display:flex;gap:8px;margin-top:12px"><button class="mcb" style="margin-top:0;flex:1;background:var(--acc);color:#fff;border-color:var(--acc)" onclick="trackMeal(\''+m.n.replace(/'/g,'')+'\',\''+m.e+'\','+m.k+','+m.p+','+m.c+','+m.f+')">＋ Tracker</button><button class="mcb" style="margin-top:0;flex:1" onclick="this.classList.toggle(\'chk\');this.innerHTML=this.classList.contains(\'chk\')?\'✓ Erledigt\':\'○ Abhaken\'">○ Abhaken</button></div></div></div>';});}
 function trackMeal(n,e,k,p,c,f){log.push({n:n,e:e||'🍽️',a:1,u:'Portion',k:Math.round(k),p:+(+p).toFixed(1),c:+(+c).toFixed(1),f:+(+f).toFixed(1),t:new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})});saveAll();updUI();toast(n+' getrackt ✓');}
-function genM(){renMeals('mG');toast('Plan generiert! 🤖');}
+function genM(){renMeals('mG');toast('Neue Vorschläge 🔄');}
 function stb(b){document.querySelectorAll('#mTb .tbn').forEach(x=>x.classList.remove('act'));b.classList.add('act');renMeals('mG');}
 // === TRAINING (EDITABLE) ===
 function renTTabs(){const tb=document.getElementById('tTb');tb.innerHTML='';tpNames.forEach((n,i)=>{tb.innerHTML+='<button class="tbn'+(i===curTDay?' act':'')+'" onclick="setTD('+i+')">'+n+'</button>';});}
@@ -778,6 +850,7 @@ function loadProf(){document.getElementById('pName').value=prof.name;document.ge
 const gc=document.getElementById('goalChips');gc.innerHTML='';['Muskelaufbau','Abnehmen','Kraft','Ausdauer','Definition','Gesundheit'].forEach(g=>{gc.innerHTML+='<div class="ch2'+(prof.goals.includes(g)?' act':'')+'" onclick="this.classList.toggle(\'act\')">'+g+'</div>';});}
 function saveProf(){prof.name=document.getElementById('pName').value||'Alex';prof.age=+document.getElementById('pAge').value||28;prof.sex=document.getElementById('pSex').value;prof.height=+document.getElementById('pHeight').value||180;prof.weight=+document.getElementById('pWeight').value||80;prof.bf=+document.getElementById('pBF').value||15;prof.bench=+document.getElementById('pBench').value||0;prof.squat=+document.getElementById('pSquat').value||0;prof.dl=+document.getElementById('pDL').value||0;prof.ohp=+document.getElementById('pOHP').value||0;
 prof.goals=[];document.querySelectorAll('#goalChips .ch2.act').forEach(c=>prof.goals.push(c.textContent));
+if(prof.weight>0)wHist[todayKey()]=prof.weight;renWeightCharts();
 saveAll();updDash();renDailyBar();renWeekCal();toast('Profil gespeichert! 💾');}
 function updDash(){const h=new Date().getHours();document.getElementById('greet').textContent=(h<12?'Guten Morgen':h<18?'Guten Tag':'Guten Abend')+', '+prof.name+' 👋';
 document.getElementById('dashSub').textContent=prof.goals.length?'Ziel: '+prof.goals.join(', '):'Dein heutiger Überblick';
@@ -787,7 +860,7 @@ const bodyParts=[{k:'arm',l:'Oberarm',e:'💪'},{k:'chest',l:'Brust',e:'🫁'},{
 function renBody(){const m=document.getElementById('bodyMap'),fm=document.getElementById('bodyForm');
 m.innerHTML=bodyParts.map(b=>'<div class="bp"><div class="bp-e">'+b.e+'</div><div class="bp-l">'+b.l+'</div><div class="bp-v">'+bodyM[b.k]+'</div><div class="bp-u">cm</div></div>').join('');
 fm.innerHTML=bodyParts.map(b=>'<div class="fgp"><label class="fl">'+b.l+'</label><input class="fi" type="number" step="0.1" id="bf_'+b.k+'" placeholder="cm"></div>').join('');}
-function saveBody(){bodyParts.forEach(b=>{const v=parseFloat(document.getElementById('bf_'+b.k).value);if(v>0)bodyM[b.k]=v;});saveAll();renBody();toast('Maße gespeichert! 📏');}
+function saveBody(){let ch=false;bodyParts.forEach(b=>{const v=parseFloat(document.getElementById('bf_'+b.k).value);if(v>0){bodyM[b.k]=v;ch=true;}});if(ch)bHist[todayKey()]=Object.assign({},bodyM);renWeightCharts();saveAll();renBody();toast('Maße gespeichert! 📏');}
 // === PREFERENCES ===
 function loadPref(){const dc=document.getElementById('dietChips'),ac=document.getElementById('allergyChips');
 dc.innerHTML='';['Omnivor','Vegetarisch','Vegan','Keto','Paleo','High Protein','Low Carb','Flexitarisch'].forEach(d=>{dc.innerHTML+='<div class="ch2'+(prefs.diet.includes(d)?' act':'')+'" onclick="this.classList.toggle(\'act\')">'+d+'</div>';});
@@ -808,10 +881,29 @@ function showRec(i){const r=REC[i];document.getElementById('recDet').innerHTML='
 function renProg(){
 const sp=document.getElementById('strProg');
 sp.innerHTML=[{l:'Bankdrücken',v:prof.bench,g:150},{l:'Kniebeugen',v:prof.squat,g:180},{l:'Kreuzheben',v:prof.dl,g:200},{l:'Schulterdrücken',v:prof.ohp,g:80}].map(s=>'<div class="pbc"><div class="pbl"><span>'+s.l+'</span><span>'+s.v+'kg / '+s.g+'kg</span></div><div class="pb"><div class="pf grn" style="width:'+(s.v/s.g*100).toFixed(0)+'%"></div></div></div>').join('');}
+function renStreak(){const has=k=>dayEntries(k).length>0;let n=0;const d=new Date();if(!has(keyOf(d)))d.setDate(d.getDate()-1);
+  while(has(keyOf(d))&&n<3650){n++;d.setDate(d.getDate()-1);}
+  const v=document.getElementById('streakV');if(v)v.textContent=n;const s2=document.getElementById('streakS');if(s2)s2.textContent=n===1?'Tag getrackt':'Tage in Folge getrackt';}
+function renProgStats(){const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  let act=0,ent=0,inGoal=0;const dir=goalDir(),tg=goals.k||1;
+  for(let i=0;i<30;i++){const d=new Date();d.setDate(d.getDate()-i);const k=keyOf(d),es=dayEntries(k);if(!es.length)continue;act++;ent+=es.length;
+    const v=dayTotalK(k);if(dir==='bulk'?v>=tg*0.95:dir==='cut'?v<=tg*1.05:Math.abs(v-tg)<=tg*0.1)inGoal++;}
+  set('prAct',act);set('prEnt',ent);set('prGoal',act?Math.round(inGoal/act*100)+'%':'—');set('prGoalS',act?inGoal+' von '+act+' getrackten Tagen':'noch keine getrackten Tage');
+  const ks=Object.keys(wHist).sort();
+  if(ks.length>=2){const dlt=wHist[ks[ks.length-1]]-wHist[ks[0]];set('prLost',(dlt>0?'+':dlt<0?'−':'±')+Math.abs(dlt).toLocaleString('de-DE',{maximumFractionDigits:1})+' kg');set('prLostS','seit '+fmtDay(ks[0]));}
+  else{set('prLost',prof.weight?prof.weight+' kg':'—');set('prLostS',ks.length?'Verlauf ab der 2. Messung':'Gewicht unter „Mein Profil“ speichern');}}
+// Gewichts-/Oberarm-Verlauf aus echten Messungen (Profil bzw. Körpermaße speichern)
+function renWeightCharts(){
+  const empty=(id,txt)=>{const c=document.getElementById(id);if(c)c.innerHTML='<div style="flex:1;align-self:center;text-align:center;font-size:12px;color:var(--t3)">'+txt+'</div>';};
+  const lbl=k=>{const d=new Date(k+'T12:00:00');return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0');};
+  const series=(obj,pick)=>Object.keys(obj).sort().map(k=>({l:lbl(k),v:+pick(obj[k])||0})).filter(x=>x.v>0);
+  const w=series(wHist,x=>x).slice(-8),a=series(bHist,x=>x&&x.arm).slice(-8);
+  if(w.length>=2){renBC('wChart',w,'var(--blu)');renBC('pWC',w,'var(--acc)');}else{empty('wChart','Noch kein Verlauf – speichere dein Gewicht unter „Mein Profil“.');empty('pWC','Noch kein Verlauf – speichere dein Gewicht unter „Mein Profil“.');}
+  if(a.length>=2)renBC('armCh',a,'var(--ora)');else empty('armCh','Noch kein Verlauf – speichere neue Messungen.');}
 // === CHARTS ===
-function renBC(id,data,color){const c=document.getElementById(id);if(!c)return;const max=Math.max(...data.map(d=>d.v));c.innerHTML='';data.forEach(d=>{const b=document.createElement('div');b.className='cbar';b.style.height=(d.v/max*90)+'%';b.style.background='linear-gradient(180deg,'+color+','+color+'88)';b.setAttribute('data-label',d.l);c.appendChild(b);});}
+function renBC(id,data,color){const c=document.getElementById(id);if(!c)return;const max=Math.max(...data.map(d=>d.v)),min=Math.min(...data.map(d=>d.v)),lo=Math.max(0,min-(max-min||max*0.05)*1.5);c.innerHTML='';data.forEach(d=>{const b=document.createElement('div');b.className='cbar';b.style.height=(12+(d.v-lo)/((max-lo)||1)*78)+'%';b.title=d.l+': '+d.v.toLocaleString('de-DE');b.style.background='linear-gradient(180deg,'+color+',color-mix(in srgb,'+color+' 55%,transparent))';b.setAttribute('data-label',d.l);c.appendChild(b);});}
 // === TOAST ===
-function toast(m){const c=document.getElementById('toC'),t=document.createElement('div');t.className='tst';t.textContent=m;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(40px)';t.style.transition='.3s';},2500);setTimeout(()=>t.remove(),3000);}
+function toast(m,ms){ms=ms||2500;const c=document.getElementById('toC'),t=document.createElement('div');t.className='tst';t.textContent=m;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(40px)';t.style.transition='.3s';},ms);setTimeout(()=>t.remove(),ms+500);}
 // === MODALS ===
 document.querySelectorAll('.mo').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('sh');});});
 // === SCANNER (Barcode + Open Food Facts) ===
@@ -951,7 +1043,7 @@ function chatGreet(){chatHist=[];chatPush('bot','Hi '+(prof.name||'')+'! 👋 Ic
 // === HANDOFF (Import aus SuPER-Health-Rechner) ===
 function applyImport(d){try{
   if(d.goals){goals.k=Math.round(d.goals.k)||goals.k;goals.p=Math.round(d.goals.p)||goals.p;goals.c=Math.round(d.goals.c)||goals.c;goals.f=Math.round(d.goals.f)||goals.f;if(d.goals.maint)goals.maint=Math.round(d.goals.maint);}
-  if(d.prof){['name','age','sex','height','weight','bf'].forEach(k=>{if(d.prof[k]!=null&&d.prof[k]!=='')prof[k]=d.prof[k];});if(Array.isArray(d.prof.goals)&&d.prof.goals.length)prof.goals=d.prof.goals;}
+  if(d.prof){['name','age','sex','height','weight','bf'].forEach(k=>{if(d.prof[k]!=null&&d.prof[k]!=='')prof[k]=d.prof[k];});if(+d.prof.weight>0)wHist[todayKey()]=+d.prof.weight;if(Array.isArray(d.prof.goals)&&d.prof.goals.length)prof.goals=d.prof.goals;}
   saveAll();return true;
 }catch(e){console.warn('applyImport',e);return false;}}
 function checkImport(){
@@ -977,22 +1069,58 @@ function checkShared(silent){try{
 // === HANDOFF (Mahlzeiten aus der SuPER Küche – Familien-Wochenplaner) ===
 // Gleiche Domain: Warteschlange 'kueche2track' im gemeinsamen Speicher. Andere Domain: Link mit #meals=<base64>.
 // Jeder Eintrag hat eine id und wird nur einmal übernommen ('kueche2track_done').
+const KP_URL='/wochenplaner/';
+function kuechePlan(){try{const d=JSON.parse(localStorage.getItem('kueche_plan')||'null');return d&&d.days&&typeof d.days==='object'?d:null;}catch(e){return null;}}
+function addDaysKey(k,n){const d=new Date(k+'T12:00:00');d.setDate(d.getDate()+n);return keyOf(d);}
+function mondayKey(k){const d=new Date(k+'T12:00:00');d.setDate(d.getDate()-((d.getDay()+6)%7));return keyOf(d);}
+function kidOf(m){return m&&m.recipe?(m.date||'')+'|'+(m.meal||'')+'|'+m.recipe:'';}
+function hasKid(date,kid){return !!kid&&dayEntries(date).some(e=>e.kid===kid);}
+function nowTime(){return new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});}
+// Eintrag einem beliebigen Tag hinzufügen (aktiver Tag = Tagebuch, sonst Verlauf)
+function addToDay(key,en){
+  if(key===activeDate){log.push(en);return;}
+  const d=hist[key]||(hist[key]={k:0,p:0,c:0,f:0,entries:[],water:0});d.entries=(d.entries||[]).concat(en);
+  const t=d.entries.reduce((a,x)=>({k:a.k+x.k,p:a.p+x.p,c:a.c+x.c,f:a.f+x.f}),{k:0,p:0,c:0,f:0});d.k=Math.round(t.k);d.p=Math.round(t.p);d.c=Math.round(t.c);d.f=Math.round(t.f);}
+function planEntry(m){const num=v=>Math.max(0,+v||0);return {n:String(m.n||'Gericht').slice(0,90),e:String(m.e||'🍽️').slice(0,4),a:1,u:'Portion',k:Math.round(num(m.k)),p:+num(m.p).toFixed(1),c:+num(m.c).toFixed(1),f:+num(m.f).toFixed(1),t:nowTime(),src:'Wochenplaner',kid:kidOf(m)};}
+function refreshAll(){saveAll();updUI();updDash();renDailyBar();renWeekCal();renWeekView();renProgStats();if(document.getElementById('pg-meals').classList.contains('act'))renMeals('mG');}
+// Kalorien-Tracker: geplante Gerichte des aktiven Tages
+function renKueche(){const el=document.getElementById('kpCard');if(!el)return;const kp=kuechePlan();
+  const lbl=activeDate===todayKey()?'heute':fmtDay(activeDate);
+  const head='<div class="ch" style="margin-bottom:12px"><div class="ct">🛒 Aus dem Wochenplaner</div><a class="btn sm" href="'+KP_URL+'" style="text-decoration:none">Wochenplaner ↗</a></div>';
+  if(!kp){el.innerHTML=head+'<p class="small" style="color:var(--t2);line-height:1.55">Plane deine Woche in der <b>SuPER Küche</b>. Deine geplanten Gerichte erscheinen dann automatisch hier – ein Tipp auf <b>＋</b> trägt sie mit allen Nährwerten ins Tagebuch ein.</p>';return;}
+  const list=kp.days[activeDate]||[];
+  if(!list.length){el.innerHTML=head+'<p class="small" style="color:var(--t2);line-height:1.55">Für '+lbl+' ist im Wochenplaner nichts geplant. Über den Datums-Wähler oben kannst du einen anderen Tag öffnen.</p>';return;}
+  let open=0;
+  const rows=list.map((m,i)=>{const done=hasKid(activeDate,kidOf(m));if(!done)open++;
+    return '<div class="kp-i">'+(m.img?'<img src="'+KP_URL+escAttr(m.img)+'" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">':'<span style="font-size:24px">'+(m.e||'🍽️')+'</span>')+'<div class="kp-t"><div class="kp-n">'+escHtml(m.n)+'</div><div class="kp-d">'+escHtml(m.mealN||'')+' · '+Math.round(m.k)+' kcal · P '+Math.round(m.p)+' · C '+Math.round(m.c)+' · F '+Math.round(m.f)+'</div></div>'+(done?'<span class="kp-ok">✓ getrackt</span>':'<button class="btn sm pr" onclick="addPlanned(\''+activeDate+'\','+i+')" title="Ins Tagebuch übernehmen" style="white-space:nowrap">＋ Tracken</button>')+'</div>';}).join('');
+  el.innerHTML=head+'<p class="small" style="color:var(--t3);margin:-4px 0 10px">Geplant für '+lbl+' · Portion für 1 Erwachsenen</p>'+rows+(open>1?'<button class="btn pr" style="width:100%;justify-content:center;margin-top:4px" onclick="addPlannedAll(\''+activeDate+'\')">＋ Alle '+open+' Gerichte übernehmen</button>':'');}
+function addPlanned(date,i){const kp=kuechePlan();const m=kp&&kp.days[date]&&kp.days[date][i];if(!m)return;
+  if(hasKid(date,kidOf(m))){toast('Schon im Tagebuch');return;}
+  addToDay(date,planEntry(m));refreshAll();toast(m.n+' getrackt ✓');}
+function addPlannedAll(date){const kp=kuechePlan();const list=(kp&&kp.days[date])||[];let n=0;
+  list.forEach(m=>{if(!hasKid(date,kidOf(m))){addToDay(date,planEntry(m));n++;}});
+  if(n){refreshAll();toast(n+' Gerichte übernommen ✓');}}
+// Push-Übergabe aus dem Wochenplaner (Buttons „In SuPER Health tracken" / „Woche an SuPER Health")
 function importMeals(list){
   let done=[];try{done=JSON.parse(localStorage.getItem('kueche2track_done')||'[]');}catch(e){}
-  const tm=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});let n=0;
+  const per={};let n=0,dup=0;
   (list||[]).forEach(function(it){
     if(!it||!it.id||!it.entry||done.indexOf(it.id)>=0)return;
-    const e=it.entry,num=v=>Math.max(0,+v||0);
-    const en={n:String(e.n||'Gericht').slice(0,90),e:String(e.e||'🍽️').slice(0,4),a:1,u:'Portion',k:Math.round(num(e.k)),p:+num(e.p).toFixed(1),c:+num(e.c).toFixed(1),f:+num(e.f).toFixed(1),t:tm,src:'SuPER Küche'};
+    done.push(it.id);
     const key=/^\d{4}-\d{2}-\d{2}$/.test(it.date||'')?it.date:todayKey();
-    if(key===activeDate)log.push(en);
-    else{const d=hist[key]||(hist[key]={k:0,p:0,c:0,f:0,entries:[],water:0});d.entries=(d.entries||[]).concat(en);
-      const t=d.entries.reduce((a,x)=>({k:a.k+x.k,p:a.p+x.p,c:a.c+x.c,f:a.f+x.f}),{k:0,p:0,c:0,f:0});d.k=Math.round(t.k);d.p=Math.round(t.p);d.c=Math.round(t.c);d.f=Math.round(t.f);}
-    done.push(it.id);n++;
+    const kid=kidOf({date:key,meal:it.meal,recipe:it.recipe});
+    if(kid&&hasKid(key,kid)){dup++;return;}
+    addToDay(key,planEntry(Object.assign({},it.entry,{date:key,meal:it.meal,recipe:it.recipe})));per[key]=(per[key]||0)+1;n++;
   });
   localStorage.setItem('kueche2track_done',JSON.stringify(done.slice(-500)));
-  if(n){saveAll();updUI();updDash();if(typeof renDailyBar==='function')renDailyBar();if(typeof renWeekCal==='function')renWeekCal();if(typeof renWeekView==='function')renWeekView();
-    toast(n===1?'🍽️ Mahlzeit aus der SuPER Küche übernommen':'🍽️ '+n+' Mahlzeiten aus der SuPER Küche übernommen');}
+  if(n){refreshAll();
+    const keys=Object.keys(per).sort();
+    const where=keys.map(k=>(k===todayKey()?'heute':fmtDay(k))+(per[k]>1?' ('+per[k]+'×)':'')).join(', ');
+    // Liegt etwas auf dem aktiven Tag → Tagebuch zeigen, sonst die Wochenübersicht mit dem ersten betroffenen Tag
+    if(per[activeDate])go('track',document.getElementById('niTrack'));
+    else{const diff=Math.round((new Date(keys[0]+'T12:00:00')-new Date(todayKey()+'T12:00:00'))/864e5);weekOffset=Math.ceil(diff/7);go('week',document.getElementById('niWeek'));renWeekView();}
+    toast('🍽️ '+n+(n===1?' Gericht':' Gerichte')+' aus dem Wochenplaner übernommen → '+where,5000);}
+  else if(dup)toast('Diese Gerichte sind schon im Tagebuch ✓');
   return n;
 }
 function checkMeals(){try{
@@ -1090,21 +1218,20 @@ function copyDay(key){
   es.forEach(e=>log.push(Object.assign({},e,{t:new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})})));
   saveAll();updUI();renWeekView();if(typeof renDailyBar==='function')renDailyBar();if(typeof renWeekCal==='function')renWeekCal();
   toast(es.length+' Einträge übernommen ✓');}
-function seedHist(){if(Object.keys(hist).length>1)return;const tgt=goals.k||1800,dir=goalDir();const offs=dir==='bulk'?[40,-120,180,-60,90,-200]:[-60,120,-180,40,-90,210];for(let i=6;i>=1;i--){const d=new Date();d.setDate(d.getDate()-i);const key=keyOf(d);if(hist[key]==null){const v=Math.max(0,Math.round(tgt+offs[6-i]));hist[key]={k:v,p:Math.round(v*0.3/4),c:Math.round(v*0.4/4),f:Math.round(v*0.3/9),entries:[],water:Math.floor(Math.random()*5)+3};}}}
 
 // === INIT ===
 function init(){
-loadAll();seedHist();initSearch();renW();document.getElementById('wC').textContent=water;
-loadProf();loadPref();renBody();renMeals('mG');renTTabs();renTrain();renRecTabs();renRec();renProg();updUI();updDash();renDailyBar();renWeekCal();
-renBC('wChart',[{l:'Mo',v:79.2},{l:'Di',v:79},{l:'Mi',v:78.8},{l:'Do',v:78.9},{l:'Fr',v:78.6},{l:'Sa',v:78.5},{l:'So',v:78.5}],'var(--blu)');
-renBC('armCh',[{l:'Jan',v:36},{l:'Feb',v:36.5},{l:'Mär',v:37},{l:'Apr',v:37.2},{l:'Mai',v:37.8},{l:'Jun',v:38},{l:'Jul',v:38.5}],'var(--ora)');
-renBC('pWC',[{l:'W1',v:81.3},{l:'W2',v:80.8},{l:'W3',v:80.5},{l:'W4',v:80.1},{l:'W5',v:79.6},{l:'W6',v:79.2},{l:'W7',v:78.8},{l:'W8',v:78.5}],'var(--acc)');
+loadAll();initSearch();initNavSwipe();renW();document.getElementById('wC').textContent=water;
+loadProf();loadPref();renBody();{const tabs=document.querySelectorAll('#mTb .tbn'),wd=(new Date().getDay()+6)%7;tabs.forEach((b,i)=>b.classList.toggle('act',i===wd));}renMeals('mG');renTTabs();renTrain();renRecTabs();renRec();renProg();updUI();updDash();renDailyBar();renWeekCal();
+renWeightCharts();renProgStats();
 renderChatChips();chatGreet();renWeekView();
 {const mu=document.getElementById('mealApiUrl');if(mu)mu.value=localStorage.getItem('vfMealApi')||'';const mt=document.getElementById('mealApiToken');if(mt)mt.value=localStorage.getItem('vfMealTok')||'';}
 checkImport();checkShared();checkMeals();
 window.addEventListener('hashchange',function(){checkImport();checkMeals();});
 window.addEventListener('focus',function(){checkShared();checkMeals();});
-document.addEventListener('visibilitychange',function(){if(!document.hidden){checkShared();checkMeals();}});
+document.addEventListener('visibilitychange',function(){if(!document.hidden){checkShared();checkMeals();renKueche();if(document.getElementById('pg-meals').classList.contains('act'))renMeals('mG');}});
+// Änderungen aus dem Wochenplaner in einem anderen Tab sofort übernehmen
+window.addEventListener('storage',function(e){if(e.key==='kueche2track'&&e.newValue)checkMeals();if(e.key==='kueche_plan'){renKueche();if(document.getElementById('pg-meals').classList.contains('act'))renMeals('mG');}});
 // Pfeiltasten: Wochendiagramm blättern (nur auf der Wochenübersicht, nicht in Eingabefeldern)
 document.addEventListener('keydown',function(e){
   const wk=document.getElementById('pg-week');if(!wk||!wk.classList.contains('act'))return;

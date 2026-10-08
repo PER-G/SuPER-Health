@@ -107,6 +107,10 @@ svg.i { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-widt
 /* ---------- Plan ---------- */
 .greet { text-align: center; padding: 20px 0 6px; }
 .greet h1 { font-size: 34px; margin: 4px 0 12px; }
+.sh-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; }
+.sh-links span { color: var(--t3); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.sh-links a { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--bdr2); background: var(--card); color: var(--acc); font-weight: 600; text-decoration: none; }
+.sh-links a:hover { background: var(--soft); }
 .week-nav { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 14px 0 4px; }
 .week-nav .lbl { font-weight: 700; font-size: 14px; min-width: 190px; text-align: center; }
 .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0 6px; }

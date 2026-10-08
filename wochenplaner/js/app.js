@@ -141,7 +141,30 @@
     lsSet('sk_profiles', profiles);
   }
   let S = Object.assign(DEFAULT_STATE(), lsGet('sk_data_' + profiles.active, {}));
-  function save() { S.updated = Date.now(); lsSet('sk_data_' + profiles.active, S); const p = profiles.list.find(x => x.id === profiles.active); if (p && S.name) { p.name = S.name; lsSet('sk_profiles', profiles); } }
+  /* Plan-Snapshot für SuPER Health Tracking (gleiche Domain, Schlüssel 'kueche_plan'): alle geplanten Gerichte
+   * von letzter bis in vier Wochen mit Nährwerten pro Erwachsenen-Portion. Der Tracker zeigt sie unter
+   * „Aus dem Wochenplaner" (Kalorien-Tracker) und im Ernährungsplan an – dort reicht ein Tipp zum Tracken. */
+  const PLAN_SNAPSHOT = 'kueche_plan';
+  let snapT = null;
+  function publishPlan() { clearTimeout(snapT); snapT = setTimeout(writeSnapshot, 120); }
+  function writeSnapshot() {
+    try {
+      const mon = mondayOf(new Date()), from = keyOf(addDays(mon, -7)), to = keyOf(addDays(mon, 28)), f = MEMBER_TYPES.erwachsen.f, days = {};
+      Object.keys(S.plans).forEach(wkKey => {
+        if (wkKey < from || wkKey > to) return;
+        const slots = (S.plans[wkKey] && S.plans[wkKey].slots) || {}, start = parseKey(wkKey);
+        Object.keys(slots).forEach(sk => {
+          const [d, m] = sk.split('|'), r = R[slots[sk].r];
+          if (!r || !MEALS[m]) return;
+          const date = keyOf(addDays(start, +d)), n = nutriFor(r, f);
+          (days[date] = days[date] || []).push({ date, meal: m, mealN: MEALS[m].n, recipe: r.id, n: r.n, e: MEALS[m].e, img: r._img, k: r0(n.k), p: +n.p.toFixed(1), c: +n.c.toFixed(1), f: +n.f.toFixed(1) });
+        });
+      });
+      for (const k in days) days[k].sort((a, b) => MEAL_ORDER.indexOf(a.meal) - MEAL_ORDER.indexOf(b.meal));
+      lsSet(PLAN_SNAPSHOT, { v: 1, ts: Date.now(), days });
+    } catch (e) { console.warn('Plan-Snapshot', e); }
+  }
+  function save() { S.updated = Date.now(); lsSet('sk_data_' + profiles.active, S); publishPlan(); const p = profiles.list.find(x => x.id === profiles.active); if (p && S.name) { p.name = S.name; lsSet('sk_profiles', profiles); } }
 
   let weekStart = mondayOf(new Date());
   const wk = () => keyOf(weekStart);
@@ -306,6 +329,10 @@
     if (/su-per-health\.vercel\.app$|paulper\.com$|^localhost$/.test(location.hostname)) return '/tracking';
     return TRACKER_DEFAULT;
   }
+  function rechnerUrl() { const t = trackerUrl(); return t.charAt(0) === '/' ? '/#/app' : t.replace(/\/(tracking|tracker)\/?(#.*)?$/, '') + '/#/app'; }
+  function healthLinks() {
+    return '<div class="sh-links"><span>SuPER Health</span><a href="' + esc(rechnerUrl()) + '">⚙️ Ziele &amp; Rechner</a><a href="' + esc(trackerUrl()) + '">🔥 Kalorien-Tracker</a></div>';
+  }
   function importGoalsFromTracker(silent) {
     const d = trackerData();
     if (!d || !d.goals) { if (!silent) toast('Keine SuPER-Health-Daten auf diesem Gerät gefunden'); return false; }
@@ -329,7 +356,7 @@
     return items;
   }
   function trackerLink(items) {
-    const payload = btoa(unescape(encodeURIComponent(JSON.stringify(items.map(i => ({ id: i.id, date: i.date, entry: i.entry }))))));
+    const payload = btoa(unescape(encodeURIComponent(JSON.stringify(items.map(i => ({ id: i.id, date: i.date, meal: i.meal, recipe: i.recipe, entry: i.entry }))))));
     return trackerUrl() + '#meals=' + encodeURIComponent(payload);
   }
   function entryFor(r, portionType, dateKey, mealType) {
@@ -421,7 +448,7 @@
     const wEnd = addDays(weekStart, 6);
     const fmt = d => d.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
     let html = '<div class="greet"><div class="eyebrow">' + hello + '</div><h1>' + (S.name ? 'Chefkoch ' + esc(S.name) + '!' : 'Deine Familienküche') + '</h1>' +
-      '<span class="pill"><span class="dot" style="color:' + mk.c + '">🛒</span>geplant für ' + mk.n + ' · ' + persons() + ' Pers.</span></div>' +
+      '<span class="pill"><span class="dot" style="color:' + mk.c + '">🛒</span>geplant für ' + mk.n + ' · ' + persons() + ' Pers.</span>' + healthLinks() + '</div>' +
       '<div class="week-nav"><button class="icon-btn" data-act="wprev" aria-label="Vorige Woche">' + ic('left') + '</button><span class="lbl">' + (isThisWeek ? 'Diese Woche · ' : '') + fmt(weekStart) + ' – ' + fmt(wEnd) + '</span><button class="icon-btn" data-act="wnext" aria-label="Nächste Woche">' + ic('right') + '</button></div>';
 
     const n = Object.keys(p.slots).length;
@@ -681,12 +708,12 @@
   }
   function trackSheet(items, title) {
     const today = keyOf(new Date());
-    let h = '<div class="sheet-pad"><h2>' + esc(title) + '</h2><p class="muted" style="margin:6px 0 14px">Die Nährwerte werden als Einträge in dein Ernährungstagebuch in <b>SuPER Health</b> übertragen.</p>';
+    let h = '<div class="sheet-pad"><h2>' + esc(title) + '</h2><p class="muted" style="margin:6px 0 14px">Jedes Gericht landet mit allen Nährwerten im Ernährungstagebuch von <b>SuPER Health</b> – jeweils am geplanten Tag. Tipp: Im Tracker stehen deine geplanten Gerichte auch unter <b>„Aus dem Wochenplaner“</b> und lassen sich dort mit einem Tipp übernehmen.</p>';
     const sum = items.reduce((a, i) => ({ k: a.k + i.entry.k, p: a.p + i.entry.p, c: a.c + i.entry.c, f: a.f + i.entry.f }), { k: 0, p: 0, c: 0, f: 0 });
     h += '<div class="card" style="padding:4px 16px;margin-bottom:14px">' + items.map(i => '<div class="shop-item" style="cursor:default;padding:12px 0"><div class="n">' + esc(i.entry.n) + '<small>' + parseKey(i.date).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' }) + (i.date === today ? ' (heute)' : '') + '</small></div><div class="q">' + i.entry.k + ' kcal<br>' + r1(i.entry.p) + 'P · ' + r1(i.entry.c) + 'K · ' + r1(i.entry.f) + 'F</div></div>').join('') + '</div>';
     if (items.length > 1) h += '<p style="font-weight:700;margin-bottom:12px">Summe: <span class="mono">' + r0(sum.k) + ' kcal · ' + r0(sum.p) + ' g P · ' + r0(sum.c) + ' g K · ' + r0(sum.f) + ' g F</span></p>';
-    h += '<button class="btn btn-pri btn-block" data-act="dotrack">' + ic('send') + 'Übertragen & SuPER Health öffnen</button><button class="btn btn-ghost btn-block" style="margin-top:6px" data-act="dotrack-stay">Nur übertragen (öffnet sich beim nächsten Besuch)</button>' +
-      '<p class="muted" style="font-size:12px;margin-top:12px">Gleiche Website: Übernahme automatisch über den gemeinsamen Speicher. Andere Domain: Übergabe per sicherem Link. Tracker-Adresse: ' + esc(trackerUrl()) + '</p></div>';
+    h += '<button class="btn btn-pri btn-block" data-act="dotrack">' + ic('send') + 'Übertragen & Tracker öffnen</button><button class="btn btn-ghost btn-block" style="margin-top:6px" data-act="dotrack-stay">Nur übertragen (erscheint beim nächsten Öffnen des Trackers)</button>' +
+      '<p class="muted" style="font-size:12px;margin-top:12px">Doppelte Einträge werden automatisch erkannt. Tracker-Adresse: ' + esc(trackerUrl()) + '</p></div>';
     openSheet(h);
     const go = open => {
       const done = trackEntries(items);
@@ -708,7 +735,7 @@
         '<div class="field-l" style="font-size:15px">Mahlzeit</div><div class="portion-sw">' + MEAL_ORDER.map(m => '<button class="' + (meal === m ? 'on' : '') + '" data-tm="' + m + '">' + MEALS[m].e + ' ' + MEALS[m].n + '</button>').join('') + '</div>' +
         '<div class="field-l" style="font-size:15px">Datum</div><input type="date" class="input" style="border-radius:14px;margin-bottom:16px" id="tdate" value="' + date + '">' +
         '<div class="card" style="padding:16px;display:flex;justify-content:space-around;text-align:center;margin-bottom:16px"><div><b class="mono" style="font-size:20px">' + e.entry.k + '</b><div class="muted" style="font-size:12px">kcal</div></div><div><b class="mono" style="font-size:20px;color:#C2477A">' + r1(e.entry.p) + '</b><div class="muted" style="font-size:12px">Protein g</div></div><div><b class="mono" style="font-size:20px;color:#B7801F">' + r1(e.entry.c) + '</b><div class="muted" style="font-size:12px">Kohlenh. g</div></div><div><b class="mono" style="font-size:20px;color:#2F6FB0">' + r1(e.entry.f) + '</b><div class="muted" style="font-size:12px">Fett g</div></div></div>' +
-        '<button class="btn btn-pri btn-block" data-act="t1go">' + ic('send') + 'Übertragen & SuPER Health öffnen</button><button class="btn btn-ghost btn-block" style="margin-top:6px" data-act="t1stay">Nur übertragen</button>' +
+        '<button class="btn btn-pri btn-block" data-act="t1go">' + ic('send') + 'Übertragen & Tracker öffnen</button><button class="btn btn-ghost btn-block" style="margin-top:6px" data-act="t1stay">Nur übertragen</button>' +
         '<button class="btn btn-ghost btn-block btn-sm" style="margin-top:4px" data-act="t1back">← Zurück zum Rezept</button></div>';
       openSheet(h);
       $$('[data-tp]').forEach(b => b.onclick = () => { portion = b.dataset.tp; draw(); });
@@ -933,6 +960,7 @@
     h += '<div class="card profile-hd"><div class="avatar">' + esc(initial) + '</div><div style="flex:1"><input class="input" id="pname" placeholder="Dein Name" value="' + esc(S.name) + '" style="border-radius:12px;padding:10px 14px"><div class="muted" style="font-size:12.5px;margin-top:6px">Profil seit ' + new Date(S.created).toLocaleDateString('de-DE') + ' · ' + Object.keys(S.plans).length + ' Wochenpläne · ' + S.favorites.length + ' Favoriten</div></div></div>';
     h += '<div class="section-t"><h2>SuPER Health</h2></div><div class="card connect"><div class="ic">S</div><div class="tx"><b><span class="status-dot ' + (td ? 'on' : '') + '"></span>' + (td ? 'Verbunden mit SuPER Health' : 'SuPER Health Tracking') + '</b><span>' + (td ? 'Ziele: ' + (td.goals ? td.goals.k + ' kcal · ' + td.goals.p + ' g Protein' : '–') + '. Mahlzeiten aus dem Plan landen direkt in deinem Tagebuch.' : 'Übertrage Mahlzeiten mit allen Nährwerten in deinen Kalorien-Tracker.') + '</span></div></div>' +
       '<div class="card" style="margin-top:10px"><a class="list-btn" href="' + esc(trackerUrl()) + '" target="superhealth" style="text-decoration:none;color:inherit">' + ic('link') + '<span class="tx">SuPER Health Tracking öffnen<span>' + esc(trackerUrl()) + '</span></span>' + ic('right') + '</a>' +
+      '<a class="list-btn" href="' + esc(rechnerUrl()) + '" style="text-decoration:none;color:inherit">' + ic('einstellungen') + '<span class="tx">Ziele &amp; Rechner öffnen<span>Kalorien- und Makroziele berechnen</span></span>' + ic('right') + '</a>' +
       '<button class="list-btn" data-act="importgoals">' + ic('download') + '<span class="tx">Ziele übernehmen<span>kcal & Makros aus SuPER Health als Tagesziel</span></span></button>' +
       '<button class="list-btn" data-act="trackerurl">' + ic('einstellungen') + '<span class="tx">Tracker-Adresse ändern<span>Für eigene Domain / Self-Hosting</span></span></button></div>';
     if (S.tracked.length) h += '<div class="section-t"><h2 style="font-size:18px">Zuletzt übertragen</h2></div><div class="card" style="padding:0 16px">' + S.tracked.slice(0, 6).map(t => '<div class="shop-item" style="cursor:default;padding:12px 0"><div class="n">' + esc(t.n) + '<small>' + parseKey(t.date).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' }) + '</small></div><div class="q">' + t.k + ' kcal · ' + r0(t.p) + ' g P</div></div>').join('') + '</div>';
@@ -1120,6 +1148,7 @@
   window.addEventListener('hashchange', route);
   if (S.goals.src === 'superhealth') importGoalsFromTracker(true); // Ziele aktuell halten
   route();
+  publishPlan();
   if (!S.onboarded) setTimeout(onboarding, 300);
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => { });
 })();

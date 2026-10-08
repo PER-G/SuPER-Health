@@ -335,6 +335,14 @@ ul.clean li::before{content:"";position:absolute;left:4px;top:13px;width:14px;he
         </div>
       </div>
       <a href="#/faq" data-r="faq">FAQ</a>
+      <div class="navdrop" data-rgroup="-">
+        <button type="button" class="navdrop-t" onclick="toggleDrop(this)" aria-haspopup="true" aria-expanded="false">Apps <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="navdrop-menu">
+          <a href="#/app" data-r="app"><b>⚙️ Ziele &amp; Rechner</b><small>Kalorien &amp; Makros in fünf Stufen</small></a>
+          <a href="/tracking"><b>🔥 Kalorien-Tracker</b><small>Tagebuch, Scanner &amp; Wochenübersicht</small></a>
+          <a href="/wochenplaner/"><b>🛒 Wochenplaner</b><small>Rezepte, Essensplan &amp; Einkaufsliste</small></a>
+        </div>
+      </div>
       <a class="cta" href="#/app" data-r="app">App &amp; Rechner</a>
     </nav>
   </div>
@@ -353,6 +361,8 @@ ul.clean li::before{content:"";position:absolute;left:4px;top:13px;width:14px;he
         <h4>Plattform</h4>
         <a href="#/">Startseite</a>
         <a href="#/app">App &amp; Rechner</a>
+        <a href="/tracking">Kalorien-Tracker</a>
+        <a href="/wochenplaner/">Wochenplaner &amp; Einkauf</a>
         <a href="#/so-funktionierts">So funktioniert’s</a>
         <a href="#/faq">FAQ</a>
       </div>
@@ -741,6 +751,14 @@ function Home(){
            ["Wochenprognose","Modernes Diagramm und Tabelle: so entwickelt sich dein Gewicht voraussichtlich Woche für Woche."]]
           .map(([t,d],i)=>`<div class="card"><div class="icon mono" style="font-weight:600">${["⚖","◔","➝","∿"][i]}</div><h3 style="margin:12px 0 6px;font-size:18px">${t}</h3><p class="small">${d}</p></div>`).join("")}
       </div>
+      <h3 style="margin:36px 0 4px;font-size:20px">Drei Apps, die zusammenarbeiten</h3>
+      <p class="small" style="max-width:62ch">Ziele im Rechner festlegen, Mahlzeiten im Wochenplaner planen, im Tracker mit einem Tipp übernehmen – die Daten wandern automatisch mit.</p>
+      <div class="grid g3" style="margin-top:16px">
+        ${[["⚙️","Ziele &amp; Rechner","Kalorien, Makros, Aktivität und Prognose in fünf Stufen.","#/app","Rechner starten"],
+           ["🔥","Kalorien-Tracker","Ernährungstagebuch mit Suche, Barcode-Scanner, Wochenübersicht und Coach.","/tracking","Tracker öffnen"],
+           ["🛒","Wochenplaner","Familienrezepte, Wochenplan und Einkaufsliste – Gerichte direkt in den Tracker übernehmen.","/wochenplaner/","Woche planen"]]
+          .map(([e,t,d,h,b])=>`<a class="card" href="${h}" style="text-decoration:none;color:inherit;display:flex;flex-direction:column"><div style="font-size:28px">${e}</div><h3 style="margin:10px 0 6px;font-size:18px">${t}</h3><p class="small" style="flex:1">${d}</p><span style="margin-top:12px;font-weight:700;color:var(--pine-deep)">${b} →</span></a>`).join("")}
+      </div>
     </div>
   </section>
 
@@ -905,7 +923,7 @@ function About(){return `
         <div class="card"><h3>Warum Körperfett, Aktivität und Ziel zusammen betrachten?</h3><p style="margin-top:8px">Zwei Personen mit 100 kg brauchen nicht dieselbe Empfehlung: Wer 10 % Körperfett und viel Muskelmasse hat, benötigt in der Regel mehr Protein und mehr Energie als jemand mit 30 % – bei gleichem Gewicht. Erst die Kombination aus Körperzusammensetzung, Alltagsaktivität, Sport und Ziel ergibt eine Empfehlung, die wirklich passt. Genau das rechnet SuPER Health.</p></div>
         <div class="card"><h3>Warum verständliche Gesundheitsaufklärung?</h3><p style="margin-top:8px">Zwischen Fitness-Marketing und Fachliteratur klafft eine Lücke. Wir füllen sie mit Inhalten, die seriös sind, ohne trocken zu wirken: ehrlich über Geduld und Konstanz, klar bei Grenzwerten, motivierend ohne Versprechen. Wer versteht, <em>warum</em> etwas funktioniert, bleibt eher dran.</p></div>
       </div>
-      <div class="note info" style="margin-top:24px">${ico.info}<div><b>Ausblick:</b> SuPER Health ist so gebaut, dass Ernährungstracking, Rezepte und Essenspläne als nächste Module folgen können – auf demselben Daten- und Designfundament.</div></div>
+      <div class="note info" style="margin-top:24px">${ico.info}<div><b>Zusammenspiel:</b> Neben dem Rechner gibt es den <a href="/tracking">Kalorien-Tracker</a> und den <a href="/wochenplaner/">Wochenplaner</a> mit Rezepten und Einkaufsliste – auf demselben Daten- und Designfundament. Ziele und Mahlzeiten wandern automatisch zwischen den Apps.</div></div>
     </div>
   </section>`;}
 
@@ -1478,6 +1496,7 @@ function openTracking(){
   if(!w)location.href=url;
 }
 // Direkt zur Tracking-App (ohne Pflicht-Check) – aktuelle Werte werden vorher best-effort übertragen.
+function appUrl(path){return location.protocol==="https:"||location.protocol==="http:"?path:"https://su-per-health.vercel.app"+path;}
 function gotoTracking(){
   if(typeof writeHandoff==="function")writeHandoff();
   const url=(location.protocol==="https:"?"/tracking":"https://su-per-health.vercel.app/tracking");
@@ -1544,6 +1563,10 @@ function resultArea(d){
   <div class="card" style="margin-top:16px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--mint-soft);border-color:#C8E6D6">
     <div><b style="color:var(--pine-deep);font-size:16px">In SuPER Health Tracking übernehmen</b><p class="small" style="margin-top:4px;color:var(--ink-2)">Übergibt Kalorienziel (${fmt(A.target)} kcal), Makros und dein Profil per Klick an die Tracking-App.</p></div>
     <button class="btn amber" onclick="openTracking()" style="white-space:nowrap">→ An Tracking senden</button>
+  </div>
+  <div class="card" style="margin-top:12px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap">
+    <div><b style="color:var(--pine-deep);font-size:16px">🛒 Passende Mahlzeiten planen</b><p class="small" style="margin-top:4px;color:var(--ink-2)">Im Wochenplaner (SuPER Küche) Rezepte, Wochenplan und Einkaufsliste erstellen – er übernimmt deine Ziele, die Gerichte landen mit einem Tipp im Tracker.</p></div>
+    <a class="btn ghost" href="${appUrl("/wochenplaner/")}" style="white-space:nowrap">Wochenplaner öffnen</a>
   </div>
 
   <div class="card" style="margin-top:16px">
@@ -1671,6 +1694,7 @@ function renderApp(){
           ${STEPS.map((s,i)=>{const n=i+1;const done=stepValid(n,d)&&(d.saved[n]||n<APPSTEP);return `<button class="${APPSTEP===n?"on":""} ${done?"done":""}" onclick="go(${n})"><span class="n">${done?"✓":n}</span><span><b>Stufe ${n}</b><span>${s[0]}</span></span></button>`}).join("")}
         </nav>
         <button class="btn amber" onclick="gotoTracking()" style="width:100%;justify-content:center;margin-top:14px;white-space:nowrap">📲 Tracking App öffnen</button>
+        <a class="btn ghost" href="${appUrl("/wochenplaner/")}" style="width:100%;justify-content:center;margin-top:8px;white-space:nowrap">🛒 Wochenplaner öffnen</a>
         ${storageOK?"":'<p class="muted small" style="margin-top:10px">Hinweis: Dauerhafte Speicherung ist in dieser Umgebung nicht verfügbar – Daten gelten für diese Sitzung.</p>'}
       </aside>
       <div>
