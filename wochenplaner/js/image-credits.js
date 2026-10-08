@@ -1495,10 +1495,11 @@ const IMAGE_CREDITS = {
   "license": "CC BY 2.0"
  },
  "smorrebrod-ei-radieschen": {
-  "file": "File:Ida Davidsen udsnit af glasmontren.JPG",
-  "page": "https://commons.wikimedia.org/wiki/File:Ida_Davidsen_udsnit_af_glasmontren.JPG",
-  "artist": "User:Nillerdk",
-  "license": "CC BY-SA 3.0"
+  "file": "ov:3c194d01-efa2-4334-a6f1-42e34191c78c",
+  "page": "https://www.flickr.com/photos/23178876@N03/2499407182",
+  "artist": "cyclonebill",
+  "license": "CC BY-SA 2.0",
+  "title": "Rugbrød med æg, mayonnaise og purløg"
  },
  "strammer-max-leicht": {
   "file": "File:Strammer-Max.jpg",
