@@ -681,7 +681,7 @@
         '<div class="card" style="padding:14px"><div class="eyebrow">Kleinkind-Portion</div><div class="mono" style="font-size:20px;margin-top:4px">' + r0(nk.k) + ' kcal</div><div class="muted" style="font-size:12.5px">' + r1(nk.p) + ' g Protein · ' + r0(nk.g) + ' g</div></div></div>' +
         '<p class="muted" style="font-size:12px;margin-top:12px">Allgemeine Hinweise, kein Ersatz für ärztlichen Rat. Neue Lebensmittel einzeln einführen, Allergene früh und regelmäßig anbieten (nach Rücksprache mit der Kinderärztin/dem Kinderarzt).</p>';
     }
-    h += '</div><div class="sticky-actions"><button class="btn btn-sec" data-act="addplan">' + ic('plus') + 'Zum Plan</button><button class="btn btn-pri" data-act="trackone">' + ic('send') + 'In SuPER Health tracken</button></div>';
+    h += '</div><div class="sticky-actions"><button class="btn btn-sec" data-act="addplan">' + ic('plus') + 'Zum Plan</button><button class="btn btn-sec" data-act="recipeshop">' + ic('einkauf') + 'Einkauf</button><button class="btn btn-pri" data-act="trackone">' + ic('send') + 'Tracken</button></div>';
     const keep = $('#overlay').classList.contains('open') ? $('#sheet').scrollTop : 0;
     openSheet(h, null);
     $('#sheet').scrollTop = keep;
@@ -820,16 +820,26 @@
    *  - Frisches → letzter Einkauf vor dem Kochtag; reicht die Haltbarkeit nicht → Hinweis (einfrieren / frisch kaufen)
    * Pro Einkauf werden Mengen addiert und in reale Packungsgrößen umgerechnet (oder exakt an der Theke). */
   function shopDays() { return (S.shopDays && S.shopDays.length ? S.shopDays : [0]).slice().sort((a, b) => a - b); }
-  function buildTrips() {
-    const p = plan(), serv = servings(), mf = marketF(), tI = todayIndex();
-    if (tI === 7) return [];
-    // Einkaufstage, die schon vorbei sind, rutschen auf heute
-    const trips = [...new Set(shopDays().map(t => Math.max(t, Math.max(0, tI))))].sort((a, b) => a - b);
-    const map = {}; // Einkaufstag -> Zutat -> Summe
+  /* Was muss eingekauft werden? Geplante Gerichte ab heute + zusätzlich hinzugefügte Einzelrezepte (Extras) */
+  function planEntries() {
+    const p = plan(), serv = servings(), out = [];
     for (const sk in p.slots) {
       const r = R[p.slots[sk].r]; if (!r) continue;
       const day = +sk.split('|')[0];
       if (isPast(day)) continue; // Vergangenes muss nicht mehr eingekauft werden
+      out.push({ r, day, serv });
+    }
+    for (const ex of (p.extras || [])) { const r = R[ex.r]; if (r) out.push({ r, day: null, serv: ex.serv || serv, extra: true }); }
+    return out;
+  }
+  function buildTrips(entries, tripDays) {
+    const p = plan(), mf = marketF(), tI = todayIndex();
+    if (!entries) { if (tI === 7) return []; entries = planEntries(); }
+    // Einkaufstage, die schon vorbei sind, rutschen auf heute
+    const trips = tripDays || [...new Set(shopDays().map(t => Math.max(t, Math.max(0, tI))))].sort((a, b) => a - b);
+    const map = {}; // Einkaufstag -> Zutat -> Summe
+    for (const en of entries) {
+      const r = en.r, day = en.day === null ? trips[0] : en.day, serv = en.serv;
       for (const it of adapted(r).items) {
         const pi = packInfo(it.key);
         const before = trips.filter(t => t <= day);
@@ -843,7 +853,7 @@
         const m = map[trip] || (map[trip] = {});
         const a = m[it.key] || (m[it.key] = { key: it.key, ing: it.ing, pi, g: 0, uses: [], warns: [] });
         a.g += it.g * serv;
-        if (!a.uses.some(u => u.day === day && u.r === r.id)) a.uses.push({ day, r: r.id, n: r.n });
+        if (!a.uses.some(u => u.day === day && u.r === r.id)) a.uses.push({ day, r: r.id, n: r.n + (en.extra ? ' (extra)' : ''), extra: !!en.extra });
         if (warn && a.warns.indexOf(warn + ':' + day) < 0) a.warns.push(warn + ':' + day);
       }
     }
@@ -899,6 +909,8 @@
     h += '<div class="card" style="padding:14px 16px;margin-top:12px"><b style="font-size:14px;display:block;margin-bottom:4px">Wo kaufst du ein?</b><div class="muted" style="font-size:12.5px;margin-bottom:8px">Erster Markt = Hauptmarkt (' + esc(MARKETS[S.market] ? MARKETS[S.market].n : '') + '). Jedes Produkt wird dem passenden Geschäft zugeordnet – mit Hinweis, wenn es dort meist nicht erhältlich ist.</div><div class="filter-row" style="flex-wrap:wrap">' + Object.keys(SHOP_PLACES).map(x => '<button class="fchip ' + (S.stores.indexOf(x) >= 0 ? 'on' : '') + '" data-shopplace="' + x + '">' + SHOP_PLACES[x].e + ' ' + SHOP_PLACES[x].n + (x === S.market ? ' ★' : '') + '</button>').join('') + '</div>' + (S.stores.length > 1 ? '<div class="filter-row" style="margin-top:4px"><span class="muted" style="font-size:12.5px;align-self:center">Sortieren nach:</span><button class="fchip ' + (S.shopGroup === 'store' ? 'on' : '') + '" data-shopgroup="store">Geschäft</button><button class="fchip ' + (S.shopGroup !== 'store' ? 'on' : '') + '" data-shopgroup="cat">Kategorie</button></div>' : '') + '</div>';
     h += '<div class="card" style="padding:14px 16px;margin-top:12px"><b style="font-size:14px;display:block;margin-bottom:8px">Einkaufstage</b><div class="days">' + DAYS_S.map((d, i) => '<button class="' + (shopDays().indexOf(i) >= 0 ? 'on' : '') + '" data-shopday="' + i + '" title="' + DAYS[i] + '" style="border-radius:12px;font-size:14px;max-width:46px">' + d + '</button>').join('') + '</div>' +
       '<div class="toggle ' + (S.theke ? 'on' : '') + '" data-act="theke" style="padding:14px 0 2px"><span class="tx"><b>Fleisch & Fisch an der Theke / beim Metzger</b><span>Exakte Menge statt fester Packungsgrößen</span></span><span class="sw"></span></div></div>';
+    const ex = p.extras || [];
+    if (ex.length) h += '<div class="card" style="padding:12px 16px;margin-top:12px"><b style="font-size:14px">➕ Zusätzliche Rezepte</b><div class="muted" style="font-size:12.5px;margin-bottom:6px">Ohne festen Tag – werden beim nächsten Einkauf mitgekauft.</div>' + ex.map((e, i) => R[e.r] ? '<div class="shop-item" style="cursor:default;padding:8px 0"><span class="n">' + esc(R[e.r].n) + '<small>' + r1(e.serv) + ' Portionen</small></span><button class="icon-btn" data-exrm="' + i + '" aria-label="Entfernen" title="Aus der Einkaufsliste entfernen">' + ic('x') + '</button></div>' : '').join('') + '</div>';
     h += '<div class="plan-actions no-print"><button class="btn btn-sec btn-sm" data-act="copyshop">' + ic('copy') + 'Kopieren</button><button class="btn btn-sec btn-sm" data-act="shareshop">' + ic('send') + 'Teilen</button><button class="btn btn-sec btn-sm" data-act="printshop">' + ic('print') + 'Drucken</button><button class="btn btn-ghost btn-sm" data-act="resetshop">' + ic('refresh') + 'Zurücksetzen</button></div>';
     for (const t of trips) {
       const tripBon = t.buyItems.reduce((s, i) => s + i.costBuy, 0);
@@ -938,6 +950,34 @@
       warnLabels(i.warns).map(w => '<small style="color:#8A4F12;font-weight:600">' + w + '</small>').join('') +
       '<span style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><span class="chip store-chip' + (i.na ? ' na' : '') + '">' + SHOP_PLACES[i.store].e + ' ' + esc(SHOP_PLACES[i.store].n) + '</span>' + (i.pi.th ? '<button class="chip ' + (i.theke ? 'diet' : 'ghost') + '" data-mode="' + i.key + '" title="Packung oder lose/Theke">' + (i.theke ? (i.ing.cat === 'obst' ? '⚖️ lose' : '🔪 Theke') : '📦 Packung') + ' ⇄</button>' : '') + '<button class="chip ghost" data-prod="' + i.key + '">🔍 Produkte</button></span></span>' +
       '<span class="q"><b style="color:var(--t1)">' + packLabel(i) + '</b><br><span class="muted" style="font-size:11.5px">' + eur(i.costBuy) + '</span></span></div>';
+  }
+  let recShop = { id: null, serv: null, done: {} };
+  function recipeShopSheet(rid) {
+    if (recShop.id !== rid) recShop = { id: rid, serv: servings(), done: {} };
+    const r = R[rid], day = Math.min(6, Math.max(0, todayIndex()));
+    const trip = buildTrips([{ r, day, serv: recShop.serv }], [day])[0] || { buyItems: [], pantryItems: [] };
+    const all = trip.buyItems, cost = all.reduce((x, i) => x + i.costBuy, 0);
+    const inWeek = (plan().extras || []).some(e => e.r === rid);
+    const row = i => '<div class="shop-item ' + (recShop.done[i.key] ? 'done' : '') + '" data-rsdone="' + i.key + '" style="align-items:flex-start"><span class="cb" style="margin-top:2px">' + ic('check') + '</span><span class="n">' + esc(i.ing.n) +
+      '<small>Bedarf ' + r0(i.g) + ' ' + (LIQUIDS.has(i.key) ? 'ml' : 'g') + (i.buy.waste > 0.5 ? ' · Rest ' + r0(i.buy.waste) : '') + '</small>' + gfHint(i.key, true, i.store) +
+      (i.na ? '<small style="color:#B03A2E;font-weight:600">⚠️ Bei ' + esc(SHOP_PLACES[S.stores[0]].n) + ' meist nicht erhältlich – Alternative: ' + esc(i.alt.join(', ') || 'Online') + '</small>' : '') +
+      '<span style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><span class="chip store-chip' + (i.na ? ' na' : '') + '">' + SHOP_PLACES[i.store].e + ' ' + esc(SHOP_PLACES[i.store].n) + '</span></span></span>' +
+      '<span class="q"><b style="color:var(--t1)">' + packLabel(i) + '</b><br><span class="muted" style="font-size:11.5px">' + eur(i.costBuy) + '</span></span></div>';
+    let h = '<div class="sheet-pad"><div class="eyebrow">Einkaufsliste für ein Gericht</div><h2 style="margin-top:4px">' + esc(r.n) + '</h2>' +
+      '<div class="card" style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0"><div><b>Portionen</b><div class="muted" style="font-size:12.5px">Haushalt = ' + r1(servings()) + ' Erwachsenen-Portionen</div></div><div class="stepper sm"><button data-rsserv="-0.5">−</button><b>' + r1(recShop.serv) + '</b><button data-rsserv="0.5">+</button></div></div>' +
+      '<div class="card" style="padding:0 14px">' + (all.length ? all.map(row).join('') : '<div class="empty" style="padding:16px">Alles Nötige ist Vorrat.</div>') + '</div>' +
+      (trip.pantryItems.length ? '<p class="muted" style="font-size:12.5px;margin:10px 2px">🫙 Vorrat prüfen: ' + esc(trip.pantryItems.map(i => i.ing.n).join(', ')) + '</p>' : '') +
+      '<p style="font-weight:700;margin:12px 2px">Ca. ' + eur(cost) + ' an der Kasse</p>' +
+      '<button class="btn btn-lime btn-block" data-act="rsweek">' + ic('plus') + (inWeek ? 'Ist schon in der Wochen-Einkaufsliste – nochmal hinzufügen' : 'Zur Wochen-Einkaufsliste hinzufügen') + '</button>' +
+      '<div class="grid2" style="margin-top:8px"><button class="btn btn-sec" data-act="rscopy">' + ic('copy') + 'Kopieren</button><button class="btn btn-sec" data-act="rsplan">' + ic('plan') + 'Im Plan einplanen</button></div>' +
+      '<button class="btn btn-ghost btn-block btn-sm" style="margin-top:6px" data-act="rsback">← Zurück zum Rezept</button>' +
+      '<p class="muted" style="font-size:12px;margin-top:10px">„Zur Wochen-Einkaufsliste“ übernimmt die Zutaten in den nächsten Einkauf – auch ohne festen Tag im Plan.</p></div>';
+    openSheet(h);
+  }
+  function recipeShopText() {
+    const r = R[recShop.id], day = Math.min(6, Math.max(0, todayIndex()));
+    const trip = buildTrips([{ r, day, serv: recShop.serv }], [day])[0] || { buyItems: [] };
+    return 'Einkaufsliste: ' + r.n + ' (' + r1(recShop.serv) + ' Portionen)\n' + trip.buyItems.map(i => '☐ ' + i.ing.n + ' – ' + packLabel(i) + (S.stores.length > 1 ? ' [' + SHOP_PLACES[i.store].n + ']' : '')).join('\n');
   }
   function shopText() {
     const p = plan(); let t = 'Einkaufsplan (SuPER Küche) – Woche ab ' + weekStart.toLocaleDateString('de-DE') + ' · ' + (MARKETS[S.market] || {}).n + '\n';
@@ -1124,7 +1164,7 @@
 
   /* ================= Events ================= */
   document.addEventListener('click', ev => {
-    const t = ev.target.closest('[data-act],[data-open],[data-fav],[data-swap],[data-lock],[data-del],[data-addslot],[data-go],[data-style],[data-cu],[data-fmeal],[data-ffav],[data-fbaby],[data-ftm],[data-fdiet],[data-cook],[data-fstyle-clear],[data-fcu-clear],[data-tab],[data-portion],[data-serv],[data-shop],[data-hh],[data-day],[data-meal],[data-diet],[data-excl],[data-sstyle],[data-profile],[data-kx],[data-dm],[data-shopplace],[data-shopgroup],[data-pg],[data-pgall],[data-shopday],[data-pantry],[data-mode],[data-prod],[data-ob],[data-obhh],[data-obdiet],[data-obmeal]');
+    const t = ev.target.closest('[data-act],[data-open],[data-fav],[data-swap],[data-lock],[data-del],[data-addslot],[data-go],[data-style],[data-cu],[data-fmeal],[data-ffav],[data-fbaby],[data-ftm],[data-fdiet],[data-cook],[data-fstyle-clear],[data-fcu-clear],[data-tab],[data-portion],[data-serv],[data-shop],[data-hh],[data-day],[data-meal],[data-diet],[data-excl],[data-sstyle],[data-profile],[data-rsdone],[data-rsserv],[data-exrm],[data-kx],[data-dm],[data-shopplace],[data-shopgroup],[data-pg],[data-pgall],[data-shopday],[data-pantry],[data-mode],[data-prod],[data-ob],[data-obhh],[data-obdiet],[data-obmeal]');
     if (!t) { if (ev.target === $('#overlay')) closeSheet(); return; }
     const d = t.dataset;
     if (d.fav) { ev.preventDefault(); ev.stopPropagation(); const i = S.favorites.indexOf(d.fav); if (i >= 0) S.favorites.splice(i, 1); else S.favorites.push(d.fav); save(); toast(i >= 0 ? 'Aus Favoriten entfernt' : 'Zu Favoriten hinzugefügt ❤️'); if ($('#sheet [data-choose]')) { t.classList.toggle('on'); refresh(); return; } if ($('#overlay').classList.contains('open') && detail.id === d.fav) renderRecipeSheet(); refresh(); return; }
@@ -1149,6 +1189,9 @@
     if (d.serv) { detail.serv = Math.max(0.5, (detail.serv || servings()) + +d.serv); renderRecipeSheet(); return; }
     if (d.prod) { ev.stopPropagation(); productSheet(d.prod); return; }
     if (d.mode) { ev.stopPropagation(); const p = plan(); p.mode = p.mode || {}; const it = buildShop().find(i => i.key === d.mode); p.mode[d.mode] = it && it.theke ? 'pack' : 'theke'; save(); renderShop(); return; }
+    if (d.rsdone) { recShop.done[d.rsdone] = !recShop.done[d.rsdone]; t.classList.toggle('done'); return; }
+    if (d.rsserv) { recShop.serv = Math.max(0.5, recShop.serv + +d.rsserv); recipeShopSheet(recShop.id); return; }
+    if (d.exrm !== undefined) { const p = plan(); (p.extras || []).splice(+d.exrm, 1); save(); renderShop(); toast('Aus der Einkaufsliste entfernt'); return; }
     if (d.shop) { const p = plan(); p.shop[d.shop] = !p.shop[d.shop]; save(); renderShop(); return; }
     if (d.pantry) { S.pantry[d.pantry] = !S.pantry[d.pantry]; save(); renderShop(); return; }
     if (d.shopday) { const i = +d.shopday, sd = shopDays(), j = sd.indexOf(i); if (j >= 0) { if (sd.length > 1) sd.splice(j, 1); } else sd.push(i); S.shopDays = sd.sort((a, b) => a - b); save(); renderShop(); return; }
@@ -1241,6 +1284,11 @@
       case 'resetshop': p.shop = {}; p.mode = {}; save(); renderShop(); break;
       case 'tmtoggle': S.thermomix = !S.thermomix; save(); renderSettings(); toast(S.thermomix ? 'Thermomix-Modus aktiv ⚙️' : 'Thermomix-Modus aus'); break;
       case 'cookidoo': copy(cookidooText(R[detail.id])).then(() => toast('Rezept kopiert – in Cookidoo einfügen ✓')); break;
+      case 'recipeshop': recipeShopSheet(detail.id); break;
+      case 'rsweek': { const p = plan(); p.extras = p.extras || []; p.extras.push({ r: recShop.id, serv: recShop.serv }); save(); closeSheet(); toast(R[recShop.id].n + ' → Wochen-Einkaufsliste ✓', '<a href="#einkauf">Ansehen</a>'); if (current === 'einkauf') renderShop(); else if (current === 'plan') renderPlan(); break; }
+      case 'rscopy': copy(recipeShopText()).then(() => toast('Einkaufsliste kopiert ✓')); break;
+      case 'rsplan': pickSlotSheet(recShop.id); break;
+      case 'rsback': openRecipe(recShop.id); break;
       case 'theke': S.theke = !S.theke; plan().mode = {}; save(); renderShop(); break;
       case 'prodclear': delete S.products[t.dataset.key]; save(); closeSheet(); renderShop(); break;
       case 'importgoals': if (importGoalsFromTracker(false)) refresh(); else if (!trackerData()) toast('Öffne SuPER Health einmal auf dieser Website, dann klappt die Übernahme', '<a href="' + esc(trackerUrl()) + '" target="superhealth">Öffnen</a>'); break;
