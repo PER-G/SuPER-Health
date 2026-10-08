@@ -10,7 +10,7 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{color-scheme:light;--bg:#EDF2EE;--bg2:#F3F7F4;--bg3:#FFFFFF;--bg4:#E8EFEA;--acc:#11403A;--acc2:#2E8C6B;--accg:rgba(46,140,107,0.12);--accgs:rgba(46,140,107,0.28);--ora:#C97A2B;--orag:rgba(201,122,43,0.14);--red:#A23A2E;--redg:rgba(162,58,46,0.12);--blu:#2F6FB0;--blug:rgba(47,111,176,0.13);--pur:#8A5CC0;--purg:rgba(138,92,192,0.13);--t1:#1B2421;--t2:#46544F;--t3:#6C7A75;--bdr:#DCE7E1;--bdra:rgba(46,140,107,0.4);--r:16px;--rs:10px;--rx:6px;--sh:0 1px 2px rgba(17,64,58,.06),0 8px 28px rgba(17,64,58,.08);--tr:0.3s cubic-bezier(0.4,0,0.2,1);--disp:'Fraunces',Georgia,serif;--mono:'Spline Sans Mono',ui-monospace,monospace;--pine-deep:#11403A;--card:#FFFFFF}
 .small{font-size:12px}.mono{font-family:var(--mono)}
-html{scroll-behavior:smooth}body{font-family:'Instrument Sans',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden}
+body{font-family:'Instrument Sans',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden}
 h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);letter-spacing:-.01em}
 .st-v,.sv,.cc .vl,.ma-v,.bp-v,.fdi-mc .fv,.lf-k,#rTm,.fdi-mc .fv{font-family:var(--mono)}
 /* Light-theme Fixes (ehemals Dark-Theme-Annahmen) */
@@ -223,12 +223,20 @@ h1,h2,h3,h4,.logo-t,.hd-l h1,.md h2,.ct,.sv,.cc .vl{font-family:var(--disp);lett
 .lgi{display:inline-flex;align-items:center;gap:6px}.lgi i{width:11px;height:11px;border-radius:3px;display:inline-block}
 /* Mobiles Menü: eigener Scrollbereich, Abdunklung, Wischgesten */
 .sb{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-.sb-x,.sb-bd{display:none}
+.sb-x,.sb-bd,.sb-edge{display:none}
+@media(max-width:900px),(prefers-reduced-motion:reduce){.amb{display:none}}
+/* Ladebalken (Seitenaufbau) */
+.lbar{position:fixed;top:0;left:0;right:0;z-index:3000;pointer-events:none;opacity:0;transition:opacity .2s}
+.lbar.sh{opacity:1}
+.lbar i{display:block;height:3px;width:0;background:linear-gradient(90deg,var(--acc2),var(--acc));transition:width .12s}
+.lbar span{position:absolute;top:10px;left:50%;transform:translateX(-50%);white-space:nowrap;font:600 12px var(--mono);color:var(--acc);background:var(--bg3);border:1px solid var(--bdr);border-radius:20px;padding:4px 12px;box-shadow:var(--sh)}
 @media(max-width:900px){
 .sb{width:min(290px,84vw);padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
 .sb.open{box-shadow:0 0 48px rgba(17,32,28,.28)}
 .sb-bd{display:block;position:fixed;inset:0;z-index:99;background:rgba(17,32,28,.4);opacity:0;pointer-events:none;transition:opacity var(--tr);touch-action:none}
 .sb-bd.sh{opacity:1;pointer-events:auto}
+.sb-edge{display:block;position:fixed;left:0;top:0;bottom:0;width:16px;z-index:98}
+body.nav-open .sb-edge{display:none}
 .sb-x{display:flex;position:absolute;top:18px;right:12px;width:36px;height:36px;border-radius:10px;border:1px solid var(--bdr);background:var(--bg3);color:var(--t2);font-size:16px;align-items:center;justify-content:center;cursor:pointer}
 .sb-logo{padding-right:44px}
 body.nav-open{overflow:hidden}
@@ -266,7 +274,7 @@ body.nav-open .fab{opacity:0;pointer-events:none}}
 <div class="amb"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
 <div class="ham" id="ham" onclick="toggleNav()" role="button" aria-label="Menü öffnen">☰</div>
 <div class="app">
-<div class="sb-bd" id="sbBd" onclick="closeNav()"></div><!-- innerhalb von .app, damit es unter dem Menü liegt (.app bildet eine eigene Ebene) -->
+<div class="sb-bd" id="sbBd" onclick="closeNav()"></div><div class="sb-edge" id="sbEdge"></div><!-- innerhalb von .app, damit es unter dem Menü liegt (.app bildet eine eigene Ebene) -->
 <aside class="sb" id="sb">
 <button class="sb-x" onclick="closeNav()" aria-label="Menü schließen">✕</button>
 <a href="/" class="sb-logo" style="text-decoration:none;color:inherit" title="Zur SuPER Health Startseite"><div class="logo-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 13h4l2.4-6 3.6 10 2.4-6.5L17 13h4" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="logo-t">SuPER <span>Health</span></div><div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--t3);text-transform:uppercase">Tracking</div></div></a>
@@ -280,7 +288,7 @@ body.nav-open .fab{opacity:0;pointer-events:none}}
 <div class="ni" id="niTrack" onclick="go('track',this)"><span class="ni-i">🔥</span> Kalorien Tracker</div>
 <div class="ni" onclick="go('scan',this)"><span class="ni-i">📷</span> Scanner</div>
 <div class="ni" onclick="go('asst',this)"><span class="ni-i">💬</span> Assistent</div>
-<div class="ni" id="niWeek" onclick="go('week',this);renWeekView()"><span class="ni-i">📅</span> Wochenübersicht</div>
+<div class="ni" id="niWeek" onclick="go('week',this)"><span class="ni-i">📅</span> Wochenübersicht</div>
 <div class="ni" onclick="go('meals',this)"><span class="ni-i">🍽️</span> Ernährungsplan</div>
 <a href="/wochenplaner/" class="ni" style="text-decoration:none"><span class="ni-i">🛒</span> Wochenplaner &amp; Einkauf</a>
 <div class="ni" onclick="go('train',this)"><span class="ni-i">💪</span> Training</div>
@@ -552,6 +560,7 @@ body.nav-open .fab{opacity:0;pointer-events:none}}
 <div class="mo" id="mo-setup" data-lock="1"><div class="md" id="suBody"></div></div>
 <button class="fab" onclick="goT()">+</button>
 <div class="tc2" id="toC"></div>
+<div class="lbar" id="lbar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><i></i><span></span></div>
 <script>
 // === EXPANDED FOOD DATABASE 300+ items ===
 const DB=[
@@ -712,21 +721,23 @@ function setActiveDate(k){if(!k||k===activeDate)return;saveAll();activeDate=k;co
 renW();const wc=document.getElementById('wC');if(wc)wc.textContent=water;updUI();updDash();if(typeof renDailyBar==='function')renDailyBar();if(typeof renWeekCal==='function')renWeekCal();if(typeof renWeekView==='function')renWeekView();
 toast(k===todayKey()?'📅 Heute ('+fmtDay(k)+')':'📅 Tag gewechselt: '+fmtDay(k));}
 // === NAV ===
-function go(p,el){document.querySelectorAll('.pg').forEach(s=>s.classList.remove('act'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));document.getElementById('pg-'+p).classList.add('act');if(el)el.classList.add('act');if(window.innerWidth<900)closeNav();window.scrollTo(0,0);if(p==='meals')renMeals('mG');if(p==='prog')renProgStats();}
+function go(p,el){document.querySelectorAll('.pg').forEach(s=>s.classList.remove('act'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));document.getElementById('pg-'+p).classList.add('act');if(el)el.classList.add('act');if(window.innerWidth<900)closeNav();window.scrollTo(0,0);if(p==='week')renWeekViewLoading();if(p==='meals')renMeals('mG');if(p==='prog')renProgStats();}
 function openNav(){document.getElementById('sb').classList.add('open');document.getElementById('sbBd').classList.add('sh');document.body.classList.add('nav-open');}
 function closeNav(){document.getElementById('sb').classList.remove('open');document.getElementById('sbBd').classList.remove('sh');document.body.classList.remove('nav-open');}
 function toggleNav(){if(document.getElementById('sb').classList.contains('open'))closeNav();else openNav();}
 // Wischgesten (Handy): Menü nach links zuwischen, vom linken Rand aufziehen. Vertikales Scrollen im Menü bleibt unberührt.
 function initNavSwipe(){
-  const sb=document.getElementById('sb'),bd=document.getElementById('sbBd');let sx=0,sy=0,mode=null,drag=false,w=280;
+  const sb=document.getElementById('sb'),bd=document.getElementById('sbBd'),edge=document.getElementById('sbEdge');let sx=0,sy=0,mode=null,drag=false,w=280;
   const mob=()=>window.innerWidth<900;
   document.addEventListener('touchstart',function(e){mode=null;drag=false;if(!mob()||e.touches.length!==1)return;
     const t=e.touches[0];sx=t.clientX;sy=t.clientY;w=sb.offsetWidth||280;const open=sb.classList.contains('open');
-    if(open&&(e.target.closest('#sb')||e.target===bd))mode='close';else if(!open&&sx<22&&!document.querySelector('.mo.sh'))mode='open';},{passive:true});
-  document.addEventListener('touchmove',function(e){if(!mode)return;const t=e.touches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+    if(open&&(e.target.closest('#sb')||e.target===bd))mode='close';else if(!open&&e.target===edge&&!document.querySelector('.mo.sh'))mode='open';},{passive:true});
+  // nur auf Menü, Abdunklung und Rand-Streifen – der restliche Seiteninhalt scrollt ungebremst
+  const mv=function(e){if(!mode)return;const t=e.touches[0],dx=t.clientX-sx,dy=t.clientY-sy;
     if(!drag){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;if(Math.abs(dy)>=Math.abs(dx)){mode=null;return;}drag=true;sb.style.transition='none';bd.style.transition='none';bd.classList.add('sh');}
     if(e.cancelable)e.preventDefault();
-    const off=mode==='close'?Math.min(0,dx):Math.min(0,-w+dx);sb.style.transform='translateX('+off+'px)';bd.style.opacity=String(Math.max(0,1+off/w));},{passive:false});
+    const off=mode==='close'?Math.min(0,dx):Math.min(0,-w+dx);sb.style.transform='translateX('+off+'px)';bd.style.opacity=String(Math.max(0,1+off/w));};
+  [sb,bd,edge].forEach(x=>x.addEventListener('touchmove',mv,{passive:false}));
   const end=function(e){if(!mode||!drag){mode=null;return;}const t=e.changedTouches&&e.changedTouches[0];const dx=t?t.clientX-sx:0;
     sb.style.transition='';sb.style.transform='';bd.style.transition='';bd.style.opacity='';
     if(mode==='close'){if(dx<-w*0.25)closeNav();else openNav();}else{if(dx>w*0.3)openNav();else closeNav();}
@@ -1250,9 +1261,9 @@ function weekDays(off){const days=[];for(let i=6;i>=0;i--){const d=new Date();d.
 function dayTotalK(key){return key===activeDate?log.reduce((a,e)=>a+e.k,0):(hist[key]?hist[key].k:0);}
 function dayEntries(key){return key===activeDate?log:((hist[key]&&hist[key].entries)||[]);}
 function weekNav(d){weekOffset=Math.max(-520,Math.min(52,weekOffset+d));renWeekView();}
-function renWeekView(){const el=document.getElementById('weekCal2');if(!el)return;
-  const dir=goalDir(),target=goals.k||1,maint=maintK();const nm=['So','Mo','Di','Mi','Do','Fr','Sa'];
-  const ds=weekDays(weekOffset);const days=ds.map(d=>{const key=keyOf(d);return{key,l:nm[d.getDay()],v:dayTotalK(key)};});
+function weekData(){const dir=goalDir(),target=goals.k||1,maint=maintK();const nm=['So','Mo','Di','Mi','Do','Fr','Sa'];
+  const ds=weekDays(weekOffset);const days=ds.map(d=>{const key=keyOf(d);return{key,l:nm[d.getDay()],v:dayTotalK(key)};});return{dir,target,maint,ds,days};}
+function renWeekChart(w){const el=document.getElementById('weekCal2');if(!el)return;const {dir,target,maint,ds,days}=w;
   const top=Math.max(maint,target,Math.max.apply(null,days.map(x=>x.v)),1)*1.3;const P=v=>v/top*100;
   const colorFor=v=>{if(!v)return 'var(--bg4)';if(dir==='cut')return v<=target?'#2E8C6B':v<=maint?'#C99A2B':'#C0392B';if(dir==='bulk')return v>=target?'#2E8C6B':v>=maint?'#88C2A8':'#C99A2B';return v<=target*1.05?'#2E8C6B':'#C99A2B';};
   el.innerHTML=days.map(x=>'<div class="wcb"><div class="val" style="bottom:calc('+P(x.v)+'% + 6px)">'+(x.v?'<span>'+fmtN(x.v)+'</span>':'')+'</div><div class="bar" style="height:'+Math.max(x.v?4:0,P(x.v))+'%;background:'+colorFor(x.v)+'"></div><div class="lbl">'+x.l+'</div></div>').join('')+
@@ -1261,15 +1272,27 @@ function renWeekView(){const el=document.getElementById('weekCal2');if(!el)retur
   const valid=days.filter(x=>x.v>0),avg=valid.length?Math.round(valid.reduce((a,x)=>a+x.v,0)/valid.length):0;
   document.getElementById('weekAvg2').textContent='⌀ '+fmtN(avg)+' kcal/Tag'+(weekOffset===0?' · diese Woche':weekOffset===-1?' · letzte Woche':weekOffset<0?' · vor '+(-weekOffset)+' Wochen':weekOffset===1?' · nächste Woche':' · in '+weekOffset+' Wochen');
   const leg=document.getElementById('weekLeg2');if(leg)leg.innerHTML=(dir==='bulk'?'<span class="lgi"><i style="background:#2E8C6B"></i>im Aufbau-Ziel</span> <span class="lgi"><i style="background:#88C2A8"></i>über Erhaltung</span> <span class="lgi"><i style="background:#C99A2B"></i>zu wenig</span>':'<span class="lgi"><i style="background:#2E8C6B"></i>im Defizit-Ziel</span> <span class="lgi"><i style="background:#C99A2B"></i>über Ziel</span> <span class="lgi"><i style="background:#C0392B"></i>Überschuss</span>');
-  renWeekBalance(days,maint);
-  const ent=document.getElementById('weekEntries');if(!ent)return;
-  ent.innerHTML=days.slice().reverse().map(x=>{const es=dayEntries(x.key),tot=dayTotalK(x.key);
+}
+function weekDayHtml(x){const es=dayEntries(x.key),tot=dayTotalK(x.key);
     const acts='<span style="display:inline-flex;gap:6px;margin-left:10px">'+(es.length&&x.key!==activeDate?'<button class="btn sm" title="Diesen Tag auf den aktiven Tag übernehmen" onclick="copyDay(\''+x.key+'\')">📋 Kopieren</button>':'')+((es.length||tot>0)?'<button class="btn sm dn" title="Tagesdaten löschen" onclick="deleteDay(\''+x.key+'\')">🗑️</button>':'')+'</span>';
     const head='<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:16px 0 4px;flex-wrap:wrap"><b style="color:var(--pine-deep)">'+fmtDay(x.key)+(x.key===todayKey()?' · heute':'')+(x.key===activeDate&&x.key!==todayKey()?' · aktiv':'')+'</b><span style="display:inline-flex;align-items:center"><span class="mono" style="color:var(--t2);font-size:13px">'+fmtN(tot)+' kcal</span>'+acts+'</span></div>';
     if(!es.length)return head+'<div class="small" style="color:var(--t3)">keine Einträge</div>';
     return head+es.map(e=>'<div style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--bdr)"><span style="font-size:18px">'+(e.e||'🍽️')+'</span><span style="flex:1;font-size:13px;min-width:0">'+escHtml(e.n)+' <span style="color:var(--t3)">'+e.a+' '+(e.u||'g')+'</span></span><span class="mono" style="font-size:13px;color:var(--acc)">'+e.k+' kcal</span></div>').join('');
-  }).join('');
-}
+  }
+function renWeekView(){if(!document.getElementById('weekCal2'))return;const w=weekData();renWeekChart(w);renWeekBalance(w.days,w.maint);
+  const ent=document.getElementById('weekEntries');if(ent)ent.innerHTML=w.days.slice().reverse().map(weekDayHtml).join('');}
+// Beim Öffnen: Schritt für Schritt aufbauen und den echten Fortschritt im Ladebalken zeigen (Diagramm → Bilanz → 7 Tage)
+function renWeekViewLoading(){if(!document.getElementById('weekCal2'))return;const w=weekData(),ent=document.getElementById('weekEntries');
+  if(ent)ent.innerHTML='';
+  runSteps('Wochenübersicht',[()=>renWeekChart(w),()=>renWeekBalance(w.days,w.maint)].concat(w.days.slice().reverse().map(x=>()=>{if(ent)ent.insertAdjacentHTML('beforeend',weekDayHtml(x));})));}
+let stepRun=0;
+function runSteps(label,steps){const lb=document.getElementById('lbar');if(!lb){steps.forEach(f=>f());return;}
+  const my=++stepRun,bar=lb.querySelector('i'),tx=lb.querySelector('span'),n=steps.length;let i=0;
+  const upd=()=>{const pct=Math.round(i/n*100);bar.style.width=pct+'%';tx.textContent=label+' wird geladen … '+pct+' %';lb.setAttribute('aria-valuenow',pct);};
+  upd();lb.classList.add('sh');
+  const next=()=>{if(my!==stepRun)return;if(i>=n){upd();setTimeout(()=>{if(my===stepRun)lb.classList.remove('sh');},250);return;}
+    try{steps[i]();}catch(e){console.warn('runSteps',e);}i++;upd();setTimeout(next,0);};
+  setTimeout(next,30);}
 // Kalorien-Bilanz der angezeigten Woche: Summe (Erhaltungsbedarf − gegessen) über nur die getrackten Tage.
 function renWeekBalance(days,maint){const bal=document.getElementById('weekBalance');if(!bal)return;
   let tracked=0,net=0,eatenSum=0;
