@@ -247,6 +247,19 @@ body.nav-open .fab{opacity:0;pointer-events:none}}
 .mhint{padding:14px 16px;border-radius:var(--rs);background:var(--accg);color:var(--t2);font-size:13px;line-height:1.5;margin-bottom:16px}
 .mhint a{color:var(--acc);font-weight:700}
 .tb{scrollbar-width:none}.tb::-webkit-scrollbar{display:none}
+/* Einrichtung beim ersten Start */
+.su-opt{display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;padding:14px 16px;border-radius:var(--rs);border:1px solid var(--bdr);background:var(--bg2);color:var(--t1);font-family:inherit;cursor:pointer;margin-bottom:10px;text-decoration:none;transition:all var(--tr)}
+.su-opt:hover{border-color:var(--acc);background:var(--accg)}
+.su-opt.rec{border-color:var(--bdra);background:var(--accg)}
+.su-opt .su-e{font-size:24px;line-height:1;flex:none;margin-top:2px}
+.su-opt b{display:block;font-size:15px}.su-opt span{display:block;font-size:12.5px;color:var(--t2);margin-top:3px;line-height:1.45}
+.su-opt .su-tag{display:inline-block;margin-top:0;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--acc);background:var(--bg3);border:1px solid var(--bdra);border-radius:20px;padding:1px 8px;margin-left:6px;vertical-align:2px}
+.su-prev{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0 4px}
+.su-prev div{text-align:center;padding:10px 4px;border-radius:var(--rs);background:var(--bg2);border:1px solid var(--bdr)}
+.su-prev b{display:block;font-family:var(--mono);font-size:17px}.su-prev small{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.su-ban{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:14px 16px;border-radius:var(--r);background:#FFF6E9;border:1px solid #F0D6B2;margin-bottom:20px;font-size:13.5px;color:var(--t2)}
+.su-ban b{color:var(--t1)}
+@media(max-width:600px){.md{width:94%;padding:20px;max-height:90vh}.su-prev{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -287,6 +300,7 @@ body.nav-open .fab{opacity:0;pointer-events:none}}
 <main class="mc">
 <!-- DASHBOARD -->
 <section class="pg act" id="pg-dash">
+<div id="setupBan"></div>
 <div class="hd"><div class="hd-l"><h1 id="greet">Guten Tag, Alex 👋</h1><p id="dashSub">Dein heutiger Überblick</p></div><div class="hd-r"><button class="btn" onclick="goT()">🔥 Kalorien tracken</button></div></div>
 <div class="sg">
 <div class="sc"><div class="si grn">🔥</div><div class="sl">Kalorien heute</div><div class="sv" id="dC">0</div><div class="sch" id="dCR">Ziel verbleibend</div></div>
@@ -334,6 +348,7 @@ body.nav-open .fab{opacity:0;pointer-events:none}}
 
 <!-- TRACKER -->
 <section class="pg" id="pg-track">
+<div id="setupBan2"></div>
 <div class="hd"><div class="hd-l"><h1>🔥 Kalorien Tracker</h1><p id="trackDayLbl">Suche Lebensmittel und tracke Makros</p></div><div class="hd-r"><input type="date" id="trackDate" onchange="setActiveDate(this.value)" title="Tag wählen" style="padding:9px 11px;border:1px solid var(--bdr);border-radius:10px;background:var(--card);color:var(--t1);font-family:inherit;font-size:14px"><button class="btn" onclick="setActiveDate(todayKey())" title="Zum heutigen Tag springen">Heute</button><button class="btn" onclick="clrLog()">🗑️ Zurücksetzen</button><button class="btn pr" onclick="endDay()">✓ Tag beenden</button></div></div>
 <div class="sg">
 <div class="sc"><div class="si grn">🔥</div><div class="sl">Kalorien</div><div class="sv" id="tCal">0</div><div class="sch" id="tCalG">Ziel: 1.800</div></div>
@@ -411,6 +426,9 @@ body.nav-open .fab{opacity:0;pointer-events:none}}
 </div>
 <div class="fgp"><label class="fl">Ziel</label><div class="chs" id="goalChips"></div></div>
 </div></div>
+<div class="cd"><div class="ch"><div class="ct">🔁 Profil einrichten &amp; sichern</div></div>
+<p class="small" style="color:var(--t2);line-height:1.55;margin-bottom:14px">Ziele neu berechnen (im SuPER Health Rechner oder schnell hier) oder alle Tracking-Daten als Datei sichern – z. B. für ein neues Handy. Die Daten liegen nur in diesem Browser.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" onclick="openSetup()">⚙️ Einrichtung öffnen</button><button class="btn" onclick="exportBackup()">💾 Backup herunterladen</button><label class="btn" style="cursor:pointer">📂 Backup laden<input type="file" accept="application/json,.json" hidden onchange="importBackup(this)"></label></div></div>
 </section>
 
 <!-- BODY -->
@@ -531,6 +549,7 @@ body.nav-open .fab{opacity:0;pointer-events:none}}
 <div class="fgp"><label class="fl">Muskelgruppe</label><input class="fi" id="exM" placeholder="z.B. Brust"></div>
 </div>
 <div class="md-a"><button class="btn" onclick="document.getElementById('mo-ex').classList.remove('sh')">Abbrechen</button><button class="btn pr" onclick="confirmEx()">Hinzufügen</button></div></div></div>
+<div class="mo" id="mo-setup" data-lock="1"><div class="md" id="suBody"></div></div>
 <button class="fab" onclick="goT()">+</button>
 <div class="tc2" id="toC"></div>
 <script>
@@ -655,7 +674,7 @@ const REC=[
 let log=[],water=0,selF=null,hlI=-1,filt=[];
 let hist={};            // { 'YYYY-MM-DD': {k,p,c,f,entries:[],water} }
 let activeDate=null;    // aktuell bearbeiteter Tag
-let prof={name:'Alex',age:28,sex:'Männlich',height:182,weight:78.5,bf:16,bench:95,squat:120,dl:140,ohp:60,goals:['Muskelaufbau']};
+let prof={name:'',age:28,sex:'Männlich',height:182,weight:78.5,bf:16,bench:95,squat:120,dl:140,ohp:60,goals:['Muskelaufbau']};
 let goals={k:1800,p:180,c:200,f:65,maint:2200};
 let wHist={},bHist={};   // Gewichts- und Maß-Verlauf { 'YYYY-MM-DD': kg } / { 'YYYY-MM-DD': {arm,…} }
 function keyOf(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -675,7 +694,9 @@ function loadAll(){try{
 const d=JSON.parse(localStorage.getItem('vf4'));if(!d){activeDate=todayKey();return;}
 if(d.prof)prof=Object.assign(prof,d.prof);if(d.goals)goals=Object.assign(goals,d.goals);if(d.bodyM)bodyM=d.bodyM;if(d.prefs)prefs=d.prefs;
 if(d.TP)TP=d.TP;if(d.tpDone)tpDone=d.tpDone;if(d.tpNames)for(let i=0;i<d.tpNames.length;i++)tpNames[i]=d.tpNames[i];
-if(d.hist)hist=d.hist;if(d.wHist)wHist=d.wHist;if(d.bHist)bHist=d.bHist;
+if(d.hist)hist=d.hist;
+if(d.prof&&d.prof.setup==null&&((d.prof.name&&d.prof.name!=='Alex')||localStorage.getItem('shp2track_seen')))prof.setup=true; // ältere Profile gelten als eingerichtet
+if(prof.name==='Alex'&&!prof.setup)prof.name='';if(d.wHist)wHist=d.wHist;if(d.bHist)bHist=d.bHist;
 for(const k in hist){if(typeof hist[k]==='number')hist[k]={k:hist[k],p:0,c:0,f:0,entries:[],water:0};} // alt: Zahl -> Objekt
 activeDate=todayKey(); // beim Laden immer automatisch den heutigen Tag wählen (manuell änderbar im Header)
 if(d.dt===new Date().toDateString()&&d.log&&!hist[activeDate])hist[activeDate]={k:0,p:0,c:0,f:0,entries:d.log,water:d.w||0}; // Altformat übernehmen
@@ -848,11 +869,11 @@ function updR(){document.getElementById('rTm').textContent=String(Math.floor(rts
 // === PROFILE ===
 function loadProf(){document.getElementById('pName').value=prof.name;document.getElementById('pAge').value=prof.age;document.getElementById('pSex').value=prof.sex;document.getElementById('pHeight').value=prof.height;document.getElementById('pWeight').value=prof.weight;document.getElementById('pBF').value=prof.bf;document.getElementById('pBench').value=prof.bench;document.getElementById('pSquat').value=prof.squat;document.getElementById('pDL').value=prof.dl;document.getElementById('pOHP').value=prof.ohp;
 const gc=document.getElementById('goalChips');gc.innerHTML='';['Muskelaufbau','Abnehmen','Kraft','Ausdauer','Definition','Gesundheit'].forEach(g=>{gc.innerHTML+='<div class="ch2'+(prof.goals.includes(g)?' act':'')+'" onclick="this.classList.toggle(\'act\')">'+g+'</div>';});}
-function saveProf(){prof.name=document.getElementById('pName').value||'Alex';prof.age=+document.getElementById('pAge').value||28;prof.sex=document.getElementById('pSex').value;prof.height=+document.getElementById('pHeight').value||180;prof.weight=+document.getElementById('pWeight').value||80;prof.bf=+document.getElementById('pBF').value||15;prof.bench=+document.getElementById('pBench').value||0;prof.squat=+document.getElementById('pSquat').value||0;prof.dl=+document.getElementById('pDL').value||0;prof.ohp=+document.getElementById('pOHP').value||0;
+function saveProf(){prof.name=document.getElementById('pName').value.trim();prof.age=+document.getElementById('pAge').value||28;prof.sex=document.getElementById('pSex').value;prof.height=+document.getElementById('pHeight').value||180;prof.weight=+document.getElementById('pWeight').value||80;prof.bf=+document.getElementById('pBF').value||15;prof.bench=+document.getElementById('pBench').value||0;prof.squat=+document.getElementById('pSquat').value||0;prof.dl=+document.getElementById('pDL').value||0;prof.ohp=+document.getElementById('pOHP').value||0;
 prof.goals=[];document.querySelectorAll('#goalChips .ch2.act').forEach(c=>prof.goals.push(c.textContent));
-if(prof.weight>0)wHist[todayKey()]=prof.weight;renWeightCharts();
-saveAll();updDash();renDailyBar();renWeekCal();toast('Profil gespeichert! 💾');}
-function updDash(){const h=new Date().getHours();document.getElementById('greet').textContent=(h<12?'Guten Morgen':h<18?'Guten Tag':'Guten Abend')+', '+prof.name+' 👋';
+if(prof.weight>0)wHist[todayKey()]=prof.weight;renWeightCharts();prof.setup=true;
+saveAll();renSetupBanner();updDash();renDailyBar();renWeekCal();toast('Profil gespeichert! 💾');}
+function updDash(){const h=new Date().getHours();document.getElementById('greet').textContent=(h<12?'Guten Morgen':h<18?'Guten Tag':'Guten Abend')+(prof.name?', '+prof.name:'')+' 👋';renSetupBanner();
 document.getElementById('dashSub').textContent=prof.goals.length?'Ziel: '+prof.goals.join(', '):'Dein heutiger Überblick';
 document.getElementById('dW').textContent=prof.weight+'kg';}
 // === BODY ===
@@ -905,7 +926,7 @@ function renBC(id,data,color){const c=document.getElementById(id);if(!c)return;c
 // === TOAST ===
 function toast(m,ms){ms=ms||2500;const c=document.getElementById('toC'),t=document.createElement('div');t.className='tst';t.textContent=m;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(40px)';t.style.transition='.3s';},ms);setTimeout(()=>t.remove(),ms+500);}
 // === MODALS ===
-document.querySelectorAll('.mo').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('sh');});});
+document.querySelectorAll('.mo').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m&&!m.dataset.lock)m.classList.remove('sh');});});
 // === SCANNER (Barcode + Open Food Facts) ===
 let scanStream=null,scanActive=false,scanDetector=null,scanFood=null;
 async function startScan(){
@@ -1040,11 +1061,70 @@ function chatHelp(){return 'Ich bin dein <b>SuPER Health Coach</b> 🌿 – ich 
 function resetChat(){chatHist=[];chatGreet();}
 function chatGreet(){chatHist=[];chatPush('bot','Hi '+(prof.name||'')+'! 👋 Ich bin dein <b>SuPER Health Coach</b>. Ich helfe beim Tracken, bei Snack-Ideen und deiner Tagesbilanz – und kenne dabei deine Ziele und dein Tagebuch. Wie kann ich helfen?');}
 
+// === EINRICHTUNG (erster Start ohne Profil) ===
+// Eingerichtet = Profil gespeichert, Werte aus dem Rechner übernommen oder Schnell-Einrichtung abgeschlossen.
+function needsSetup(){return !prof.setup;}
+function rechnerUrl(){return (location.protocol==='file:'?'https://su-per-health.vercel.app':'')+'/#/app';}
+function rechnerData(){try{const d=JSON.parse(localStorage.getItem('shp2track')||'null');return d&&d.goals&&d.goals.k?d:null;}catch(e){return null;}}
+let suState={sex:'Männlich',act:1.375,goal:'maintain'};
+function openSetup(){suChoose();document.getElementById('mo-setup').classList.add('sh');closeNav&&closeNav();}
+function closeSetup(){const m=document.getElementById('mo-setup');if(m)m.classList.remove('sh');renSetupBanner();}
+function skipSetup(){closeSetup();toast('Beispielwerte aktiv – Einrichtung jederzeit über das Banner oder „Mein Profil“',4000);}
+function suChoose(){const rd=rechnerData();
+  document.getElementById('suBody').innerHTML='<div style="font-size:34px;margin-bottom:6px">👋</div><h2 style="margin-bottom:8px">Willkommen bei SuPER Health Tracking</h2>'+
+  '<p class="small" style="color:var(--t2);line-height:1.55;margin-bottom:18px">Damit Kalorien- und Makroziele zu dir passen, richte zuerst dein Profil ein. Deine Daten bleiben nur in diesem Browser.</p>'+
+  (rd?'<button class="su-opt rec" onclick="suLoadRechner()"><span class="su-e">📥</span><span><b>Profil aus dem Rechner laden<span class="su-tag">gefunden</span></b><span>Auf diesem Gerät berechnet: '+fmtN(rd.goals.k)+' kcal · '+fmtN(rd.goals.p)+' g Protein · '+fmtN(rd.goals.c)+' g Carbs · '+fmtN(rd.goals.f)+' g Fett</span></span></button>':'')+
+  '<a class="su-opt'+(rd?'':' rec')+'" href="'+rechnerUrl()+'"><span class="su-e">⚙️</span><span><b>Mit dem SuPER Health Rechner einrichten'+(rd?'':'<span class="su-tag">empfohlen</span>')+'</b><span>Genaueste Ziele in 5 Stufen – mit Körperfett, Alltag, Schritten und Sport. Am Ende auf „An Tracking senden“ tippen, die Werte landen automatisch hier.</span></span></a>'+
+  '<button class="su-opt" onclick="suQuick()"><span class="su-e">⚡</span><span><b>Schnell hier einrichten</b><span>In einer Minute: Geschlecht, Alter, Größe, Gewicht, Aktivität und Ziel.</span></span></button>'+
+  '<label class="su-opt" style="cursor:pointer"><span class="su-e">📂</span><span><b>Backup laden</b><span>Gesicherte Datei aus „Mein Profil“ (z. B. vom alten Handy) wiederherstellen.</span></span><input type="file" accept="application/json,.json" hidden onchange="importBackup(this)"></label>'+
+  '<div style="text-align:center;margin-top:8px"><button class="btn sm" style="display:inline-flex;border:none;background:none;box-shadow:none;color:var(--t3)" onclick="skipSetup()">Erst mal umschauen (Beispielwerte)</button></div>';}
+function suLoadRechner(){const rd=rechnerData();if(!rd)return;if(applyImport(rd)){localStorage.setItem('shp2track_seen',String(rd.ts||Date.now()));afterProfileChange();toast('Profil aus dem Rechner übernommen ✓');}}
+function suField(lbl,html){return '<div class="fgp" style="margin-bottom:12px"><label class="fl">'+lbl+'</label>'+html+'</div>';}
+function suChips(key,opts){return '<div class="chs">'+opts.map(o=>'<div class="ch2'+(suState[key]===o[0]?' act':'')+'" onclick="suSet(\''+key+'\',\''+o[0]+'\')">'+o[1]+'</div>').join('')+'</div>';}
+function suSet(k,v){suState[k]=k==='act'?+v:v;suRead();suQuick(true);}
+function suRead(){['name','age','height','weight'].forEach(k=>{const el=document.getElementById('su_'+k);if(el)suState[k]=el.value;});}
+function suQuick(keep){if(!keep){suState=Object.assign({sex:prof.sex||'Männlich',act:1.375,goal:prof.setup?goalDir():'maintain',name:prof.setup?prof.name:'',age:prof.setup?prof.age:'',height:prof.setup?prof.height:'',weight:prof.setup?prof.weight:''},{});}
+  const v=k=>suState[k]==null?'':escAttr(String(suState[k]));
+  document.getElementById('suBody').innerHTML='<h2 style="margin-bottom:6px">⚡ Schnell einrichten</h2><p class="small" style="color:var(--t3);margin-bottom:16px">Schätzung nach Mifflin-St-Jeor. Genauer wird es im <a href="'+rechnerUrl()+'" style="color:var(--acc);font-weight:700">SuPER Health Rechner</a>.</p>'+
+  suField('Name (optional)','<input class="fi" id="su_name" value="'+v('name')+'" placeholder="Dein Name" oninput="suRead();suCalcShow()">')+
+  suField('Geschlecht',suChips('sex',[['Männlich','Männlich'],['Weiblich','Weiblich']]))+
+  '<div class="fg" style="grid-template-columns:repeat(3,1fr);gap:10px">'+suField('Alter','<input class="fi" id="su_age" type="number" inputmode="numeric" min="14" max="99" value="'+v('age')+'" placeholder="Jahre" oninput="suRead();suCalcShow()">')+suField('Größe','<input class="fi" id="su_height" type="number" inputmode="numeric" min="120" max="230" value="'+v('height')+'" placeholder="cm" oninput="suRead();suCalcShow()">')+suField('Gewicht','<input class="fi" id="su_weight" type="number" inputmode="decimal" step="0.1" min="35" max="250" value="'+v('weight')+'" placeholder="kg" oninput="suRead();suCalcShow()">')+'</div>'+
+  suField('Aktivität im Alltag',suChips('act',[['1.2','Sitzend'],['1.375','Leicht aktiv'],['1.55','Aktiv'],['1.725','Sehr aktiv']]))+
+  suField('Ziel',suChips('goal',[['cut','Abnehmen'],['maintain','Gewicht halten'],['bulk','Muskelaufbau']]))+
+  '<div id="suPrev"></div><div id="suErr" class="small" style="color:var(--red);min-height:16px;margin-top:6px"></div>'+
+  '<div class="md-a" style="margin-top:12px"><button class="btn" onclick="suChoose()">← Zurück</button><button class="btn pr" onclick="suSave()">✓ Profil speichern</button></div>';
+  document.querySelectorAll('#suBody .ch2').forEach(c=>{const m=(c.getAttribute('onclick')||'').match(/suSet\('act','([\d.]+)'\)/);if(m)c.classList.toggle('act',+m[1]===suState.act);});
+  suCalcShow();}
+function suCalc(){const a=+suState.age,h=+suState.height,w=+String(suState.weight).replace(',','.');
+  if(!(a>=14&&a<=99&&h>=120&&h<=230&&w>=35&&w<=250))return null;
+  const bmr=10*w+6.25*h-5*a+(suState.sex==='Weiblich'?-161:5),tdee=bmr*(+suState.act||1.375),g=suState.goal;
+  const k=Math.round(tdee*(g==='cut'?0.82:g==='bulk'?1.1:1)/10)*10;
+  const p=Math.round(w*(g==='maintain'?1.8:2.0)),f=Math.round(Math.max(w*0.8,k*0.25/9)),c=Math.max(0,Math.round((k-p*4-f*9)/4));
+  return {k,p,c,f,maint:Math.round(tdee),w,a,h};}
+function suCalcShow(){const el=document.getElementById('suPrev');if(!el)return;const r=suCalc();
+  el.innerHTML=r?'<div class="small" style="color:var(--t2);font-weight:600">Deine Tagesziele</div><div class="su-prev"><div><b>'+fmtN(r.k)+'</b><small>kcal</small></div><div><b>'+r.p+'</b><small>Protein g</small></div><div><b>'+r.c+'</b><small>Carbs g</small></div><div><b>'+r.f+'</b><small>Fett g</small></div></div><div class="small" style="color:var(--t3)">Erhaltungsbedarf ca. '+fmtN(r.maint)+' kcal/Tag</div>':'<div class="small" style="color:var(--t3)">Alter, Größe und Gewicht eingeben – die Ziele erscheinen sofort hier.</div>';}
+function suSave(){suRead();const r=suCalc();const err=document.getElementById('suErr');
+  if(!r){if(err)err.textContent='Bitte gültige Werte eingeben (Alter 14–99, Größe 120–230 cm, Gewicht 35–250 kg).';return;}
+  goals={k:r.k,p:r.p,c:r.c,f:r.f,maint:r.maint};
+  prof.name=(suState.name||'').trim()||prof.name||'';if(prof.name==='Alex'&&!(suState.name||'').trim())prof.name='';
+  prof.sex=suState.sex;prof.age=r.a;prof.height=r.h;prof.weight=r.w;
+  prof.goals=[suState.goal==='cut'?'Abnehmen':suState.goal==='bulk'?'Muskelaufbau':'Gesundheit'];
+  wHist[todayKey()]=r.w;prof.setup=true;saveAll();afterProfileChange();toast('Profil eingerichtet ✓ – los geht’s!');}
+function afterProfileChange(){loadProf();loadPref();updUI();updDash();renDailyBar();renWeekCal();renWeekView();renWeightCharts();renProgStats();closeSetup();}
+function renSetupBanner(){const h=needsSetup()?'<div class="su-ban"><span>⚠️ <b>Profil noch nicht eingerichtet</b> – es gelten Beispielwerte (1.800 kcal).</span><button class="btn sm pr" onclick="openSetup()">Jetzt einrichten</button></div>':'';
+  ['setupBan','setupBan2'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=h;});}
+// === BACKUP ===
+function exportBackup(){saveAll();try{const blob=new Blob([localStorage.getItem('vf4')||'{}'],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='superhealth-tracking-backup-'+todayKey()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);toast('Backup gespeichert 💾');}catch(e){toast('Backup fehlgeschlagen');}}
+function importBackup(input){const f=input.files&&input.files[0];input.value='';if(!f)return;const rd=new FileReader();
+  rd.onload=function(){try{const d=JSON.parse(rd.result);if(!d||typeof d!=='object'||!d.prof||!d.goals)throw new Error('format');
+    if(!confirm('Backup laden? Die aktuellen Tracking-Daten in diesem Browser werden ersetzt.'))return;
+    d.prof.setup=true;localStorage.setItem('vf4',JSON.stringify(d));location.reload();}catch(e){toast('Keine gültige SuPER-Health-Backup-Datei',4000);}};
+  rd.readAsText(f);}
 // === HANDOFF (Import aus SuPER-Health-Rechner) ===
 function applyImport(d){try{
   if(d.goals){goals.k=Math.round(d.goals.k)||goals.k;goals.p=Math.round(d.goals.p)||goals.p;goals.c=Math.round(d.goals.c)||goals.c;goals.f=Math.round(d.goals.f)||goals.f;if(d.goals.maint)goals.maint=Math.round(d.goals.maint);}
   if(d.prof){['name','age','sex','height','weight','bf'].forEach(k=>{if(d.prof[k]!=null&&d.prof[k]!=='')prof[k]=d.prof[k];});if(+d.prof.weight>0)wHist[todayKey()]=+d.prof.weight;if(Array.isArray(d.prof.goals)&&d.prof.goals.length)prof.goals=d.prof.goals;}
-  saveAll();return true;
+  prof.setup=true;saveAll();if(typeof closeSetup==='function')closeSetup();return true;
 }catch(e){console.warn('applyImport',e);return false;}}
 function checkImport(){
   const h=location.hash||'';const m=h.match(/import=([^&]+)/);if(!m)return;
@@ -1227,6 +1307,7 @@ renWeightCharts();renProgStats();
 renderChatChips();chatGreet();renWeekView();
 {const mu=document.getElementById('mealApiUrl');if(mu)mu.value=localStorage.getItem('vfMealApi')||'';const mt=document.getElementById('mealApiToken');if(mt)mt.value=localStorage.getItem('vfMealTok')||'';}
 checkImport();checkShared();checkMeals();
+renSetupBanner();if(needsSetup())openSetup();
 window.addEventListener('hashchange',function(){checkImport();checkMeals();});
 window.addEventListener('focus',function(){checkShared();checkMeals();});
 document.addEventListener('visibilitychange',function(){if(!document.hidden){checkShared();checkMeals();renKueche();if(document.getElementById('pg-meals').classList.contains('act'))renMeals('mG');}});
