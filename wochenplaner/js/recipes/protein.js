@@ -1,8 +1,5 @@
 // Proteinreiche Rezepte mit Markenprodukten (More Nutrition, ESN) – alle glutenfrei umsetzbar.
 // Proteinpulver ist nicht für Babys und Kleinkinder geeignet: Kinderportion immer ohne Pulver.
-Object.assign(ING, {
-  prot_gelatine: { n: 'Gelatine (gemahlen)', k: 340, p: 86, c: 0, f: 0.1, fi: 0, su: 0, sa: 0.6, pr: 40, cat: 'backen', fl: 'XA', u: [9, 'Päckchen'] },
-});
 (typeof window !== 'undefined' ? window : globalThis).RECIPES = ((typeof window !== 'undefined' ? window : globalThis).RECIPES || []).concat([
   {
     id: 'protein-milchreis-more-sahne',
@@ -92,7 +89,7 @@ Object.assign(ING, {
     n: 'ESN Isoclear Protein-Wackelpudding mit Beeren',
     img: { file: "Götterspeise Hof (Saale) 20220923 182656.jpg", q: 'jelly dessert berries glass' },
     cu: 'international', m: ['snack'], t: 15, d: 1, st: ['mealprep'],
-    i: [['esn_isoclear', 25], ['prot_gelatine', 6], ['beeren_tk', 80], ['skyr', 80]],
+    i: [['esn_isoclear', 25], ['gelatine', 6], ['beeren_tk', 80], ['skyr', 80]],
     s: [
       'Gelatine in 50 ml kaltem Wasser 5 Min. quellen lassen, dann bei kleiner Hitze auflösen (nicht kochen).',
       'Isoclear in 200 ml kaltem Wasser auflösen, die warme Gelatine zügig einrühren.',

@@ -106,6 +106,7 @@ function superKuecheCore(ING, BABY_WARN) {
     if ((recipe.st || []).indexOf('comfort') >= 0) out.push('comfort');
     if (recipe.baby >= 2) out.push('familie');
     if ((recipe.st || []).indexOf('mealprep') >= 0) out.push('mealprep');
+    if ((recipe.st || []).indexOf('dessert') >= 0) out.push('dessert');
     return out;
   }
 

@@ -368,3 +368,23 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .pg-cb.on { background: var(--lime); border-color: var(--lime); color: #fff; }
 .pg-cb.part { background: var(--lime-g); border-color: var(--lime); color: var(--lime-d); }
 .pg-items { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Tages-Planer (Mahlzeiten pro Tag) */
+.dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.dp-day { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.dp-btn { width: 100%; max-width: 54px; aspect-ratio: 1; border-radius: 14px; border: 2px solid var(--bdr); background: var(--card); font-weight: 700; font-size: 16px; transition: all .2s; }
+.dp-day.on .dp-btn { border-color: var(--lime); box-shadow: 0 0 0 2px var(--lime-g); }
+.dp-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 3px; border-radius: 8px; border: 1px solid transparent; }
+.dp-boxes:hover, .dp-day.edit .dp-boxes { border-color: var(--acc2); background: var(--accg); }
+.dp-boxes i { width: 15px; height: 15px; border-radius: 4px; background: var(--soft2); color: var(--t3); font-style: normal; font-size: 9px; font-weight: 700; display: grid; place-items: center; line-height: 1; }
+.dp-boxes i.on { background: var(--acc2); color: #fff; }
+.dp-day:not(.on) .dp-boxes { opacity: .45; }
+.dp-edit { padding: 14px 16px; margin-top: 10px; }
+/* Einkaufsstätten */
+.store-chip { background: var(--sky); color: var(--blu); font-weight: 700; }
+.store-chip.na { background: var(--redg); color: var(--red); }
+.store-head { display: flex; align-items: baseline; gap: 10px; margin: 18px 4px 2px; font-weight: 800; font-size: 16px; color: var(--acc); border-bottom: 2px solid var(--accg); padding-bottom: 6px; }
+.store-head span { margin-left: auto; font-size: 12.5px; font-weight: 600; color: var(--t3); }
+.chip.dessert { background: #FFE3D3; color: #A0471C; }
+.day.past .day-body { opacity: .55; }
+.day.past .day-tag span { background: var(--soft); color: var(--t3); }

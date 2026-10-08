@@ -87,6 +87,33 @@ const PACKS = {
   weisse_bohnen: { pk: [250, 530], hb: 900, q: 'Weiße Bohnen Dose' },
   whey: { pk: [500, 1000], hb: 365, vr: 1, q: 'Whey Protein' },
   more_total_sahne: { pk: [600], hb: 365, q: 'More Nutrition Total Protein Sahne' },
+  erythrit: { pk: [500, 1000], hb: 730, vr: 1, q: 'Erythrit' },
+  zerup: { pk: [320], hb: 365, vr: 1, q: 'More Nutrition Zerup' },
+  apfelmus: { pk: [360, 710], hb: 365, q: 'Apfelmus ungesüßt' },
+  sauerkirschen: { pk: [350], hb: 365, q: 'Sauerkirschen Glas' },
+  pfirsiche_dose: { pk: [250, 470], hb: 365, q: 'Pfirsiche Dose' },
+  mandelmehl: { pk: [200, 500], hb: 180, q: 'Mandelmehl entölt' },
+  kokosmehl: { pk: [500], hb: 180, q: 'Kokosmehl' },
+  gelatine: { pk: [9, 20], hb: 730, vr: 1, q: 'Gelatine gemahlen' },
+  agar: { pk: [10, 30], hb: 730, vr: 1, q: 'Agar Agar' },
+  puffreis: { pk: [125, 200], hb: 180, q: 'Puffreis' },
+  harzer: { pk: [125, 200], hb: 21, q: 'Harzer Käse' },
+  ehrmann_pudding: { pk: [200], hb: 21, q: 'High Protein Pudding' },
+  sahne_spray_light: { pk: [200], hb: 30, q: 'Sprühsahne light' },
+  zitronensaft: { pk: [200], hb: 180, vr: 1, q: 'Zitronensaft' },
+  zimt: { pk: [35, 50], hb: 730, vr: 1, q: 'Zimt gemahlen' },
+  zander: { pk: [250, 400], hb: 1, th: 1, fr: 1, q: 'Zanderfilet' },
+  dorade: { pk: [250], hb: 1, th: 1, fr: 1, q: 'Doradenfilet' },
+  rinderfilet: { pk: [300, 400], hb: 3, th: 1, fr: 1, q: 'Rinderhüfte' },
+  schweineschnitzel: { pk: [400, 600], hb: 2, th: 1, fr: 1, q: 'Schweineschnitzel' },
+  kohlrabi: { pk: [300], hb: 10, th: 1, q: 'Kohlrabi' },
+  rosenkohl: { pk: [500], hb: 6, th: 1, q: 'Rosenkohl' },
+  radieschen: { pk: [150], hb: 5, q: 'Radieschen' },
+  fenchel: { pk: [500], hb: 7, th: 1, q: 'Fenchel' },
+  glasnudeln: { pk: [100, 250], hb: 365, q: 'Glasnudeln' },
+  amaranth: { pk: [125, 200], hb: 180, q: 'Amaranth gepufft' },
+  kichererbsenmehl: { pk: [500], hb: 180, q: 'Kichererbsenmehl' },
+  sojaschnetzel: { pk: [200, 300], hb: 365, q: 'Sojaschnetzel' },
   more_pudding: { pk: [360], hb: 365, q: 'More Nutrition Protein Pudding' },
   more_chunky: { pk: [250], hb: 365, vr: 1, q: 'More Nutrition Chunky Flavour' },
   esn_designer_whey: { pk: [908, 2000], hb: 365, q: 'ESN Designer Whey' },
@@ -329,3 +356,44 @@ function gfBrandText(key, market) {
   return own.concat(b.all || []).slice(0, 3).join(' · ');
 }
 if (typeof module !== 'undefined') Object.assign(module.exports, { GF_BRANDS, GF_CHECK, gfBrandText });
+
+/* ---------- Einkaufsstätten & Verfügbarkeit ----------
+ * Wo bekommt man was? Richtwerte zum typischen Sortiment (Filialen variieren).
+ * Standard: alle Supermärkte & Discounter. Ausnahmen in SHOP_AVAIL. */
+const SHOP_PLACES = {
+  kaufland: { n: 'Kaufland', e: '🛒', type: 'voll' }, rewe: { n: 'Rewe', e: '🛒', type: 'voll' }, edeka: { n: 'Edeka', e: '🛒', type: 'voll' },
+  lidl: { n: 'Lidl', e: '🛒', type: 'disc' }, aldi: { n: 'Aldi', e: '🛒', type: 'disc' }, netto: { n: 'Netto', e: '🛒', type: 'disc' }, penny: { n: 'Penny', e: '🛒', type: 'disc' },
+  dm: { n: 'dm', e: '🧴', type: 'drog' }, rossmann: { n: 'Rossmann', e: '🧴', type: 'drog' },
+  bio: { n: 'Bio-Markt', e: '🌱', type: 'bio' }, metzger: { n: 'Metzgerei', e: '🔪', type: 'metzger' }, fisch: { n: 'Fischhändler', e: '🐟', type: 'fisch' },
+  asia: { n: 'Asia-Markt', e: '🥢', type: 'asia' }, online: { n: 'Online-Shop', e: '📦', type: 'online' },
+};
+const SUPERS = ['kaufland', 'rewe', 'edeka', 'lidl', 'aldi', 'netto', 'penny', 'bio'];
+const VOLL = ['kaufland', 'rewe', 'edeka', 'bio'];
+const SHOP_AVAIL = {
+  // Glutenfreie Spezialprodukte (Schär & Eigenmarken)
+  nudeln_gf: [...VOLL, 'aldi', 'lidl', 'dm', 'rossmann'], lasagne_gf: [...VOLL, 'dm'], gnocchi_gf: [...VOLL, 'dm'], mehl_gf: [...VOLL, 'aldi', 'dm', 'rossmann'],
+  brot_gf: [...VOLL, 'aldi', 'dm', 'rossmann'], broetchen_gf: [...VOLL, 'aldi', 'dm'], paniermehl_gf: [...VOLL, 'dm'], pizzateig_gf: [...VOLL, 'aldi', 'dm'],
+  haferflocken_gf: [...VOLL, 'aldi', 'dm', 'rossmann'], granola_gf: [...VOLL, 'dm', 'rossmann'], tortilla_mais: [...VOLL, 'lidl', 'aldi'], tamari: [...VOLL, 'dm', 'asia'],
+  // Asiatisches & Spezielles
+  asia_gochujang: ['asia', 'rewe', 'edeka', 'kaufland'], asia_reispapier: ['asia', ...VOLL], fischsauce: ['asia', ...VOLL], austernsauce: ['asia', ...VOLL],
+  currypaste: ['asia', ...VOLL], glasnudeln: ['asia', ...VOLL], lachs_sushi: ['fisch', 'rewe', 'edeka', 'kaufland'], tempeh: ['bio', 'rewe', 'edeka', 'kaufland', 'dm'],
+  kichererbsenmehl: ['bio', 'rewe', 'edeka', 'kaufland', 'asia', 'dm'], sojaschnetzel: ['bio', 'rewe', 'edeka', 'kaufland', 'dm', 'rossmann'], agar: ['bio', 'rewe', 'edeka', 'kaufland', 'dm', 'asia'],
+  mandelmehl: ['dm', 'rossmann', 'bio', 'rewe', 'edeka', 'kaufland'], kokosmehl: ['dm', 'rossmann', 'bio', 'rewe', 'edeka', 'kaufland'], erythrit: ['dm', 'rossmann', 'bio', 'rewe', 'edeka', 'kaufland'],
+  amaranth: ['bio', 'dm', 'rossmann', 'rewe', 'edeka', 'kaufland'], chiasamen: [...SUPERS, 'dm', 'rossmann'], leinsamen: [...SUPERS, 'dm', 'rossmann'],
+  zander: ['fisch', 'rewe', 'edeka', 'kaufland'], dorade: ['fisch', 'rewe', 'edeka', 'kaufland'], forelle: ['fisch', ...VOLL, 'aldi', 'lidl'],
+  lammhack: ['metzger', 'rewe', 'edeka', 'kaufland'], rinderfilet: ['metzger', ...SUPERS], rindergulasch: ['metzger', ...SUPERS],
+  bruehe_fm: ['bio', 'rewe', 'edeka', 'kaufland', 'dm'], knoblauchoel: ['rewe', 'edeka', 'kaufland', 'bio'], pesto_fm: ['rewe', 'edeka', 'kaufland', 'bio'],
+  // Proteinprodukte
+  whey: ['dm', 'rossmann', 'online', ...VOLL, 'lidl', 'aldi'], whey_iso: ['dm', 'rossmann', 'online', 'kaufland', 'rewe'], erbsenprotein: ['dm', 'rossmann', 'online', 'bio'],
+  more_total_sahne: ['online'], more_pudding: ['online'], more_chunky: ['online'], zerup: ['online'],
+  esn_designer_whey: ['online'], esn_isoclear: ['online'], esn_flexpresso: ['online'],
+};
+function carriers(key) {
+  const ing = (typeof ING !== 'undefined' ? ING : globalThis.ING)[key] || {};
+  const base = (SHOP_AVAIL[key] || SUPERS).slice();
+  if (ing.cat === 'fleisch' && (ing.fl || '').indexOf('F') < 0 && (ing.fl || '').indexOf('K') < 0 && base.indexOf('metzger') < 0) base.push('metzger');
+  if (ing.cat === 'fleisch' && /F|K/.test(ing.fl || '') && base.indexOf('fisch') < 0) base.push('fisch');
+  return base;
+}
+const ONLINE_SHOPS = { more: 'morenutrition.de', esn: 'esn.com' };
+if (typeof module !== 'undefined') Object.assign(module.exports, { SHOP_PLACES, SHOP_AVAIL, carriers });

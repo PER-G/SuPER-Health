@@ -22,6 +22,7 @@
     schnell: { n: 'Schnell (≤ 20 Min.)', e: '⚡' },
     familie: { n: 'Baby & Kleinkind', e: '👶' },
     mealprep: { n: 'Meal Prep', e: '📦' },
+    dessert: { n: 'Dessert', e: '🍮' },
   };
   const CUISINES = {
     italienisch: { n: 'Italienisch', d: 'Pasta · Risotto · Gnocchi', pic: 'pesto-pasta-haehnchen' },
@@ -129,6 +130,10 @@
     thermomix: false,
     proteinBrand: '',
     noProtein: [],
+    noCuisine: [],
+    dayMeals: null,
+    stores: [],
+    shopGroup: 'store',
     theke: false,
     pantry: {},
     products: {},
@@ -164,6 +169,17 @@
       lsSet(PLAN_SNAPSHOT, { v: 1, ts: Date.now(), days });
     } catch (e) { console.warn('Plan-Snapshot', e); }
   }
+  /* Ergänzt fehlende Felder älterer Profile (Mahlzeiten pro Tag, Einkaufsstätten) */
+  function fixState() {
+    if (!Array.isArray(S.dayMeals) || S.dayMeals.length !== 7) S.dayMeals = Array.from({ length: 7 }, () => Object.assign({ fruehstueck: false, mittag: false, abend: true, snack: false }, S.meals));
+    if (!Array.isArray(S.stores)) S.stores = [];
+    if (MARKETS[S.market] && S.stores.indexOf(S.market) < 0) S.stores.unshift(S.market);
+    if (MARKETS[S.market] && S.stores[0] !== S.market) { S.stores = S.stores.filter(x => x !== S.market); S.stores.unshift(S.market); }
+    if (!S.stores.length) S.stores = ['kaufland'];
+    if (!S.noProtein) S.noProtein = [];
+    if (!S.noCuisine) S.noCuisine = [];
+  }
+  fixState();
   function save() { S.updated = Date.now(); lsSet('sk_data_' + profiles.active, S); publishPlan(); const p = profiles.list.find(x => x.id === profiles.active); if (p && S.name) { p.name = S.name; lsSet('sk_profiles', profiles); } }
 
   let weekStart = mondayOf(new Date());
@@ -176,7 +192,14 @@
   function hasLittle() { return (S.household.baby || 0) + (S.household.kleinkind || 0) > 0; }
   function marketF() { return (MARKETS[S.market] || MARKETS.kaufland).f; }
   const PROTEIN_BRANDS = { '': 'Neutral (beliebiges Whey)', esn_designer_whey: 'ESN Designer Whey', esn_isoclear: 'ESN Isoclear (laktosearm, klar)', more_total_sahne: 'More Nutrition Total Protein „Sahne“' };
-  function adapted(r) { return Core.adapt(r, S.proteinBrand ? Object.assign({}, S.diet, { pref: { whey: S.proteinBrand, whey_iso: S.proteinBrand === 'esn_isoclear' ? 'esn_isoclear' : '' } }) : S.diet); }
+  const ADAPT_CACHE = new Map();
+  function adapted(r) {
+    const d = S.proteinBrand ? Object.assign({}, S.diet, { pref: { whey: S.proteinBrand, whey_iso: S.proteinBrand === 'esn_isoclear' ? 'esn_isoclear' : '' } }) : S.diet;
+    const key = r.id + '|' + (d.gf ? 1 : 0) + (d.lf ? 1 : 0) + (d.fm ? 1 : 0) + (d.veg ? 1 : 0) + '|' + (S.proteinBrand || '');
+    let a = ADAPT_CACHE.get(key);
+    if (!a) { a = Core.adapt(r, d); ADAPT_CACHE.set(key, a); }
+    return a;
+  }
   function nutriFor(r, factor) { return Core.nutrition(adapted(r).items, factor || 1); }
   function costFor(r) { return nutriFor(r).cost * servings() * marketF(); }
   /* Fleisch- & Fischsorten: einzeln an-/abwählbar (S.noProtein = ausgeschlossene Gruppen) */
@@ -184,15 +207,16 @@
     fleisch: { n: 'Fleisch', e: '🥩', items: {
       gefluegel: { n: 'Hähnchen', keys: ['haehnchenbrust', 'haehnchenschenkel', 'haehnchenkeule', 'huehnerbruehe'] },
       pute: { n: 'Pute', keys: ['putenbrust', 'putenhack'] },
-      rind: { n: 'Rind', keys: ['rinderhack', 'rindersteak', 'rindergulasch', 'asia_rinderbruehe', 'gemischtes_hack'] },
-      schwein: { n: 'Schwein', keys: ['schweinefilet', 'schinken_gekocht', 'gemischtes_hack', 'prot_gelatine'] },
-      lamm: { n: 'Lamm', keys: ['lammhack'] },
+      rind: { n: 'Rind', keys: ['rinderhack', 'rindersteak', 'rindergulasch', 'rinderfilet', 'asia_rinderbruehe', 'gemischtes_hack'] },
+      schwein: { n: 'Schwein', keys: ['schweinefilet', 'schweineschnitzel', 'schinken_gekocht', 'gemischtes_hack', 'gelatine'] },
+      lamm: { n: 'Lamm', keys: ['lammhack', 'fleisch_lamm'] },
     } },
     fisch: { n: 'Fisch & Meeresfrüchte', e: '🐟', items: {
       lachs: { n: 'Lachs', keys: ['lachs', 'lachs_sushi', 'raeucherlachs'] },
       weissfisch: { n: 'Kabeljau & Seelachs', keys: ['kabeljau', 'seelachs'] },
       forelle: { n: 'Forelle', keys: ['forelle'] },
-      thunfisch: { n: 'Thunfisch', keys: ['thunfisch_dose'] },
+      edelfisch: { n: 'Zander & Dorade', keys: ['zander', 'dorade'] },
+      thunfisch: { n: 'Thunfisch', keys: ['thunfisch_dose', 'fisch_thunfisch'] },
       garnelen: { n: 'Garnelen', keys: ['garnelen', 'austernsauce'] },
     } },
   };
@@ -212,23 +236,56 @@
     }
     return h;
   }
+  /* Küchen-Auswahl: „Alle Küchen“ mit Aufklappen für einzelne Küchen */
+  let cuiOpen = false;
+  function cuisinePickerHtml() {
+    const ids = Object.keys(CUISINES).filter(c => RECIPES.some(r => r.cu === c)), on = ids.filter(c => S.noCuisine.indexOf(c) < 0).length;
+    return '<div class="card pg-card"><div style="display:flex;align-items:center"><button class="pg-all" data-kx="all" style="flex:1"><span class="pg-cb ' + (on === ids.length ? 'on' : on ? 'part' : '') + '">' + ic('check') + '</span><b>🌍 Alle Küchen</b><span class="muted" style="margin-left:auto;font-size:12.5px">' + (on === ids.length ? 'alle' : on + ' von ' + ids.length) + '</span></button>' +
+      '<button class="icon-btn" data-kx="open" aria-label="Küchen einzeln wählen" style="margin-left:8px">' + ic(cuiOpen ? 'left' : 'right') + '</button></div>' +
+      (cuiOpen ? '<div class="pg-items">' + ids.map(c => '<button class="fchip ' + (S.noCuisine.indexOf(c) < 0 ? 'on' : '') + '" data-kx="one:' + c + '">' + (S.noCuisine.indexOf(c) < 0 ? '✓ ' : '') + CUISINES[c].n + ' <span class="muted" style="font-size:11px">' + RECIPES.filter(r => r.cu === c && r.m.some(x => x === 'mittag' || x === 'abend')).length + '</span></button>').join('') + '</div><p class="muted" style="font-size:12px;margin-top:8px">Gilt für Mittag- und Abendessen.</p>' : '') + '</div>';
+  }
   function eligible(r, mealType) {
     if (mealType && r.m.indexOf(mealType) < 0) return false;
     if (!adapted(r).ok) return false;
     if (S.exclude.length && Core.allergens(adapted(r).items).some(a => S.exclude.indexOf(a) >= 0)) return false;
     if (S.dislikes.indexOf(r.id) >= 0) return false;
     if (proteinBlocked(r)) return false;
+    if (S.noCuisine.length && S.noCuisine.indexOf(r.cu) >= 0 && (mealType === 'mittag' || mealType === 'abend' || (!mealType && r.m.some(x => x === 'mittag' || x === 'abend')))) return false;
     // Mit Baby im Haushalt: gemeinsame Hauptmahlzeiten müssen babytauglich sein (Snacks & Frühstück dürfen getrennt sein)
     if ((S.household.baby || 0) > 0 && r.baby === 0 && (mealType === 'mittag' || mealType === 'abend')) return false;
     return true;
   }
   function slotKey(day, meal) { return day + '|' + meal; }
-  function activeMeals() { return MEAL_ORDER.filter(m => S.meals[m]); }
+  function mealsOf(d) { return S.days[d] ? MEAL_ORDER.filter(m => S.dayMeals[d] && S.dayMeals[d][m]) : []; }
+  function activeMeals() { return MEAL_ORDER.filter(m => S.days.some((on, d) => on && S.dayMeals[d][m])); }
+  function setMealAll(m, val) { for (let d = 0; d < 7; d++) S.dayMeals[d][m] = val; S.meals[m] = val; }
+  /* Tages-Planer: Tage an/aus + Mini-Kästchen (F/M/A/S) je Tag, Detail per Tipp auf die Kästchen */
+  let dmEdit = -1;
+  function dayPlannerHtml() {
+    const L = { fruehstueck: 'F', mittag: 'M', abend: 'A', snack: 'S' };
+    let h = '<div class="dp-grid">' + DAYS_S.map((ds, d) => '<div class="dp-day ' + (S.days[d] ? 'on' : '') + (dmEdit === d ? ' edit' : '') + '"><button class="dp-btn" data-dm="day:' + d + '" title="' + DAYS[d] + ' an/aus">' + ds + '</button>' +
+      '<button class="dp-boxes" data-dm="edit:' + d + '" title="Mahlzeiten für ' + DAYS[d] + ' festlegen" aria-label="Mahlzeiten für ' + DAYS[d] + '">' + MEAL_ORDER.map(m => '<i class="' + (S.days[d] && S.dayMeals[d][m] ? 'on' : '') + '">' + L[m] + '</i>').join('') + '</button></div>').join('') + '</div>';
+    if (dmEdit >= 0) h += '<div class="card dp-edit"><b>' + DAYS[dmEdit] + ' – welche Mahlzeiten?</b><div class="pick-grid" style="margin-top:8px">' + MEAL_ORDER.map(m => '<button class="' + (S.days[dmEdit] && S.dayMeals[dmEdit][m] ? 'on' : '') + '" data-dm="meal:' + dmEdit + ':' + m + '">' + MEALS[m].e + ' ' + MEALS[m].n + '</button>').join('') + '</div>' +
+      '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn btn-sec btn-sm" data-dm="copy:' + dmEdit + '">Für alle Tage übernehmen</button><button class="btn btn-pri btn-sm" data-dm="edit:-1" style="margin-left:auto">Fertig</button></div></div>';
+    h += '<p class="muted" style="font-size:12px;margin:8px 2px 0">Tag antippen = an/aus · Kästchen antippen = Mahlzeiten festlegen (F Frühstück · M Mittag · A Abend · S Snack)</p>';
+    h += '<div class="filter-row" style="flex-wrap:wrap;margin-top:8px"><span class="muted" style="font-size:12.5px;align-self:center">Für alle Tage:</span>' + MEAL_ORDER.map(m => { const days = S.days.map((on, d) => on ? d : -1).filter(d => d >= 0); const all = days.length && days.every(d => S.dayMeals[d][m]); return '<button class="fchip ' + (all ? 'on' : '') + '" data-dm="all:' + m + '">' + MEALS[m].e + ' ' + MEALS[m].n + '</button>'; }).join('') + '</div>';
+    return h;
+  }
 
+  /* Index des heutigen Tages in der angezeigten Woche: -1 = Woche liegt in der Zukunft, 7 = Woche ist vorbei */
+  function todayIndex() {
+    const thisMon = mondayOf(new Date()), diff = Math.round((weekStart - thisMon) / 864e5);
+    if (diff > 0) return -1;
+    if (diff < 0) return 7;
+    return (new Date().getDay() + 6) % 7;
+  }
+  function isPast(d) { return d < todayIndex(); }
+  function futureMealsCount() { return S.days.reduce((n, on, d) => n + (isPast(d) ? 0 : mealsOf(d).length), 0); }
   function weekStats(k) {
     const p = plan(k); let cost = 0, n = 0; const tot = { k: 0, p: 0, c: 0, f: 0 }; const days = new Set();
     for (const sk in p.slots) {
       const r = R[p.slots[sk].r]; if (!r) continue;
+      if (isPast(+sk.split('|')[0])) continue; // vergangene Mahlzeiten zählen nicht mehr
       cost += costFor(r); n++; days.add(sk.split('|')[0]);
       const nu = nutriFor(r); tot.k += nu.k; tot.p += nu.p; tot.c += nu.c; tot.f += nu.f;
     }
@@ -275,20 +332,19 @@
   function mainProtein(r) { let best = null, bp = 0; for (const [k, g] of r.i) { const ing = ING[k]; if (!ing) continue; const p = ing.p * g / 100; if (p > bp) { bp = p; best = k; } } return best && ING[best].cat === 'fleisch' || best && /tofu|tempeh|linsen|bohnen|kichererbsen|ei$/.test(best) ? best.replace(/schenkel|keule/, 'brust') : null; }
   function makeCtx(p) {
     const ctx = { used: new Set(), usedCuisine: {}, prevCuisine: null, mealsInWeek: 0, fresh: {}, prot: {} };
-    ctx.mealsInWeek = S.days.filter(Boolean).length * activeMeals().length;
+    ctx.mealsInWeek = Math.max(1, futureMealsCount());
     for (const sk in p.slots) { const r = R[p.slots[sk].r]; if (r) noteUse(ctx, r); }
     return ctx;
   }
   function generateWeek(keepLocked) {
     const p = plan();
     const kept = {};
-    if (keepLocked) for (const sk in p.slots) if (p.slots[sk].lock) kept[sk] = p.slots[sk];
+    for (const sk in p.slots) if ((keepLocked && p.slots[sk].lock) || isPast(+sk.split('|')[0])) kept[sk] = p.slots[sk];
     p.slots = kept;
     const ctx = makeCtx(p);
-    const meals = activeMeals();
     for (let d = 0; d < 7; d++) {
-      if (!S.days[d]) continue;
-      for (const m of meals) {
+      if (isPast(d)) continue; // nie in der Vergangenheit planen
+      for (const m of mealsOf(d)) {
         const sk = slotKey(d, m);
         if (p.slots[sk]) continue;
         const r = pickFor(m, ctx);
@@ -416,15 +472,15 @@
 
   /* ================= Bausteine ================= */
   function chipsFor(r, max) {
-    const order = ['protein', 'leicht', 'comfort', 'familie', 'schnell', 'mealprep'];
+    const order = ['dessert', 'protein', 'leicht', 'comfort', 'familie', 'schnell', 'mealprep'];
     return order.filter(s => r._styles.indexOf(s) >= 0).slice(0, max || 2).map(s => '<span class="chip ' + s + '">' + (STYLES[s].n.replace(' (≤ 20 Min.)', '')) + '</span>').join('');
   }
   function imgTag(r, cls) { return '<img class="' + (cls || '') + '" src="' + r._img + '" alt="' + esc(r.n) + '" loading="lazy" onerror="this.onerror=null;this.src=\'img/placeholder.svg\'">'; }
   /* Glutenfrei-Hinweise zu einer Zutat (Markenempfehlung bzw. Kennzeichnung prüfen) */
-  function gfHint(key, small) {
+  function gfHint(key, small, store) {
     if (!S.diet.gf) return '';
     const tag = small ? 'small' : 'span';
-    const b = gfBrandText(key, S.market), note = GF_BRANDS[key] && GF_BRANDS[key].note;
+    const b = gfBrandText(key, store || S.market), note = GF_BRANDS[key] && GF_BRANDS[key].note;
     if (b) return '<' + tag + ' class="sw" style="color:var(--acc2);font-weight:600">🌾 z. B. ' + esc(b) + '</' + tag + '>' + (note && !small ? '<span class="sw" style="color:var(--t3);font-weight:400">' + esc(note) + '</span>' : '');
     if (GF_CHECK.has(key)) return '<' + tag + ' class="sw" style="color:#8A4F12;font-weight:600">🌾 auf „glutenfrei“ achten</' + tag + '>';
     return '';
@@ -443,7 +499,7 @@
     const p = plan(), st = weekStats(), mk = MARKETS[S.market] || MARKETS.kaufland;
     const shopList = buildShop(), done = shopList.filter(i => p.shop[i.tk]).length;
     const isThisWeek = keyOf(mondayOf(new Date())) === wk();
-    const todayIdx = isThisWeek ? (new Date().getDay() + 6) % 7 : -1;
+    const todayIdx = isThisWeek ? (new Date().getDay() + 6) % 7 : -1, tIdx = todayIndex();
     const hello = (() => { const h = new Date().getHours(); return h < 11 ? 'Guten Morgen' : h < 17 ? 'Guten Tag' : 'Guten Abend'; })();
     const wEnd = addDays(weekStart, 6);
     const fmt = d => d.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
@@ -452,6 +508,9 @@
       '<div class="week-nav"><button class="icon-btn" data-act="wprev" aria-label="Vorige Woche">' + ic('left') + '</button><span class="lbl">' + (isThisWeek ? 'Diese Woche · ' : '') + fmt(weekStart) + ' – ' + fmt(wEnd) + '</span><button class="icon-btn" data-act="wnext" aria-label="Nächste Woche">' + ic('right') + '</button></div>';
 
     const n = Object.keys(p.slots).length;
+    if (tIdx === 7) html += '<div class="diet-row" style="margin-top:12px;background:var(--soft)">🕘 <span>Diese Woche liegt in der Vergangenheit – nur zur Ansicht. <a href="#" data-act="thisweek" style="color:var(--acc2);font-weight:700">Zur aktuellen Woche</a></span></div>';
+    else if (tIdx >= 5) html += '<div class="diet-row" style="margin-top:12px;background:var(--lime-g);border-color:transparent">📅 <span>Nur noch ' + (7 - tIdx) + ' Tag' + (7 - tIdx > 1 ? 'e' : '') + ' in dieser Woche. <a href="#" data-act="wnext" style="color:var(--acc2);font-weight:700">Nächste Woche planen →</a></span></div>';
+    if (!n && tIdx === 7) { $('#pg-plan').innerHTML = html + '<div class="card empty" style="margin-top:16px"><div class="big">🕘</div>Für diese vergangene Woche gibt es keinen Plan.</div>'; return; }
     if (!n) {
       html += '<div class="card empty" style="margin-top:16px"><div class="big">🗓️</div><h2 style="font-size:22px;color:var(--t1)">Noch kein Plan für diese Woche</h2><p style="margin:8px 0 18px">Wir stellen dir passende, proteinreiche Familiengerichte zusammen – abgestimmt auf Haushalt, Budget und Ernährung.</p><button class="btn btn-lime" data-act="generate">' + ic('spark') + 'Wochenplan erstellen</button></div>';
       $('#pg-plan').innerHTML = html; return;
@@ -468,27 +527,29 @@
     for (let d = 0; d < 7; d++) {
       const slotsOfDay = MEAL_ORDER.filter(m => p.slots[slotKey(d, m)]);
       if (!S.days[d] && !slotsOfDay.length) continue;
-      const dayMeals = MEAL_ORDER.filter(m => meals.indexOf(m) >= 0 || p.slots[slotKey(d, m)]);
+      const past = isPast(d);
+      if (past && !slotsOfDay.length) continue; // vergangene leere Tage ausblenden
+      const dayMeals = MEAL_ORDER.filter(m => mealsOf(d).indexOf(m) >= 0 || p.slots[slotKey(d, m)]);
       let dk = 0, dp = 0;
       let inner = '';
       for (const m of dayMeals) {
         const sk = slotKey(d, m), sl = p.slots[sk];
-        if (!sl || !R[sl.r]) { inner += '<div class="meal-empty" data-addslot="' + sk + '">' + ic('plus') + MEALS[m].n + ' hinzufügen</div>'; continue; }
+        if (!sl || !R[sl.r]) { if (past) continue; inner += '<div class="meal-empty" data-addslot="' + sk + '">' + ic('plus') + MEALS[m].n + ' hinzufügen</div>'; continue; }
         const r = R[sl.r], nu = nutriFor(r); dk += nu.k; dp += nu.p;
         inner += '<div class="meal ' + (sl.lock ? 'locked' : '') + '" data-open="' + r.id + '" data-slot="' + sk + '">' + imgTag(r, 'ph') +
           '<div class="info">' + (dayMeals.length > 1 ? '<div class="mt">' + MEALS[m].n + '</div>' : '') + '<div class="nm">' + esc(r.n) + '</div><div class="chips">' + chipsFor(r, 1) + (adapted(r).swaps.length ? '<span class="chip diet">angepasst</span>' : '') + '</div>' +
           '<div class="meta"><span>' + ic('clock') + r.t + 'm</span><span class="sep"></span><span>' + ic('user') + persons() + '</span><span class="sep"></span><span>' + eur(costFor(r)) + '</span><span class="sep"></span><span class="mono" style="font-size:12.5px">' + r0(nu.k) + ' kcal · ' + r0(nu.p) + 'g P</span></div>' +
-          '<div class="acts no-print"><button class="icon-btn" data-swap="' + sk + '" title="Tauschen" aria-label="Tauschen">' + ic('swap') + '</button><button class="icon-btn ' + (sl.lock ? 'on' : '') + '" data-lock="' + sk + '" title="Fixieren" aria-label="Fixieren">' + ic(sl.lock ? 'lock' : 'unlock') + '</button><button class="icon-btn" data-del="' + sk + '" title="Entfernen" aria-label="Entfernen">' + ic('x') + '</button></div></div></div>';
+          (past ? '' : '<div class="acts no-print">') + (past ? '<!--' : '') + '<button class="icon-btn" data-swap="' + sk + '" title="Tauschen" aria-label="Tauschen">' + ic('swap') + '</button><button class="icon-btn ' + (sl.lock ? 'on' : '') + '" data-lock="' + sk + '" title="Fixieren" aria-label="Fixieren">' + ic(sl.lock ? 'lock' : 'unlock') + '</button><button class="icon-btn" data-del="' + sk + '" title="Entfernen" aria-label="Entfernen">' + ic('x') + '</button>' + (past ? '-->' : '</div>') + '</div></div>';
       }
       const dd = addDays(weekStart, d);
-      html += '<div class="day"><div class="day-tag"><span class="' + (d === todayIdx ? 'today' : '') + '">' + DAYS[d] + ' · ' + dd.getDate() + '.' + (dd.getMonth() + 1) + '.</span></div><div class="card day-body">' + inner +
+      html += '<div class="day' + (past ? ' past' : '') + '"><div class="day-tag"><span class="' + (d === todayIdx ? 'today' : '') + '">' + (d === todayIdx ? 'Heute · ' : '') + DAYS[d] + ' · ' + dd.getDate() + '.' + (dd.getMonth() + 1) + '.' + (past ? ' · vorbei' : '') + '</span></div><div class="card day-body">' + inner +
         (dk ? '<div class="day-sum">' + (dayMeals.length > 1 ? '<span>Σ ' + r0(dk) + ' kcal · ' + r0(dp) + ' g P</span>' : '') + '<span class="mbar" title="Anteil am Tagesziel Protein"><i style="width:' + Math.min(100, dp / S.goals.p * 100) + '%"></i></span><span>' + r0(dp / S.goals.p * 100) + '% Protein-Ziel</span></div>' : '') + '</div></div>';
     }
     $('#pg-plan').innerHTML = html;
   }
 
   /* ================= Seite: Rezepte ================= */
-  const RF = { q: '', meal: '', style: '', cu: '', fav: false, baby: false, tm: false, dt: [], dietOnly: true };
+  const RF = { q: '', meal: '', style: '', cu: '', fav: false, baby: false, tm: false, dt: [], dietOnly: true, limit: 48 };
   function filteredRecipes() {
     const q = RF.q.trim().toLowerCase();
     return RECIPES.filter(r => {
@@ -504,7 +565,9 @@
       return true;
     }).sort((a, b) => (S.favorites.indexOf(b.id) >= 0) - (S.favorites.indexOf(a.id) >= 0) || nutriFor(b).p / nutriFor(b).k - nutriFor(a).p / nutriFor(a).k);
   }
+  let lastRF = '';
   function renderRecipes() {
+    const sig = JSON.stringify([RF.q, RF.meal, RF.style, RF.cu, RF.fav, RF.baby, RF.tm, RF.dt, RF.dietOnly]); if (sig !== lastRF) { RF.limit = 48; lastRF = sig; }
     const activeDiets = Object.keys(S.diet).filter(d => S.diet[d]).map(d => Core.DIETS[d].n);
     let html = '<div class="page-head"><div class="eyebrow">' + RECIPES.length + ' Familienrezepte</div><h1>Gerichte</h1></div>' +
       '<div class="search">' + ic('search') + '<input class="input" id="rq" placeholder="Gerichte oder Zutaten suchen" value="' + esc(RF.q) + '" autocomplete="off"></div>';
@@ -531,7 +594,7 @@
     const list = filteredRecipes();
     html += '<div class="count-l">' + list.length + ' Gerichte' + (activeDiets.length ? ' · passend für <b>' + activeDiets.join(', ') + '</b>' : '') +
       ' · <a href="#" data-act="togglediet" style="color:var(--acc2)">' + (RF.dietOnly ? 'alle zeigen' : 'nur passende') + '</a></div>';
-    html += list.length ? '<div class="rgrid">' + list.map(recipeCard).join('') + '</div>' : '<div class="empty"><div class="big">🔍</div>Keine Gerichte gefunden.</div>';
+    html += list.length ? '<div class="rgrid">' + list.slice(0, RF.limit).map(recipeCard).join('') + '</div>' + (list.length > RF.limit ? '<div style="text-align:center;margin:20px 0"><button class="btn btn-sec" data-act="moreRecipes">Weitere ' + Math.min(48, list.length - RF.limit) + ' von ' + (list.length - RF.limit) + ' Gerichten anzeigen</button></div>' : '') : '<div class="empty"><div class="big">🔍</div>Keine Gerichte gefunden.</div>';
     $('#pg-rezepte').innerHTML = html;
     const inp = $('#rq');
     inp.addEventListener('input', () => { RF.q = inp.value; const pos = inp.selectionStart; renderRecipes(); const n = $('#rq'); n.focus(); n.setSelectionRange(pos, pos); });
@@ -602,10 +665,11 @@
       if (detail.cook === 'tm' && r.tm) {
         h += '<div class="diet-row" style="margin-bottom:10px;background:' + (r.tm.fit === 2 ? 'var(--accg)' : 'var(--orag)') + ';border-color:transparent">' + (r.tm.fit === 2 ? '✓ Komplett im Thermomix' : r.tm.fit === 1 ? '◐ Teilweise im Thermomix' : '○ Thermomix nur für Teilschritte') + (r.tm.note ? ' · ' + esc(r.tm.note) : '') + '</div>';
         h += '<ol class="steps tm-steps">' + r.tm.steps.map(st => '<li><span>' + esc(st[0]) + (st[1] || st[2] || st[3] || st[4] ? '<span class="tm-set">' + [st[1] ? '⏱ ' + esc(st[1]) : '', st[2] ? '🌡 ' + esc(st[2]) : '', st[4] === 'Linkslauf' ? '↺ Linkslauf' : st[4] ? '◆ ' + esc(st[4]) : '', st[3] ? '⚙ ' + esc(st[3]) : ''].filter(Boolean).map(x => '<b>' + x + '</b>').join('') + '</span>' : '') + '</span></li>').join('') + '</ol>';
-        h += '<div class="plan-actions" style="justify-content:flex-start"><button class="btn btn-sec btn-sm" data-act="cookidoo">' + ic('copy') + 'Für Cookidoo kopieren</button><a class="btn btn-sec btn-sm" href="rezepte/' + r.id + '.html" target="_blank" rel="noopener">' + ic('link') + 'Rezeptseite (Import-Link)</a></div>' +
-          '<p class="muted" style="font-size:12px;margin-top:8px">Einstellungen für ca. 4 Portionen (Mixtopf max. 2,2 l). In Cookidoo unter „Meine Rezepte“ → „Rezept erstellen“ einfügen oder – falls in deinem Konto verfügbar – die Rezeptseite per Link importieren. Mit dem TM5 funktionieren die Werte ebenso – nur den Modus „Anbraten“ gibt es dort nicht (stattdessen Varoma-Temperatur, Deckel ohne Messbecher).</p>';
+        h += '<div class="plan-actions" style="justify-content:flex-start"><button class="btn btn-sec btn-sm" data-act="cookidoo">' + ic('copy') + 'Für Cookidoo kopieren</button><a class="btn btn-sec btn-sm" href="' + cookidooUrl(r) + '" target="_blank" rel="noopener">' + ic('search') + 'Ähnliche Rezepte auf Cookidoo</a></div>' +
+          '<p class="muted" style="font-size:12px;margin-top:8px">Einstellungen für ca. 4 Portionen (Mixtopf max. 2,2 l). „Ähnliche Rezepte auf Cookidoo“ öffnet passende Original-Thermomix-Rezepte (Cookidoo-Abo nötig). Eigene Fassung: kopieren und in Cookidoo unter „Meine Rezepte“ → „Rezept erstellen“ einfügen. Mit dem TM5 funktionieren die Werte ebenso – nur den Modus „Anbraten“ gibt es dort nicht (stattdessen Varoma-Temperatur, Deckel ohne Messbecher).</p>';
       } else {
         h += '<ol class="steps">' + r.s.map(s => '<li><span>' + esc(s) + '</span></li>').join('') + '</ol>';
+        h += '<div class="plan-actions" style="justify-content:flex-start"><a class="btn btn-sec btn-sm" href="' + cookidooUrl(r) + '" target="_blank" rel="noopener">' + ic('search') + 'Ähnliche Thermomix-Rezepte auf Cookidoo</a></div>';
       }
     }
     if (detail.tab === 'familie') {
@@ -624,6 +688,7 @@
   }
 
   /* Text zum Anlegen in Cookidoo („Meine Rezepte“ → „Rezept erstellen“) – Mengen für 4 Portionen */
+  function cookidooUrl(r) { return 'https://cookidoo.de/search/de-DE?query=' + encodeURIComponent(r.ck || r.n.replace(/\(.*?\)/g, '').replace(/\b(Protein|High-Protein|leicht|light)[- ]?/gi, '').replace(/\s+/g, ' ').trim()); }
   function cookidooText(r) {
     const a = adapted(r), P = 4;
     const fmt = st => [st[1], st[2], st[4] === 'Linkslauf' ? 'Linkslauf' : st[4], st[3]].filter(Boolean).join(' / ');
@@ -636,19 +701,19 @@
     const r = R[rid];
     let h = '<div class="sheet-pad"><h2>Zum Wochenplan</h2><p class="muted" style="margin:6px 0 16px">„' + esc(r.n) + '“ – wähle Tag und Mahlzeit (' + (function () { const e = addDays(weekStart, 6); return weekStart.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) + '–' + e.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }); })() + ').</p>';
     h += '<div class="field-l" style="font-size:15px">Mahlzeit</div><div class="pick-grid" id="pm">' + r.m.concat(MEAL_ORDER.filter(m => r.m.indexOf(m) < 0)).map((m, i) => '<button class="' + (i === 0 ? 'on' : '') + '" data-pm="' + m + '">' + MEALS[m].e + ' ' + MEALS[m].n + '</button>').join('') + '</div>';
-    h += '<div class="field-l" style="font-size:15px;margin-top:16px">Tag</div><div class="pick-grid" id="pd">' + DAYS.map((d, i) => { const sl = plan().slots[slotKey(i, r.m[0])]; return '<button data-pd="' + i + '">' + d.slice(0, 2) + (sl ? ' •' : '') + '</button>'; }).join('') + '</div>';
+    h += '<div class="field-l" style="font-size:15px;margin-top:16px">Tag</div><div class="pick-grid" id="pd">' + DAYS.map((d, i) => { const sl = plan().slots[slotKey(i, r.m[0])]; return '<button data-pd="' + i + '"' + (isPast(i) ? ' disabled style="opacity:.35" title="Tag ist vorbei"' : '') + '>' + d.slice(0, 2) + (sl ? ' •' : '') + '</button>'; }).join('') + '</div>';
     h += '<p class="muted" style="font-size:12.5px;margin-top:10px">• = dort steht schon ein Gericht (wird ersetzt).</p></div>';
     openSheet(h);
     let meal = r.m[0];
     $$('#pm button').forEach(b => b.onclick = () => { meal = b.dataset.pm; $$('#pm button').forEach(x => x.classList.toggle('on', x === b)); });
-    $$('#pd button').forEach(b => b.onclick = () => {
+    $$('#pd button:not([disabled])').forEach(b => b.onclick = () => {
       const d = +b.dataset.pd; plan().slots[slotKey(d, meal)] = { r: rid, lock: true };
-      if (!S.days[d]) S.days[d] = true; if (!S.meals[meal]) S.meals[meal] = true;
+      S.days[d] = true; S.dayMeals[d][meal] = true;
       plan().shop = {}; save(); closeSheet(); toast(r.n + ' → ' + DAYS[d] + ' (' + MEALS[meal].n + ') ✓'); if (current === 'plan') renderPlan();
     });
   }
   /* ---------- Schnellfilter (Gericht hinzufügen & Rezepte-Seite) ---------- */
-  const QF_STYLES = ['protein', 'leicht', 'schnell', 'familie', 'comfort', 'mealprep'];
+  const QF_STYLES = ['protein', 'leicht', 'dessert', 'schnell', 'familie', 'comfort', 'mealprep'];
   const QF_DIETS = { gf: 'Glutenfrei', lf: 'Laktosefrei', fm: 'FODMAP-arm', veg: 'Vegetarisch' };
   function newFilter() { return { q: '', st: [], dt: [], pg: [], tm: false, fav: false, sort: 'protein' }; }
   /* Diät-Filter: ist die Ernährungsform in den Einstellungen aktiv, sind alle passenden Gerichte schon angepasst.
@@ -756,11 +821,15 @@
    * Pro Einkauf werden Mengen addiert und in reale Packungsgrößen umgerechnet (oder exakt an der Theke). */
   function shopDays() { return (S.shopDays && S.shopDays.length ? S.shopDays : [0]).slice().sort((a, b) => a - b); }
   function buildTrips() {
-    const p = plan(), serv = servings(), mf = marketF(), trips = shopDays();
+    const p = plan(), serv = servings(), mf = marketF(), tI = todayIndex();
+    if (tI === 7) return [];
+    // Einkaufstage, die schon vorbei sind, rutschen auf heute
+    const trips = [...new Set(shopDays().map(t => Math.max(t, Math.max(0, tI))))].sort((a, b) => a - b);
     const map = {}; // Einkaufstag -> Zutat -> Summe
     for (const sk in p.slots) {
       const r = R[p.slots[sk].r]; if (!r) continue;
       const day = +sk.split('|')[0];
+      if (isPast(day)) continue; // Vergangenes muss nicht mehr eingekauft werden
       for (const it of adapted(r).items) {
         const pi = packInfo(it.key);
         const before = trips.filter(t => t <= day);
@@ -782,11 +851,21 @@
       const items = Object.values(map[t] || {}).map(a => {
         const prod = S.products[a.key];
         const mode = p.mode && p.mode[a.key];
-        const theke = !!a.pi.th && (mode ? mode === 'theke' : (S.theke && a.ing.cat === 'fleisch'));
+        // Wo kaufen? Erste gewählte Einkaufsstätte, die das Produkt typischerweise führt
+        const car = carriers(a.key), isMeat = a.ing.cat === 'fleisch' && !/F|K/.test(a.ing.fl || ''), isFish = a.ing.cat === 'fleisch' && /F|K/.test(a.ing.fl || '');
+        let store = null;
+        if (isMeat && S.stores.indexOf('metzger') >= 0 && mode !== 'pack') store = 'metzger';
+        else if (isFish && S.stores.indexOf('fisch') >= 0 && mode !== 'pack' && car.indexOf('fisch') >= 0) store = 'fisch';
+        else store = S.stores.find(x => x !== 'metzger' && x !== 'fisch' && car.indexOf(x) >= 0) || null;
+        const na = !store; if (!store) store = S.stores[0];
+        const moved = !na && store !== S.stores[0] && car.indexOf(S.stores[0]) < 0;
+        const alt = na ? car.filter(x => S.stores.indexOf(x) < 0).slice(0, 3).map(x => SHOP_PLACES[x].n) : [];
+        const loose = !mode && !!a.pi.lose && a.g < a.pi.pk[0] * 0.6;
+        const theke = !!a.pi.th && (mode ? mode === 'theke' : ((S.theke || store === 'metzger' || store === 'fisch') && a.ing.cat === 'fleisch') || loose);
         let buy;
-        if (theke) { const total = Math.max(10, Math.ceil(a.g / 10) * 10); buy = { theke: true, total, waste: total - a.g, combo: [] }; }
+        if (theke) { const total = Math.max(a.pi.lose || 10, Math.ceil(a.g / 10) * 10); buy = { theke: true, total, waste: total - a.g, combo: [] }; }
         else buy = bestPacks(a.g, prod && prod.size ? [prod.size] : a.pi.pk);
-        return Object.assign(a, { buy, theke, prod, costUsed: a.ing.pr * a.g / 1000 * mf, costBuy: a.ing.pr * buy.total / 1000 * mf, pantry: !!a.pi.vr });
+        return Object.assign(a, { buy, theke, prod, store, na, moved, alt, costUsed: a.ing.pr * a.g / 1000 * mf, costBuy: a.ing.pr * buy.total / 1000 * mf, pantry: !!a.pi.vr });
       }).sort((x, y) => x.ing.n.localeCompare(y.ing.n, 'de'));
       return { day: t, items, buyItems: items.filter(i => !i.pantry), pantryItems: items.filter(i => i.pantry) };
     }).filter(t => t.items.length);
@@ -795,7 +874,7 @@
   function fmtSize(s, unit) { return s >= 1000 && s % 100 === 0 ? r1(s / 1000) + (unit === 'ml' ? ' l' : ' kg') : s + ' ' + unit; }
   function packLabel(i) {
     const unit = LIQUIDS.has(i.key) ? 'ml' : 'g';
-    if (i.theke) return (i.ing.cat === 'obst' ? 'lose ' : 'Theke ') + i.buy.total + ' ' + unit;
+    if (i.theke) return (i.ing.cat === 'obst' ? 'lose ~' : (i.store === 'metzger' ? 'Metzger ' : i.store === 'fisch' ? 'Fischtheke ' : 'Theke ')) + i.buy.total + ' ' + unit + (i.pi.lose && i.buy.total <= i.pi.lose ? ' (kleines Stück)' : '');
     if (i.pantry) return fmtQty(i.key, i.g).replace(/<[^>]+>/g, '');
     return i.buy.combo.map(([s, n]) => n + ' × ' + fmtSize(s, unit)).join(' + ');
   }
@@ -814,6 +893,7 @@
     if (!trips.length) { $('#pg-einkauf').innerHTML = h + '<div class="card empty"><div class="big">🛒</div>Erstelle zuerst einen Wochenplan – die Einkäufe werden automatisch geplant.<div style="margin-top:16px"><a class="btn btn-lime" href="#plan">Zum Plan</a></div></div>'; return; }
     h += '<div class="stats"><div class="card stat"><div class="eyebrow">Erledigt</div><div class="v">' + done + ' <small>/ ' + all.length + '</small></div><div class="bar"><i style="width:' + (all.length ? done / all.length * 100 : 0) + '%"></i></div></div>' +
       '<div class="card stat"><div class="eyebrow">Kassenbon ca.</div><div class="v">' + eur(bon) + '</div><div class="muted" style="font-size:12px;margin-top:6px">davon verkocht ' + eur(used) + ' – der Rest bleibt im Vorrat</div></div></div>';
+    h += '<div class="card" style="padding:14px 16px;margin-top:12px"><b style="font-size:14px;display:block;margin-bottom:4px">Wo kaufst du ein?</b><div class="muted" style="font-size:12.5px;margin-bottom:8px">Erster Markt = Hauptmarkt (' + esc(MARKETS[S.market] ? MARKETS[S.market].n : '') + '). Jedes Produkt wird dem passenden Geschäft zugeordnet – mit Hinweis, wenn es dort meist nicht erhältlich ist.</div><div class="filter-row" style="flex-wrap:wrap">' + Object.keys(SHOP_PLACES).map(x => '<button class="fchip ' + (S.stores.indexOf(x) >= 0 ? 'on' : '') + '" data-shopplace="' + x + '">' + SHOP_PLACES[x].e + ' ' + SHOP_PLACES[x].n + (x === S.market ? ' ★' : '') + '</button>').join('') + '</div>' + (S.stores.length > 1 ? '<div class="filter-row" style="margin-top:4px"><span class="muted" style="font-size:12.5px;align-self:center">Sortieren nach:</span><button class="fchip ' + (S.shopGroup === 'store' ? 'on' : '') + '" data-shopgroup="store">Geschäft</button><button class="fchip ' + (S.shopGroup !== 'store' ? 'on' : '') + '" data-shopgroup="cat">Kategorie</button></div>' : '') + '</div>';
     h += '<div class="card" style="padding:14px 16px;margin-top:12px"><b style="font-size:14px;display:block;margin-bottom:8px">Einkaufstage</b><div class="days">' + DAYS_S.map((d, i) => '<button class="' + (shopDays().indexOf(i) >= 0 ? 'on' : '') + '" data-shopday="' + i + '" title="' + DAYS[i] + '" style="border-radius:12px;font-size:14px;max-width:46px">' + d + '</button>').join('') + '</div>' +
       '<div class="toggle ' + (S.theke ? 'on' : '') + '" data-act="theke" style="padding:14px 0 2px"><span class="tx"><b>Fleisch & Fisch an der Theke / beim Metzger</b><span>Exakte Menge statt fester Packungsgrößen</span></span><span class="sw"></span></div></div>';
     h += '<div class="plan-actions no-print"><button class="btn btn-sec btn-sm" data-act="copyshop">' + ic('copy') + 'Kopieren</button><button class="btn btn-sec btn-sm" data-act="shareshop">' + ic('send') + 'Teilen</button><button class="btn btn-sec btn-sm" data-act="printshop">' + ic('print') + 'Drucken</button><button class="btn btn-ghost btn-sm" data-act="resetshop">' + ic('refresh') + 'Zurücksetzen</button></div>';
@@ -823,13 +903,18 @@
       const nx = shopDays().find(x => x > t.day), until = nx === undefined ? 'So' : DAYS[nx - 1].slice(0, 2);
       h += '<div class="day" style="margin-top:26px"><div class="day-tag"><span class="today">🛒 Einkauf ' + DAYS[t.day] + ' · ' + d.getDate() + '.' + (d.getMonth() + 1) + '.</span></div><div class="card day-body" style="padding-top:22px">' +
         '<div class="muted" style="font-size:12.5px;text-align:center;margin-bottom:6px">Für die Gerichte ' + DAYS[t.day].slice(0, 2) + (until !== DAYS[t.day].slice(0, 2) ? '–' + until : '') + ' · ' + t.buyItems.length + ' Artikel · ca. ' + eur(tripBon) + '</div>';
-      for (const c in SHOP_CATS) {
-        const items = t.buyItems.filter(i => i.ing.cat === c); if (!items.length) continue;
-        h += '<div class="shop-cat" style="margin-top:10px"><h3>' + SHOP_CATS[c].e + ' ' + SHOP_CATS[c].n + '</h3>' + items.map(i => shopRow(t.day, i, p)).join('') + '</div>';
+      const byStore = S.shopGroup === 'store' && S.stores.length > 1;
+      const groups = byStore ? S.stores.concat(Object.keys(SHOP_PLACES).filter(x => S.stores.indexOf(x) < 0)).map(st => ({ st, items: t.buyItems.filter(i => i.store === st) })).filter(g => g.items.length) : [{ st: null, items: t.buyItems }];
+      for (const g of groups) {
+        if (g.st) h += '<div class="store-head">' + SHOP_PLACES[g.st].e + ' ' + esc(SHOP_PLACES[g.st].n) + '<span>' + g.items.length + ' Artikel · ca. ' + eur(g.items.reduce((x, i) => x + i.costBuy, 0)) + '</span></div>';
+        for (const c in SHOP_CATS) {
+          const items = g.items.filter(i => i.ing.cat === c); if (!items.length) continue;
+          h += '<div class="shop-cat" style="margin-top:10px"><h3>' + SHOP_CATS[c].e + ' ' + SHOP_CATS[c].n + '</h3>' + items.map(i => shopRow(t.day, i, p)).join('') + '</div>';
+        }
       }
       if (t.pantryItems.length) {
         h += '<div class="shop-cat" style="margin-top:10px"><h3>🫙 Vorrat prüfen</h3><p class="muted" style="font-size:12.5px;margin:-4px 4px 6px">Tippe an, was du zu Hause hast – wird gemerkt.</p>' +
-          t.pantryItems.map(i => { const have = !!S.pantry[i.key]; return '<div class="shop-item ' + (have ? 'done' : '') + '" data-pantry="' + i.key + '"><span class="cb">' + ic('check') + '</span><span class="n">' + esc(i.ing.n) + '<small>' + (have ? 'Habe ich' : 'Bei Bedarf kaufen') + '</small></span><span class="q">' + packLabel(i) + '</span></div>'; }).join('') + '</div>';
+          t.pantryItems.map(i => { const have = !!S.pantry[i.key]; return '<div class="shop-item ' + (have ? 'done' : '') + '" data-pantry="' + i.key + '"><span class="cb">' + ic('check') + '</span><span class="n">' + esc(i.ing.n) + '<small>' + (have ? 'Habe ich' : 'Bei Bedarf kaufen' + (S.stores.length > 1 || i.na ? ' · ' + SHOP_PLACES[i.store].e + ' ' + esc(SHOP_PLACES[i.store].n) : '')) + '</small>' + (!have && i.na ? '<small style="color:#B03A2E;font-weight:600">⚠️ Bei ' + esc(SHOP_PLACES[S.stores[0]].n) + ' meist nicht erhältlich – Alternative: ' + esc(i.alt.join(', ') || 'Online') + '</small>' : '') + (!have && i.moved ? '<small style="color:#8A4F12;font-weight:600">↪ nicht bei ' + esc(SHOP_PLACES[S.stores[0]].n) + ' – daher bei ' + esc(SHOP_PLACES[i.store].n) + '</small>' : '') + '</span><span class="q">' + packLabel(i) + '</span></div>'; }).join('') + '</div>';
       }
       h += '</div></div>';
     }
@@ -843,17 +928,19 @@
     const useTxt = uniq(uses.map(u => DAYS[u.day].slice(0, 2))).join(', ') + ': ' + uniq(uses.map(u => u.n)).slice(0, 2).join(', ') + (uniq(uses.map(u => u.n)).length > 2 ? ' …' : '');
     const unit = LIQUIDS.has(i.key) ? 'ml' : 'g';
     return '<div class="shop-item ' + (done ? 'done' : '') + '" data-shop="' + k + '" style="align-items:flex-start"><span class="cb" style="margin-top:2px">' + ic('check') + '</span><span class="n">' + esc(i.prod ? i.prod.name + (i.prod.brand ? ' (' + i.prod.brand + ')' : '') : i.ing.n) +
-      '<small>' + esc(useTxt) + '</small>' + gfHint(i.key, true) +
+      '<small>' + esc(useTxt) + '</small>' + gfHint(i.key, true, i.store) +
+      (i.na ? '<small style="color:#B03A2E;font-weight:600">⚠️ Bei ' + esc(SHOP_PLACES[S.stores[0]].n) + ' meist nicht erhältlich – Alternative: ' + esc(i.alt.join(', ') || 'Online') + '</small>' : '') +
+      (i.moved ? '<small style="color:#8A4F12;font-weight:600">↪ Bei ' + esc(SHOP_PLACES[S.stores[0]].n) + ' meist nicht im Sortiment – daher bei ' + esc(SHOP_PLACES[i.store].n) + '</small>' : '') +
       '<small>Bedarf ' + r0(i.g) + ' ' + unit + (i.buy.waste > 0.5 ? ' · Rest ' + r0(i.buy.waste) + ' ' + unit + (i.pi.fr ? ' (einfrierbar)' : '') : '') + ' · haltbar ' + (i.pi.hb >= 60 ? 'lange' : '~' + i.pi.hb + ' T.') + '</small>' +
       warnLabels(i.warns).map(w => '<small style="color:#8A4F12;font-weight:600">' + w + '</small>').join('') +
-      '<span style="display:flex;gap:6px;margin-top:6px">' + (i.pi.th ? '<button class="chip ' + (i.theke ? 'diet' : 'ghost') + '" data-mode="' + i.key + '" title="Packung oder lose/Theke">' + (i.theke ? (i.ing.cat === 'obst' ? '⚖️ lose' : '🔪 Theke') : '📦 Packung') + ' ⇄</button>' : '') + '<button class="chip ghost" data-prod="' + i.key + '">🔍 Produkte</button></span></span>' +
+      '<span style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><span class="chip store-chip' + (i.na ? ' na' : '') + '">' + SHOP_PLACES[i.store].e + ' ' + esc(SHOP_PLACES[i.store].n) + '</span>' + (i.pi.th ? '<button class="chip ' + (i.theke ? 'diet' : 'ghost') + '" data-mode="' + i.key + '" title="Packung oder lose/Theke">' + (i.theke ? (i.ing.cat === 'obst' ? '⚖️ lose' : '🔪 Theke') : '📦 Packung') + ' ⇄</button>' : '') + '<button class="chip ghost" data-prod="' + i.key + '">🔍 Produkte</button></span></span>' +
       '<span class="q"><b style="color:var(--t1)">' + packLabel(i) + '</b><br><span class="muted" style="font-size:11.5px">' + eur(i.costBuy) + '</span></span></div>';
   }
   function shopText() {
     const p = plan(); let t = 'Einkaufsplan (SuPER Küche) – Woche ab ' + weekStart.toLocaleDateString('de-DE') + ' · ' + (MARKETS[S.market] || {}).n + '\n';
     for (const tr of buildTrips()) {
       t += '\n🛒 ' + DAYS[tr.day] + ':\n';
-      for (const c in SHOP_CATS) { const items = tr.buyItems.filter(i => i.ing.cat === c && !p.shop[tr.day + '|' + i.key]); if (!items.length) continue; t += '  ' + SHOP_CATS[c].n + ':\n' + items.map(i => '  ☐ ' + (i.prod ? i.prod.name : i.ing.n) + ' – ' + packLabel(i)).join('\n') + '\n'; }
+      for (const c in SHOP_CATS) { const items = tr.buyItems.filter(i => i.ing.cat === c && !p.shop[tr.day + '|' + i.key]); if (!items.length) continue; t += '  ' + SHOP_CATS[c].n + ':\n' + items.map(i => '  ☐ ' + (i.prod ? i.prod.name : i.ing.n) + ' – ' + packLabel(i) + (S.stores.length > 1 ? ' [' + SHOP_PLACES[i.store].n + ']' : '') + (i.na ? ' (nicht im Hauptmarkt!)' : '')).join('\n') + '\n'; }
       const pan = tr.pantryItems.filter(i => !S.pantry[i.key]); if (pan.length) t += '  Vorrat prüfen: ' + pan.map(i => i.ing.n).join(', ') + '\n';
     }
     return t;
@@ -891,7 +978,8 @@
   }
   function productSheet(key) {
     const ing = ING[key], pi = packInfo(key);
-    let store = S.market === 'bio' ? '' : S.market, q = pi.q || ing.n;
+    const assigned = (buildShop().find(x => x.key === key) || {}).store;
+    let store = /^more_|^zerup/.test(key) ? 'more' : /^esn_/.test(key) ? 'esn' : (assigned && STORES[assigned] && assigned !== 'bio') ? assigned : (S.market === 'bio' ? '' : S.market), q = pi.q || ing.n;
     const gb = GF_BRANDS[key];
     const brandQ = gb ? [...new Set([gb.kaufland, gb.aldi, gb.rewe].filter(Boolean).concat((gb.all || []).filter(x => /^(Schär|Barilla|3Pauly|Hammermühle|Bauck|Kölln|Kikkoman|Clearspring)/.test(x)).map(x => x.split(/[ (/]/)[0] + ' ' + (pi.q || ing.n).replace(/ ?glutenfrei/i, '') + ' glutenfrei')))] : [];
     const draw = async () => {
@@ -930,13 +1018,13 @@
     h += '<div class="set-block"><div class="field-l">Supermarkt</div><div class="field-s">Preise werden an den Markt angepasst (Richtwerte).</div><select class="select" id="smarket">' + Object.keys(MARKETS).map(m => '<option value="' + m + '" ' + (S.market === m ? 'selected' : '') + '>' + MARKETS[m].n + '</option>').join('') + '</select></div>';
     h += '<div class="set-block"><div class="field-l">Haushalt</div><div class="field-s">Für wen kochst du? Portionen, Einkauf und Kosten passen sich automatisch an (= ' + r1(servings()) + ' Erwachsenen-Portionen).</div><div class="members">' +
       Object.keys(MEMBER_TYPES).map(t => '<div class="card member"><span class="e">' + MEMBER_TYPES[t].e + '</span><span class="tx"><b>' + MEMBER_TYPES[t].n + '</b><span>' + MEMBER_TYPES[t].age + ' · Portion ×' + MEMBER_TYPES[t].f + '</span></span><div class="stepper sm"><button data-hh="' + t + '" data-d="-1">−</button><b>' + (S.household[t] || 0) + '</b><button data-hh="' + t + '" data-d="1">+</button></div></div>').join('') + '</div></div>';
-    h += '<div class="set-block"><div class="field-l">Kochtage</div><div class="field-s">An welchen Tagen sollen Mahlzeiten geplant werden?</div><div class="days">' + DAYS_S.map((d, i) => '<button class="' + (S.days[i] ? 'on' : '') + '" data-day="' + i + '" title="' + DAYS[i] + '">' + d + '</button>').join('') + '</div></div>';
-    h += '<div class="set-block"><div class="field-l">Mahlzeiten</div><div class="field-s">Welche Mahlzeiten sollen geplant werden?</div><div class="pick-grid">' + MEAL_ORDER.map(m => '<button class="' + (S.meals[m] ? 'on' : '') + '" data-meal="' + m + '">' + MEALS[m].e + ' ' + MEALS[m].n + '</button>').join('') + '</div></div>';
+    h += '<div class="set-block"><div class="field-l">Kochtage & Mahlzeiten</div><div class="field-s">Für jeden Tag festlegen, welche Mahlzeiten geplant werden.</div>' + dayPlannerHtml() + '</div>';
     h += '<div class="set-block"><div class="field-l">Wochenbudget</div><div class="budget-v">€' + S.budget + ' <small>für ' + nd + ' Tage</small></div><input type="range" class="range" id="sbudget" min="30" max="400" step="5" value="' + S.budget + '"><div class="range-l"><span>€30</span><span>€400</span></div></div>';
     h += '<div class="set-block"><div class="field-l">Ernährung</div><div class="field-s">Rezepte werden automatisch angepasst (z. B. glutenfreie Nudeln, laktosefreier Quark, Knoblauch-Öl statt Knoblauch).</div><div class="toggles">' +
       [['gf', 'Glutenfrei', 'Zöliakie / Glutenunverträglichkeit'], ['lf', 'Laktosefrei', 'Laktoseintoleranz'], ['fm', 'FODMAP-arm', 'Reizdarm – nach Monash-Portionsgrenzen'], ['veg', 'Vegetarisch', 'Ohne Fleisch & Fisch']].map(d => '<div class="card toggle ' + (S.diet[d[0]] ? 'on' : '') + '" data-diet="' + d[0] + '"><span class="tx"><b>' + d[1] + '</b><span>' + d[2] + '</span></span><span class="sw"></span></div>').join('') + '</div></div>';
     h += '<div class="set-block"><div class="field-l">Küchengeräte</div><div class="toggles"><div class="card toggle ' + (S.thermomix ? 'on' : '') + '" data-act="tmtoggle"><span class="tx"><b>⚙️ Ich koche mit dem Thermomix</b><span>TM6 / TM7 – Rezepte zeigen zuerst die Thermomix-Einstellungen</span></span><span class="sw"></span></div></div></div>';
     h += '<div class="set-block"><div class="field-l">Proteinpulver</div><div class="field-s">Deine Lieblingsmarke ersetzt in allen Rezepten das Proteinpulver – Nährwerte & Einkauf passen sich an.</div><select class="select" id="sprot">' + Object.keys(PROTEIN_BRANDS).map(k => '<option value="' + k + '" ' + (S.proteinBrand === k ? 'selected' : '') + '>' + PROTEIN_BRANDS[k] + '</option>').join('') + '</select></div>';
+    h += '<div class="set-block"><div class="field-l">Küchen</div><div class="field-s">Welche Küchen sollen vorgeschlagen werden?</div><div data-pgscope="settings">' + cuisinePickerHtml() + '</div></div>';
     h += '<div class="set-block"><div class="field-l">Fleisch & Fisch</div><div class="field-s">Abgewählte Sorten werden nicht vorgeschlagen.</div><div class="pg-wrap" data-pgscope="settings">' + proteinPickerHtml() + '</div></div>';
     h += '<div class="set-block"><div class="field-l">Allergene ausschließen</div><div class="field-s">Gerichte mit diesen Zutaten werden nicht vorgeschlagen.</div><div class="filter-row" style="flex-wrap:wrap">' + ['E', 'N', 'P', 'F', 'K', 'Y', 'Z', 'M'].map(a => '<button class="fchip ' + (S.exclude.indexOf(a) >= 0 ? 'on' : '') + '" data-excl="' + a + '">' + ALLERGENS[a] + '</button>').join('') + '</div></div>';
     h += '<div class="set-block"><div class="field-l">Essensstimmung</div><div class="field-s">Wähle bis zu 3 Stile, die bevorzugt werden.</div><div class="styles-grid">' + Object.keys(STYLES).map(s => '<button class="style-card ' + (S.styles.indexOf(s) >= 0 ? 'on' : '') + '" data-sstyle="' + s + '"><span class="e">' + STYLES[s].e + '</span>' + STYLES[s].n + '</button>').join('') + '</div></div>';
@@ -967,7 +1055,7 @@
     if (favs.length) h += '<div class="section-t"><h2 style="font-size:18px">Deine Favoriten</h2></div><div class="fav-strip">' + favs.map(recipeCard).join('') + '</div>';
     h += '<div class="section-t"><h2 style="font-size:18px">Profile auf diesem Gerät</h2></div><div class="card">' + profiles.list.map(p => '<button class="list-btn" data-profile="' + p.id + '">' + ic('user') + '<span class="tx">' + esc(p.name) + '<span>' + (p.id === profiles.active ? 'Aktiv' : 'Wechseln') + '</span></span>' + (p.id === profiles.active ? ic('check') : '') + '</button>').join('') + '<button class="list-btn" data-act="newprofile">' + ic('plus') + '<span class="tx">Neues Profil anlegen<span>z. B. für Partner:in oder eine zweite Familie</span></span></button></div>';
     h += '<div class="section-t"><h2 style="font-size:18px">Daten & Sicherung</h2></div><div class="card"><button class="list-btn" data-act="export">' + ic('download') + '<span class="tx">Backup herunterladen<span>Alle Pläne, Favoriten & Einstellungen als Datei</span></span></button><button class="list-btn" data-act="import">' + ic('upload') + '<span class="tx">Backup wiederherstellen<span>Auf neuem Gerät oder Browser</span></span></button><button class="list-btn" data-act="onboard">' + ic('spark') + '<span class="tx">Einrichtung erneut starten</span></button><button class="list-btn danger" data-act="reset">' + ic('trash') + '<span class="tx">Profil zurücksetzen<span>Löscht alle Daten dieses Profils auf diesem Gerät</span></span></button></div>';
-    h += '<p class="muted" style="font-size:12px;text-align:center;margin:26px 0 6px">SuPER Küche · Deine Daten bleiben auf deinem Gerät (kein Konto, keine Cloud nötig).<br>Nährwerte sind berechnete Richtwerte. Rezeptfotos: Wikimedia Commons (Symbolbilder, Lizenz je Bild).</p>';
+    h += '<p class="muted" style="font-size:12px;text-align:center;margin:26px 0 6px">SuPER Küche · Deine Daten bleiben auf deinem Gerät (kein Konto, keine Cloud nötig).<br>Nährwerte sind berechnete Richtwerte. Rezeptfotos: Wikimedia Commons & Openverse/Flickr (Symbolbilder, CC-Lizenz je Bild).</p>';
     $('#pg-konto').innerHTML = h;
     $('#pname').onchange = e => { S.name = e.target.value.trim(); save(); renderAccount(); };
   }
@@ -980,9 +1068,9 @@
     let h = '<div class="sheet-pad"><div class="ob-hero" style="padding-top:0"><div class="big">🗓️</div><h2>Wochenplan erstellen</h2><p>Kurz prüfen – dann stellen wir die Woche passend zusammen.</p></div>';
     h += '<div class="set-block" style="margin-top:18px"><div class="field-l">Wer isst mit?</div><div class="members">' +
       Object.keys(MEMBER_TYPES).map(t => '<div class="card member" style="padding:9px 14px"><span class="e" style="font-size:22px">' + MEMBER_TYPES[t].e + '</span><span class="tx"><b>' + MEMBER_TYPES[t].n + '</b><span>' + MEMBER_TYPES[t].age + '</span></span><div class="stepper sm"><button data-wz="hh:' + t + ':-1">−</button><b>' + (S.household[t] || 0) + '</b><button data-wz="hh:' + t + ':1">+</button></div></div>').join('') + '</div></div>';
-    h += '<div class="set-block"><div class="field-l">Kochtage</div><div class="days">' + DAYS_S.map((d, i) => '<button class="' + (S.days[i] ? 'on' : '') + '" data-wz="day:' + i + '" title="' + DAYS[i] + '">' + d + '</button>').join('') + '</div></div>';
-    h += '<div class="set-block"><div class="field-l">Mahlzeiten</div><div class="pick-grid">' + MEAL_ORDER.map(m => '<button class="' + (S.meals[m] ? 'on' : '') + '" data-wz="meal:' + m + '">' + MEALS[m].e + ' ' + MEALS[m].n + '</button>').join('') + '</div></div>';
+    h += '<div class="set-block"><div class="field-l">Kochtage & Mahlzeiten</div>' + dayPlannerHtml() + '</div>';
     h += '<div class="set-block"><div class="field-l">Ernährung</div><div class="toggles">' + [['gf', 'Glutenfrei'], ['lf', 'Laktosefrei'], ['fm', 'FODMAP-arm'], ['veg', 'Vegetarisch']].map(d => toggle(S.diet[d[0]], 'data-wz="diet:' + d[0] + '"', d[1])).join('') + '</div></div>';
+    h += '<div class="set-block"><div class="field-l">Küchen</div><div data-pgscope="wizard">' + cuisinePickerHtml() + '</div></div>';
     if (!S.diet.veg) h += '<div class="set-block"><div class="field-l">Fleisch & Fisch</div><div class="field-s">Alles angehakt = alles erlaubt. Einzelne Sorten abwählen.</div><div class="pg-wrap" data-pgscope="wizard">' + proteinPickerHtml() + '</div></div>';
     h += '<div class="set-block"><div class="field-l">Stil (bis zu 3)</div><div class="filter-row" style="flex-wrap:wrap">' + Object.keys(STYLES).map(st => '<button class="fchip ' + (S.styles.indexOf(st) >= 0 ? 'on' : '') + '" data-wz="style:' + st + '">' + STYLES[st].e + ' ' + STYLES[st].n + '</button>').join('') + '</div></div>';
     h += '<div class="set-block"><div class="field-l">Wochenbudget: <span id="wzb">€' + S.budget + '</span></div><input type="range" class="range" id="wzbudget" min="30" max="400" step="5" value="' + S.budget + '"></div>';
@@ -992,7 +1080,7 @@
     openSheet(h); $('#sheet').scrollTop = keepScroll;
     // Live-Zähler: wie viele Gerichte passen pro Mahlzeit
     const cnt = activeMeals().map(m => MEALS[m].n + ': ' + RECIPES.filter(r => eligible(r, m)).length).join(' · ');
-    $('#wzcount').innerHTML = 'Passende Gerichte – ' + cnt;
+    $('#wzcount').innerHTML = futureMealsCount() + ' Mahlzeiten ab ' + (todayIndex() > 0 ? 'heute (' + DAYS[todayIndex()] + ')' : DAYS[0]) + ' · passende Gerichte – ' + cnt;
     const br = $('#wzbudget'); br.oninput = () => { S.budget = +br.value; $('#wzb').textContent = '€' + S.budget; };
     $$('[data-wz]').forEach(b => b.onclick = ev => {
       ev.stopPropagation();
@@ -1033,7 +1121,7 @@
 
   /* ================= Events ================= */
   document.addEventListener('click', ev => {
-    const t = ev.target.closest('[data-act],[data-open],[data-fav],[data-swap],[data-lock],[data-del],[data-addslot],[data-go],[data-style],[data-cu],[data-fmeal],[data-ffav],[data-fbaby],[data-ftm],[data-fdiet],[data-cook],[data-fstyle-clear],[data-fcu-clear],[data-tab],[data-portion],[data-serv],[data-shop],[data-hh],[data-day],[data-meal],[data-diet],[data-excl],[data-sstyle],[data-profile],[data-pg],[data-pgall],[data-shopday],[data-pantry],[data-mode],[data-prod],[data-ob],[data-obhh],[data-obdiet],[data-obmeal]');
+    const t = ev.target.closest('[data-act],[data-open],[data-fav],[data-swap],[data-lock],[data-del],[data-addslot],[data-go],[data-style],[data-cu],[data-fmeal],[data-ffav],[data-fbaby],[data-ftm],[data-fdiet],[data-cook],[data-fstyle-clear],[data-fcu-clear],[data-tab],[data-portion],[data-serv],[data-shop],[data-hh],[data-day],[data-meal],[data-diet],[data-excl],[data-sstyle],[data-profile],[data-kx],[data-dm],[data-shopplace],[data-shopgroup],[data-pg],[data-pgall],[data-shopday],[data-pantry],[data-mode],[data-prod],[data-ob],[data-obhh],[data-obdiet],[data-obmeal]');
     if (!t) { if (ev.target === $('#overlay')) closeSheet(); return; }
     const d = t.dataset;
     if (d.fav) { ev.preventDefault(); ev.stopPropagation(); const i = S.favorites.indexOf(d.fav); if (i >= 0) S.favorites.splice(i, 1); else S.favorites.push(d.fav); save(); toast(i >= 0 ? 'Aus Favoriten entfernt' : 'Zu Favoriten hinzugefügt ❤️'); if ($('#sheet [data-choose]')) { t.classList.toggle('on'); refresh(); return; } if ($('#overlay').classList.contains('open') && detail.id === d.fav) renderRecipeSheet(); refresh(); return; }
@@ -1067,6 +1155,37 @@
     if (d.diet) { S.diet[d.diet] = !S.diet[d.diet]; save(); renderSettings(); toast(Core.DIETS[d.diet].n + (S.diet[d.diet] ? ' aktiviert' : ' deaktiviert')); return; }
     if (d.excl) { const i = S.exclude.indexOf(d.excl); if (i >= 0) S.exclude.splice(i, 1); else S.exclude.push(d.excl); save(); renderSettings(); return; }
     if (d.sstyle) { const i = S.styles.indexOf(d.sstyle); if (i >= 0) S.styles.splice(i, 1); else { if (S.styles.length >= 3) S.styles.shift(); S.styles.push(d.sstyle); } save(); renderSettings(); return; }
+    if (d.kx) {
+      ev.stopPropagation();
+      const ids = Object.keys(CUISINES).filter(c => RECIPES.some(r => r.cu === c));
+      if (d.kx === 'open') cuiOpen = !cuiOpen;
+      else if (d.kx === 'all') { const allOn = ids.every(c => S.noCuisine.indexOf(c) < 0); S.noCuisine = allOn ? ids.slice() : []; if (allOn) cuiOpen = true; }
+      else { const c = d.kx.split(':')[1], i = S.noCuisine.indexOf(c); if (i >= 0) S.noCuisine.splice(i, 1); else S.noCuisine.push(c); }
+      if (ids.every(c => S.noCuisine.indexOf(c) >= 0) && d.kx !== 'all') S.noCuisine = S.noCuisine.filter(c => c !== d.kx.split(':')[1]);
+      save();
+      if ($('#wzcount')) planWizard(!!$('#wizKeep')); else renderSettings();
+      return;
+    }
+    if (d.dm) {
+      ev.stopPropagation();
+      const [k, a, b] = d.dm.split(':'), i = +a, any = x => MEAL_ORDER.some(m => S.dayMeals[x][m]);
+      if (k === 'day') { S.days[i] = !S.days[i]; if (S.days[i] && !any(i)) S.dayMeals[i].abend = true; if (!S.days.some(Boolean)) S.days[i] = true; }
+      if (k === 'edit') { dmEdit = (i === dmEdit || i < 0) ? -1 : i; if (dmEdit >= 0 && !S.days[dmEdit]) { S.days[dmEdit] = true; if (!any(dmEdit)) S.dayMeals[dmEdit].abend = true; } }
+      if (k === 'meal') { S.dayMeals[i][b] = !S.dayMeals[i][b]; S.days[i] = any(i); if (!S.days.some(Boolean)) { S.days[i] = true; S.dayMeals[i][b] = true; } }
+      if (k === 'copy') { for (let x = 0; x < 7; x++) { S.dayMeals[x] = Object.assign({}, S.dayMeals[i]); S.days[x] = true; } }
+      if (k === 'all') { const days = S.days.map((on, x) => on ? x : -1).filter(x => x >= 0); const all = days.every(x => S.dayMeals[x][a]); days.forEach(x => { S.dayMeals[x][a] = !all; if (!any(x)) S.dayMeals[x][a] = true; }); S.meals[a] = !all; }
+      plan().shop = {}; save();
+      if ($('#wzcount')) planWizard(!!$('#wizKeep')); else renderSettings();
+      return;
+    }
+    if (d.shopplace) {
+      ev.stopPropagation();
+      const x = d.shopplace, j = S.stores.indexOf(x);
+      if (j >= 0) { if (S.stores.length > 1) S.stores.splice(j, 1); } else S.stores.push(x);
+      if (S.stores.indexOf(S.market) < 0) { const nm = S.stores.find(y => MARKETS[y]); if (nm) S.market = nm; }
+      fixState(); save(); renderShop(); return;
+    }
+    if (d.shopgroup) { S.shopGroup = d.shopgroup; save(); renderShop(); return; }
     if (d.pg || d.pgall) {
       ev.stopPropagation();
       const toggleG = g => { const i = S.noProtein.indexOf(g); if (i >= 0) S.noProtein.splice(i, 1); else S.noProtein.push(g); };
@@ -1079,7 +1198,7 @@
     if (d.profile) { if (d.profile !== profiles.active) switchProfile(d.profile); return; }
     if (d.obhh) { S.household[d.obhh] = Math.max(0, Math.min(12, (S.household[d.obhh] || 0) + +d.d)); if (persons() === 0) S.household.erwachsen = 1; onboarding(); return; }
     if (d.obdiet) { S.diet[d.obdiet] = !S.diet[d.obdiet]; onboarding(); return; }
-    if (d.obmeal) { S.meals[d.obmeal] = !S.meals[d.obmeal]; if (!activeMeals().length) S.meals[d.obmeal] = true; onboarding(); return; }
+    if (d.obmeal) { setMealAll(d.obmeal, !S.meals[d.obmeal]); if (!activeMeals().length) setMealAll(d.obmeal, true); onboarding(); return; }
     if (d.ob) {
       if (d.ob === 'next') { ob++; save(); onboarding(); }
       else if (d.ob === 'back') { ob = Math.max(0, ob - 1); onboarding(); }
@@ -1100,8 +1219,10 @@
       case 'wizkeep': t.classList.toggle('on'); break;
       case 'regen-go': generateWeek(true); location.hash = '#plan'; toast('Neuer Plan erstellt ✓'); break;
       case 'clearweek': if (confirm('Alle Gerichte dieser Woche entfernen?')) { S.plans[wk()] = { slots: {}, shop: {} }; save(); renderPlan(); planWizard(false); } break;
+      case 'thisweek': ev.preventDefault(); weekStart = mondayOf(new Date()); renderPlan(); break;
       case 'wprev': weekStart = addDays(weekStart, -7); renderPlan(); break;
-      case 'wnext': weekStart = addDays(weekStart, 7); renderPlan(); break;
+      case 'wnext': ev.preventDefault(); weekStart = addDays(weekStart, 7); renderPlan(); break;
+      case 'moreRecipes': { const y = window.scrollY; RF.limit += 48; renderRecipes(); window.scrollTo(0, y); break; }
       case 'togglediet': ev.preventDefault(); RF.dietOnly = !RF.dietOnly; renderRecipes(); break;
       case 'addplan': pickSlotSheet(detail.id); break;
       case 'trackone': trackOneSheet(detail.id); break;
@@ -1141,11 +1262,17 @@
     rd.onload = () => { try { const d = JSON.parse(rd.result); if (!d.data || !d.data.plans) throw new Error('format'); S = Object.assign(DEFAULT_STATE(), d.data); save(); refresh(); toast('Backup wiederhergestellt ✓'); } catch (err) { toast('Datei ist kein gültiges Backup'); } };
     rd.readAsText(f); e.target.value = '';
   });
-  function refresh() { show(current); }
+  function refresh() { fixState(); show(current); }
 
   /* ================= Start ================= */
   renderNav();
   window.addEventListener('hashchange', route);
+  // Datum aktuell halten (App bleibt z. B. über Nacht offen): beim Zurückkehren neu berechnen
+  let lastDay = keyOf(new Date());
+  function checkDate() { const k = keyOf(new Date()); if (k !== lastDay) { const wasThisWeek = keyOf(weekStart) === keyOf(mondayOf(new Date(Date.now() - 864e5))); lastDay = k; if (wasThisWeek) weekStart = mondayOf(new Date()); refresh(); } }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) checkDate(); });
+  window.addEventListener('focus', checkDate);
+  setInterval(checkDate, 60000);
   if (S.goals.src === 'superhealth') importGoalsFromTracker(true); // Ziele aktuell halten
   route();
   publishPlan();
