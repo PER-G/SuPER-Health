@@ -265,8 +265,8 @@ body.nav-open .fab{opacity:0;pointer-events:none}}
 <body>
 <div class="amb"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
 <div class="ham" id="ham" onclick="toggleNav()" role="button" aria-label="Menü öffnen">☰</div>
-<div class="sb-bd" id="sbBd" onclick="closeNav()"></div>
 <div class="app">
+<div class="sb-bd" id="sbBd" onclick="closeNav()"></div><!-- innerhalb von .app, damit es unter dem Menü liegt (.app bildet eine eigene Ebene) -->
 <aside class="sb" id="sb">
 <button class="sb-x" onclick="closeNav()" aria-label="Menü schließen">✕</button>
 <a href="/" class="sb-logo" style="text-decoration:none;color:inherit" title="Zur SuPER Health Startseite"><div class="logo-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 13h4l2.4-6 3.6 10 2.4-6.5L17 13h4" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="logo-t">SuPER <span>Health</span></div><div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--t3);text-transform:uppercase">Tracking</div></div></a>
