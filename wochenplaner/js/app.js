@@ -481,8 +481,8 @@
     if (!S.diet.gf) return '';
     const tag = small ? 'small' : 'span';
     const b = gfBrandText(key, store || S.market), note = GF_BRANDS[key] && GF_BRANDS[key].note;
-    if (b) return '<' + tag + ' class="sw" style="color:var(--acc2);font-weight:600">🌾 z. B. ' + esc(b) + '</' + tag + '>' + (note && !small ? '<span class="sw" style="color:var(--t3);font-weight:400">' + esc(note) + '</span>' : '');
-    if (GF_CHECK.has(key)) return '<' + tag + ' class="sw" style="color:#8A4F12;font-weight:600">🌾 auf „glutenfrei“ achten</' + tag + '>';
+    if (b) return '<' + tag + ' class="hint" style="color:var(--acc2);font-weight:600">🌾 z. B. ' + esc(b) + '</' + tag + '>' + (note && !small ? '<span class="hint" style="color:var(--t3);font-weight:400">' + esc(note) + '</span>' : '');
+    if (GF_CHECK.has(key)) return '<' + tag + ' class="hint" style="color:#8A4F12;font-weight:600">🌾 auf „glutenfrei“ achten</' + tag + '>';
     return '';
   }
   function recipeCard(r) {
@@ -657,7 +657,7 @@
     }
     if (detail.tab === 'zutaten') {
       h += '<div class="card" style="padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px"><div><b>Portionen</b><div class="muted" style="font-size:12.5px">Haushalt = ' + r1(servings()) + ' Erwachsenen-Portionen</div></div><div class="stepper sm"><button data-serv="-0.5">−</button><b>' + r1(serv) + '</b><button data-serv="0.5">+</button></div></div>';
-      h += '<ul class="ing-list">' + a.items.map(it => '<li><span>' + esc(it.ing.n) + (it.swappedFrom ? '<span class="sw">statt ' + esc(it.swappedFrom) + '</span>' : '') + gfHint(it.key) + '</span><span class="q">' + fmtQty(it.key, it.g * serv) + '</span></li>').join('') + '</ul>';
+      h += '<ul class="ing-list">' + a.items.map(it => '<li><span>' + esc(it.ing.n) + (it.swappedFrom ? '<span class="hint">statt ' + esc(it.swappedFrom) + '</span>' : '') + gfHint(it.key) + '</span><span class="q">' + fmtQty(it.key, it.g * serv) + '</span></li>').join('') + '</ul>';
       h += '<p class="muted" style="font-size:12.5px;margin-top:10px">Geschätzte Kosten: ' + eur(Core.nutrition(a.items, serv).cost * marketF()) + ' bei ' + (MARKETS[S.market] || {}).n + '.</p>';
     }
     if (detail.tab === 'zubereitung') {
@@ -859,7 +859,10 @@
         else store = S.stores.find(x => x !== 'metzger' && x !== 'fisch' && car.indexOf(x) >= 0) || null;
         const na = !store; if (!store) store = S.stores[0];
         const moved = !na && store !== S.stores[0] && car.indexOf(S.stores[0]) < 0;
-        const alt = na ? car.filter(x => S.stores.indexOf(x) < 0).slice(0, 3).map(x => SHOP_PLACES[x].n) : [];
+        // Alternativen mit passender Eigenmarke (z. B. Kaufland → K-free); Märkte mit Eigenmarke und Drogerie zuerst
+        const gb = GF_BRANDS[a.key] || {}, schaer = (gb.all || []).find(b => /^Schär/.test(b));
+        const alt = na ? car.filter(x => S.stores.indexOf(x) < 0).sort((p, q) => (gb[q] ? 2 : 0) + (q === 'dm' ? 1 : 0) - (gb[p] ? 2 : 0) - (p === 'dm' ? 1 : 0)).slice(0, 3)
+          .map(x => SHOP_PLACES[x].n + (gb[x] ? ' (' + gb[x] + ')' : (x === 'dm' || x === 'rossmann') && schaer ? ' (' + schaer.split(' (')[0] + ')' : '')) : [];
         const loose = !mode && !!a.pi.lose && a.g < a.pi.pk[0] * 0.6;
         const theke = !!a.pi.th && (mode ? mode === 'theke' : ((S.theke || store === 'metzger' || store === 'fisch') && a.ing.cat === 'fleisch') || loose);
         let buy;

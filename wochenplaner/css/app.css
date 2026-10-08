@@ -388,3 +388,6 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .chip.dessert { background: #FFE3D3; color: #A0471C; }
 .day.past .day-body { opacity: .55; }
 .day.past .day-tag span { background: var(--soft); color: var(--t3); }
+/* Hinweistexte unter Zutaten (Marken, glutenfrei, Austausch) – eigener Stil, nicht der Schalter (.sw) */
+.hint { display: block; font-size: 12px; line-height: 1.35; color: var(--acc2); font-weight: 600; margin-top: 2px; white-space: normal; overflow-wrap: anywhere; }
+.shop-item .n small.hint, .shop-item .n small { display: block; }
