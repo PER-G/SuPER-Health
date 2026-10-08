@@ -131,6 +131,11 @@
     proteinBrand: '',
     noProtein: [],
     noCuisine: [],
+    cal: {},
+    calV: 0,
+    shopState: {},
+    mode: {},
+    extras: [],
     dayMeals: null,
     stores: [],
     shopGroup: 'store',
@@ -154,14 +159,14 @@
   function publishPlan() { clearTimeout(snapT); snapT = setTimeout(writeSnapshot, 120); }
   function writeSnapshot() {
     try {
-      const mon = mondayOf(new Date()), from = keyOf(addDays(mon, -7)), to = keyOf(addDays(mon, 28)), f = MEMBER_TYPES.erwachsen.f, days = {};
-      Object.keys(S.plans).forEach(wkKey => {
-        if (wkKey < from || wkKey > to) return;
-        const slots = (S.plans[wkKey] && S.plans[wkKey].slots) || {}, start = parseKey(wkKey);
-        Object.keys(slots).forEach(sk => {
-          const [d, m] = sk.split('|'), r = R[slots[sk].r];
+      const mon = new Date(), from = keyOf(addDays(mon, -14)), to = keyOf(addDays(mon, 35)), f = MEMBER_TYPES.erwachsen.f, days = {};
+      Object.keys(S.cal || {}).forEach(date => {
+        if (date < from || date > to) return;
+        const day = S.cal[date] || {};
+        Object.keys(day).forEach(m => {
+          const r = R[day[m] && day[m].r];
           if (!r || !MEALS[m]) return;
-          const date = keyOf(addDays(start, +d)), n = nutriFor(r, f);
+          const n = nutriFor(r, f);
           (days[date] = days[date] || []).push({ date, meal: m, mealN: MEALS[m].n, recipe: r.id, n: r.n, e: MEALS[m].e, img: r._img, k: r0(n.k), p: +n.p.toFixed(1), c: +n.c.toFixed(1), f: +n.f.toFixed(1) });
         });
       });
@@ -178,13 +183,49 @@
     if (!S.stores.length) S.stores = ['kaufland'];
     if (!S.noProtein) S.noProtein = [];
     if (!S.noCuisine) S.noCuisine = [];
+    // Umstellung von Kalenderwochen (S.plans) auf Datums-Kalender (S.cal) – einmalig
+    if (S.calV !== 1) {
+      S.cal = S.cal || {}; S.extras = S.extras || []; S.mode = S.mode || {}; S.shopState = S.shopState || {};
+      const today = keyOf(new Date());
+      for (const wkKey in (S.plans || {})) {
+        const p = S.plans[wkKey] || {}, start = parseKey(wkKey);
+        for (const sk in (p.slots || {})) { const [d, m] = sk.split('|'), dk = keyOf(addDays(start, +d)); S.cal[dk] = S.cal[dk] || {}; if (!S.cal[dk][m]) S.cal[dk][m] = p.slots[sk]; }
+        if (keyOf(addDays(start, 6)) >= today) { (p.extras || []).forEach(e => S.extras.push(e)); Object.assign(S.mode, p.mode || {}); }
+      }
+      S.calV = 1;
+    }
+    if (!S.cal) S.cal = {}; if (!S.extras) S.extras = []; if (!S.mode) S.mode = {}; if (!S.shopState) S.shopState = {};
   }
   fixState();
   function save() { S.updated = Date.now(); lsSet('sk_data_' + profiles.active, S); publishPlan(); const p = profiles.list.find(x => x.id === profiles.active); if (p && S.name) { p.name = S.name; lsSet('sk_profiles', profiles); } }
 
-  let weekStart = mondayOf(new Date());
+  /* Planungsfenster: 7 Tage ab weekStart (Standard: heute). Ein Slot "d|m" = Tag d (0–6 ab weekStart) + Mahlzeit m. */
+  function startOfDay(d) { const x = new Date(d); x.setHours(12, 0, 0, 0); return x; }
+  let weekStart = startOfDay(new Date());
   const wk = () => keyOf(weekStart);
-  function plan(k) { k = k || wk(); if (!S.plans[k]) S.plans[k] = { slots: {}, shop: {} }; return S.plans[k]; }
+  function wdOf(off) { return (addDays(weekStart, off).getDay() + 6) % 7; } // Wochentag (0 = Montag) eines Fenstertags
+  function dayName(off) { return DAYS[wdOf(off)]; }
+  function dayLabel(off) { const x = addDays(weekStart, off); return DAYS[wdOf(off)] + ' ' + x.getDate() + '.' + (x.getMonth() + 1) + '.'; }
+  function shopKeyOf(off, key) { return keyOf(addDays(weekStart, off)) + '|' + key; }
+  // plan() liefert eine Sicht auf das aktuelle Fenster; Lesen/Schreiben geht direkt in den Datums-Kalender S.cal
+  function plan() {
+    const ws = new Date(weekStart), dk = d => keyOf(addDays(ws, +d));
+    const slots = new Proxy({}, {
+      get(_, k) { if (typeof k !== 'string' || k.indexOf('|') < 0) return undefined; const [d, m] = k.split('|'), day = S.cal[dk(d)]; return day ? day[m] : undefined; },
+      set(_, k, v) { const [d, m] = k.split('|'), key = dk(d); (S.cal[key] = S.cal[key] || {})[m] = v; return true; },
+      deleteProperty(_, k) { const [d, m] = k.split('|'), key = dk(d); if (S.cal[key]) { delete S.cal[key][m]; if (!Object.keys(S.cal[key]).length) delete S.cal[key]; } return true; },
+      has(_, k) { if (typeof k !== 'string' || k.indexOf('|') < 0) return false; const [d, m] = k.split('|'), day = S.cal[dk(d)]; return !!(day && day[m]); },
+      ownKeys() { const ks = []; for (let d = 0; d < 7; d++) { const day = S.cal[dk(d)]; if (day) for (const m of MEAL_ORDER) if (day[m]) ks.push(d + '|' + m); } return ks; },
+      getOwnPropertyDescriptor(_, k) { const [d, m] = String(k).split('|'), day = S.cal[dk(d)]; return day && day[m] ? { enumerable: true, configurable: true, writable: true, value: day[m] } : undefined; },
+    });
+    return {
+      get slots() { return slots; },
+      set slots(obj) { for (let d = 0; d < 7; d++) delete S.cal[dk(d)]; for (const k in obj) slots[k] = obj[k]; },
+      get shop() { return S.shopState; }, set shop(v) { S.shopState = v || {}; },
+      get mode() { return S.mode; }, set mode(v) { S.mode = v || {}; },
+      get extras() { return S.extras; }, set extras(v) { S.extras = v || []; },
+    };
+  }
 
   /* ================= Berechnungen ================= */
   function servings() { let s = 0; for (const t in S.household) s += (S.household[t] || 0) * MEMBER_TYPES[t].f; return Math.max(0.2, Math.round(s * 100) / 100); }
@@ -256,14 +297,15 @@
     return true;
   }
   function slotKey(day, meal) { return day + '|' + meal; }
-  function mealsOf(d) { return S.days[d] ? MEAL_ORDER.filter(m => S.dayMeals[d] && S.dayMeals[d][m]) : []; }
+  function mealsOf(off) { const w = wdOf(off); return S.days[w] ? MEAL_ORDER.filter(m => S.dayMeals[w] && S.dayMeals[w][m]) : []; }
   function activeMeals() { return MEAL_ORDER.filter(m => S.days.some((on, d) => on && S.dayMeals[d][m])); }
   function setMealAll(m, val) { for (let d = 0; d < 7; d++) S.dayMeals[d][m] = val; S.meals[m] = val; }
   /* Tages-Planer: Tage an/aus + Mini-Kästchen (F/M/A/S) je Tag, Detail per Tipp auf die Kästchen */
   let dmEdit = -1;
+  function nextDateOf(wd) { for (let o = 0; o < 7; o++) if (wdOf(o) === wd) { const x = addDays(weekStart, o); return x.getDate() + '.' + (x.getMonth() + 1) + '.'; } return ''; }
   function dayPlannerHtml() {
     const L = { fruehstueck: 'F', mittag: 'M', abend: 'A', snack: 'S' };
-    let h = '<div class="dp-grid">' + DAYS_S.map((ds, d) => '<div class="dp-day ' + (S.days[d] ? 'on' : '') + (dmEdit === d ? ' edit' : '') + '"><button class="dp-btn" data-dm="day:' + d + '" title="' + DAYS[d] + ' an/aus">' + ds + '</button>' +
+    let h = '<div class="dp-grid">' + DAYS_S.map((ds, d) => '<div class="dp-day ' + (S.days[d] ? 'on' : '') + (dmEdit === d ? ' edit' : '') + '"><button class="dp-btn" data-dm="day:' + d + '" title="' + DAYS[d] + ' an/aus">' + ds + '<small>' + nextDateOf(d) + '</small></button>' +
       '<button class="dp-boxes" data-dm="edit:' + d + '" title="Mahlzeiten für ' + DAYS[d] + ' festlegen" aria-label="Mahlzeiten für ' + DAYS[d] + '">' + MEAL_ORDER.map(m => '<i class="' + (S.days[d] && S.dayMeals[d][m] ? 'on' : '') + '">' + L[m] + '</i>').join('') + '</button></div>').join('') + '</div>';
     if (dmEdit >= 0) h += '<div class="card dp-edit"><b>' + DAYS[dmEdit] + ' – welche Mahlzeiten?</b><div class="pick-grid" style="margin-top:8px">' + MEAL_ORDER.map(m => '<button class="' + (S.days[dmEdit] && S.dayMeals[dmEdit][m] ? 'on' : '') + '" data-dm="meal:' + dmEdit + ':' + m + '">' + MEALS[m].e + ' ' + MEALS[m].n + '</button>').join('') + '</div>' +
       '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn btn-sec btn-sm" data-dm="copy:' + dmEdit + '">Für alle Tage übernehmen</button><button class="btn btn-pri btn-sm" data-dm="edit:-1" style="margin-left:auto">Fertig</button></div></div>';
@@ -274,13 +316,13 @@
 
   /* Index des heutigen Tages in der angezeigten Woche: -1 = Woche liegt in der Zukunft, 7 = Woche ist vorbei */
   function todayIndex() {
-    const thisMon = mondayOf(new Date()), diff = Math.round((weekStart - thisMon) / 864e5);
-    if (diff > 0) return -1;
-    if (diff < 0) return 7;
-    return (new Date().getDay() + 6) % 7;
+    const diff = Math.round((startOfDay(new Date()) - startOfDay(weekStart)) / 864e5);
+    if (diff < 0) return -1; // Fenster liegt in der Zukunft
+    if (diff > 6) return 7;  // Fenster ist vorbei
+    return diff;
   }
   function isPast(d) { return d < todayIndex(); }
-  function futureMealsCount() { return S.days.reduce((n, on, d) => n + (isPast(d) ? 0 : mealsOf(d).length), 0); }
+  function futureMealsCount() { let n = 0; for (let d = 0; d < 7; d++) if (!isPast(d)) n += mealsOf(d).length; return n; }
   function weekStats(k) {
     const p = plan(k); let cost = 0, n = 0; const tot = { k: 0, p: 0, c: 0, f: 0 }; const days = new Set();
     for (const sk in p.slots) {
@@ -498,18 +540,18 @@
   function renderPlan() {
     const p = plan(), st = weekStats(), mk = MARKETS[S.market] || MARKETS.kaufland;
     const shopList = buildShop(), done = shopList.filter(i => p.shop[i.tk]).length;
-    const isThisWeek = keyOf(mondayOf(new Date())) === wk();
-    const todayIdx = isThisWeek ? (new Date().getDay() + 6) % 7 : -1, tIdx = todayIndex();
+    const isThisWeek = todayIndex() >= 0 && todayIndex() <= 6;
+    const todayIdx = isThisWeek ? todayIndex() : -1, tIdx = todayIndex();
     const hello = (() => { const h = new Date().getHours(); return h < 11 ? 'Guten Morgen' : h < 17 ? 'Guten Tag' : 'Guten Abend'; })();
     const wEnd = addDays(weekStart, 6);
     const fmt = d => d.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
     let html = '<div class="greet"><div class="eyebrow">' + hello + '</div><h1>' + (S.name ? 'Chefkoch ' + esc(S.name) + '!' : 'Deine Familienküche') + '</h1>' +
       '<span class="pill"><span class="dot" style="color:' + mk.c + '">🛒</span>geplant für ' + mk.n + ' · ' + persons() + ' Pers.</span>' + healthLinks() + '</div>' +
-      '<div class="week-nav"><button class="icon-btn" data-act="wprev" aria-label="Vorige Woche">' + ic('left') + '</button><span class="lbl">' + (isThisWeek ? 'Diese Woche · ' : '') + fmt(weekStart) + ' – ' + fmt(wEnd) + '</span><button class="icon-btn" data-act="wnext" aria-label="Nächste Woche">' + ic('right') + '</button></div>';
+      '<div class="week-nav"><button class="icon-btn" data-act="wprev" aria-label="Vorige Woche">' + ic('left') + '</button><span class="lbl">' + (todayIndex() === 0 ? 'Ab heute · ' : isThisWeek ? 'Diese 7 Tage · ' : '') + fmt(weekStart) + ' – ' + fmt(wEnd) + '</span><button class="icon-btn" data-act="wnext" aria-label="Nächste Woche">' + ic('right') + '</button></div>';
 
     const n = Object.keys(p.slots).length;
     if (tIdx === 7) html += '<div class="diet-row" style="margin-top:12px;background:var(--soft)">🕘 <span>Diese Woche liegt in der Vergangenheit – nur zur Ansicht. <a href="#" data-act="thisweek" style="color:var(--acc2);font-weight:700">Zur aktuellen Woche</a></span></div>';
-    else if (tIdx >= 5) html += '<div class="diet-row" style="margin-top:12px;background:var(--lime-g);border-color:transparent">📅 <span>Nur noch ' + (7 - tIdx) + ' Tag' + (7 - tIdx > 1 ? 'e' : '') + ' in dieser Woche. <a href="#" data-act="wnext" style="color:var(--acc2);font-weight:700">Nächste Woche planen →</a></span></div>';
+    else if (false) html += '<div class="diet-row" style="margin-top:12px;background:var(--lime-g);border-color:transparent">📅 <span>Nur noch ' + (7 - tIdx) + ' Tag' + (7 - tIdx > 1 ? 'e' : '') + ' in dieser Woche. <a href="#" data-act="wnext" style="color:var(--acc2);font-weight:700">Nächste Woche planen →</a></span></div>';
     if (!n && tIdx === 7) { $('#pg-plan').innerHTML = html + '<div class="card empty" style="margin-top:16px"><div class="big">🕘</div>Für diese vergangene Woche gibt es keinen Plan.</div>'; return; }
     if (!n) {
       html += '<div class="card empty" style="margin-top:16px"><div class="big">🗓️</div><h2 style="font-size:22px;color:var(--t1)">Noch kein Plan für diese Woche</h2><p style="margin:8px 0 18px">Wir stellen dir passende, proteinreiche Familiengerichte zusammen – abgestimmt auf Haushalt, Budget und Ernährung.</p><button class="btn btn-lime" data-act="generate">' + ic('spark') + 'Wochenplan erstellen</button></div>';
@@ -526,7 +568,7 @@
     const meals = activeMeals();
     for (let d = 0; d < 7; d++) {
       const slotsOfDay = MEAL_ORDER.filter(m => p.slots[slotKey(d, m)]);
-      if (!S.days[d] && !slotsOfDay.length) continue;
+      if (!S.days[wdOf(d)] && !slotsOfDay.length) continue;
       const past = isPast(d);
       if (past && !slotsOfDay.length) continue; // vergangene leere Tage ausblenden
       const dayMeals = MEAL_ORDER.filter(m => mealsOf(d).indexOf(m) >= 0 || p.slots[slotKey(d, m)]);
@@ -542,7 +584,7 @@
           (past ? '' : '<div class="acts no-print">') + (past ? '<!--' : '') + '<button class="icon-btn" data-swap="' + sk + '" title="Tauschen" aria-label="Tauschen">' + ic('swap') + '</button><button class="icon-btn ' + (sl.lock ? 'on' : '') + '" data-lock="' + sk + '" title="Fixieren" aria-label="Fixieren">' + ic(sl.lock ? 'lock' : 'unlock') + '</button><button class="icon-btn" data-del="' + sk + '" title="Entfernen" aria-label="Entfernen">' + ic('x') + '</button>' + (past ? '-->' : '</div>') + '</div></div>';
       }
       const dd = addDays(weekStart, d);
-      html += '<div class="day' + (past ? ' past' : '') + '"><div class="day-tag"><span class="' + (d === todayIdx ? 'today' : '') + '">' + (d === todayIdx ? 'Heute · ' : '') + DAYS[d] + ' · ' + dd.getDate() + '.' + (dd.getMonth() + 1) + '.' + (past ? ' · vorbei' : '') + '</span></div><div class="card day-body">' + inner +
+      html += '<div class="day' + (past ? ' past' : '') + '"><div class="day-tag"><span class="' + (d === todayIdx ? 'today' : '') + '">' + (d === todayIdx ? 'Heute · ' : '') + dayName(d) + ' · ' + dd.getDate() + '.' + (dd.getMonth() + 1) + '.' + (past ? ' · vorbei' : '') + '</span></div><div class="card day-body">' + inner +
         (dk ? '<div class="day-sum">' + (dayMeals.length > 1 ? '<span>Σ ' + r0(dk) + ' kcal · ' + r0(dp) + ' g P</span>' : '') + '<span class="mbar" title="Anteil am Tagesziel Protein"><i style="width:' + Math.min(100, dp / S.goals.p * 100) + '%"></i></span><span>' + r0(dp / S.goals.p * 100) + '% Protein-Ziel</span></div>' : '') + '</div></div>';
     }
     $('#pg-plan').innerHTML = html;
@@ -701,15 +743,14 @@
     const r = R[rid];
     let h = '<div class="sheet-pad"><h2>Zum Wochenplan</h2><p class="muted" style="margin:6px 0 16px">„' + esc(r.n) + '“ – wähle Tag und Mahlzeit (' + (function () { const e = addDays(weekStart, 6); return weekStart.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) + '–' + e.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }); })() + ').</p>';
     h += '<div class="field-l" style="font-size:15px">Mahlzeit</div><div class="pick-grid" id="pm">' + r.m.concat(MEAL_ORDER.filter(m => r.m.indexOf(m) < 0)).map((m, i) => '<button class="' + (i === 0 ? 'on' : '') + '" data-pm="' + m + '">' + MEALS[m].e + ' ' + MEALS[m].n + '</button>').join('') + '</div>';
-    h += '<div class="field-l" style="font-size:15px;margin-top:16px">Tag</div><div class="pick-grid" id="pd">' + DAYS.map((d, i) => { const sl = plan().slots[slotKey(i, r.m[0])]; return '<button data-pd="' + i + '"' + (isPast(i) ? ' disabled style="opacity:.35" title="Tag ist vorbei"' : '') + '>' + d.slice(0, 2) + (sl ? ' •' : '') + '</button>'; }).join('') + '</div>';
+    h += '<div class="field-l" style="font-size:15px;margin-top:16px">Tag</div><div class="pick-grid" id="pd">' + DAYS.map((d, i) => { const sl = plan().slots[slotKey(i, r.m[0])]; return '<button data-pd="' + i + '"' + (isPast(i) ? ' disabled style="opacity:.35" title="Tag ist vorbei"' : '') + '>' + dayName(i).slice(0, 2) + ' ' + addDays(weekStart, i).getDate() + '.' + (addDays(weekStart, i).getMonth() + 1) + '.' + (sl ? ' •' : '') + '</button>'; }).join('') + '</div>';
     h += '<p class="muted" style="font-size:12.5px;margin-top:10px">• = dort steht schon ein Gericht (wird ersetzt).</p></div>';
     openSheet(h);
     let meal = r.m[0];
     $$('#pm button').forEach(b => b.onclick = () => { meal = b.dataset.pm; $$('#pm button').forEach(x => x.classList.toggle('on', x === b)); });
     $$('#pd button:not([disabled])').forEach(b => b.onclick = () => {
       const d = +b.dataset.pd; plan().slots[slotKey(d, meal)] = { r: rid, lock: true };
-      S.days[d] = true; S.dayMeals[d][meal] = true;
-      plan().shop = {}; save(); closeSheet(); toast(r.n + ' → ' + DAYS[d] + ' (' + MEALS[meal].n + ') ✓'); if (current === 'plan') renderPlan();
+      plan().shop = {}; save(); closeSheet(); toast(r.n + ' → ' + dayLabel(d) + ' (' + MEALS[meal].n + ') ✓'); if (current === 'plan') renderPlan();
     });
   }
   /* ---------- Schnellfilter (Gericht hinzufügen & Rezepte-Seite) ---------- */
@@ -760,7 +801,7 @@
   function addToSlotSheet(sk) {
     const [d, meal] = sk.split('|');
     slotF = Object.assign(newFilter(), { sort: slotF.sort });
-    openSheet('<div class="sheet-pad"><h2>' + MEALS[meal].n + ' · ' + DAYS[+d] + '</h2><button class="btn btn-lime btn-block" style="margin:14px 0" data-act="autoslot" data-sk="' + sk + '">' + ic('spark') + 'Vorschlag automatisch wählen</button><div id="slotFilter"></div><div id="slotList"></div></div>');
+    openSheet('<div class="sheet-pad"><h2>' + MEALS[meal].n + ' · ' + dayLabel(+d) + '</h2><button class="btn btn-lime btn-block" style="margin:14px 0" data-act="autoslot" data-sk="' + sk + '">' + ic('spark') + 'Vorschlag automatisch wählen</button><div id="slotFilter"></div><div id="slotList"></div></div>');
     const drawFilter = () => { $('#slotFilter').innerHTML = filterChipsHtml(slotF, true); bindFilter($('#slotFilter'), slotF, fromSearch => { if (!fromSearch) drawFilter(); drawList(); }); };
     const drawList = () => {
       const list = sortF(RECIPES.filter(r => eligible(r, meal) && matchF(r, slotF)), slotF);
@@ -836,7 +877,13 @@
     const p = plan(), mf = marketF(), tI = todayIndex();
     if (!entries) { if (tI === 7) return []; entries = planEntries(); }
     // Einkaufstage, die schon vorbei sind, rutschen auf heute
-    const trips = tripDays || [...new Set(shopDays().map(t => Math.max(t, Math.max(0, tI))))].sort((a, b) => a - b);
+    const trips = tripDays || (() => {
+      const t0 = Math.max(0, tI), sd = shopDays();
+      let t = [0, 1, 2, 3, 4, 5, 6].filter(o => sd.indexOf(wdOf(o)) >= 0).map(o => Math.max(o, t0));
+      const first = Math.min(99, ...entries.filter(e => e.day !== null).map(e => e.day));
+      if (!t.length || first < Math.min(...t)) t.push(t0); // vor dem ersten Einkaufstag wird gekocht → heute einkaufen
+      return [...new Set(t)].sort((a, b) => a - b);
+    })();
     const map = {}; // Einkaufstag -> Zutat -> Summe
     for (const en of entries) {
       const r = en.r, day = en.day === null ? trips[0] : en.day, serv = en.serv;
@@ -883,7 +930,7 @@
       return { day: t, items, buyItems: items.filter(i => !i.pantry), pantryItems: items.filter(i => i.pantry) };
     }).filter(t => t.items.length);
   }
-  function buildShop() { return buildTrips().reduce((a, t) => a.concat(t.buyItems.map(i => Object.assign({ tk: t.day + '|' + i.key }, i))), []); }
+  function buildShop() { return buildTrips().reduce((a, t) => a.concat(t.buyItems.map(i => Object.assign({ tk: shopKeyOf(t.day, i.key) }, i))), []); }
   function fmtSize(s, unit) { return s >= 1000 && s % 100 === 0 ? r1(s / 1000) + (unit === 'ml' ? ' l' : ' kg') : s + ' ' + unit; }
   function packLabel(i) {
     const unit = LIQUIDS.has(i.key) ? 'ml' : 'g';
@@ -892,14 +939,14 @@
     return i.buy.combo.map(([s, n]) => n + ' × ' + fmtSize(s, unit)).join(' + ');
   }
   function warnLabels(warns) {
-    const g = {}; warns.forEach(w => { const [k, d] = w.split(':'); (g[k] = g[k] || []).push(DAYS[+d]); });
+    const g = {}; warns.forEach(w => { const [k, d] = w.split(':'); (g[k] = g[k] || []).push(dayLabel(+d)); });
     const L = { einfrieren: d => '🧊 Anteil für ' + d + ' direkt einfrieren & am Vortag im Kühlschrank auftauen – oder Einkaufstag ergänzen', frisch: d => '⚠️ Für ' + d + ' nicht lange genug haltbar – Einkaufstag davor ergänzen', vorher: d => '📅 Für ' + d + ' schon vorher einkaufen' };
     return Object.keys(g).map(k => L[k](g[k].join(' & ')));
   }
   function renderShop() {
     const p = plan(), trips = buildTrips();
     const all = trips.reduce((a, t) => a.concat(t.buyItems), []);
-    const done = trips.reduce((s, t) => s + t.buyItems.filter(i => p.shop[t.day + '|' + i.key]).length, 0);
+    const done = trips.reduce((s, t) => s + t.buyItems.filter(i => p.shop[shopKeyOf(t.day, i.key)]).length, 0);
     const bon = all.reduce((s, i) => s + i.costBuy, 0), used = all.reduce((s, i) => s + i.costUsed, 0);
     const mk = MARKETS[S.market] || MARKETS.kaufland;
     let h = '<div class="page-head"><div class="eyebrow">' + mk.n + ' · ' + r1(servings()) + ' Portionen pro Gericht</div><h1>Einkaufsplan</h1></div>';
@@ -915,9 +962,9 @@
     for (const t of trips) {
       const tripBon = t.buyItems.reduce((s, i) => s + i.costBuy, 0);
       const d = addDays(weekStart, t.day);
-      const nx = shopDays().find(x => x > t.day), until = nx === undefined ? 'So' : DAYS[nx - 1].slice(0, 2);
-      h += '<div class="day" style="margin-top:26px"><div class="day-tag"><span class="today">🛒 Einkauf ' + DAYS[t.day] + ' · ' + d.getDate() + '.' + (d.getMonth() + 1) + '.</span></div><div class="card day-body" style="padding-top:22px">' +
-        '<div class="muted" style="font-size:12.5px;text-align:center;margin-bottom:6px">Für die Gerichte ' + DAYS[t.day].slice(0, 2) + (until !== DAYS[t.day].slice(0, 2) ? '–' + until : '') + ' · ' + t.buyItems.length + ' Artikel · ca. ' + eur(tripBon) + '</div>';
+      const nx = trips.map(x => x.day).find(x => x > t.day), until = nx === undefined ? dayName(6).slice(0, 2) : dayName(nx - 1).slice(0, 2);
+      h += '<div class="day" style="margin-top:26px"><div class="day-tag"><span class="today">🛒 Einkauf ' + dayName(t.day) + ' · ' + d.getDate() + '.' + (d.getMonth() + 1) + '.</span></div><div class="card day-body" style="padding-top:22px">' +
+        '<div class="muted" style="font-size:12.5px;text-align:center;margin-bottom:6px">Für die Gerichte ' + dayName(t.day).slice(0, 2) + (until !== dayName(t.day).slice(0, 2) ? '–' + until : '') + ' · ' + t.buyItems.length + ' Artikel · ca. ' + eur(tripBon) + '</div>';
       const byStore = S.shopGroup === 'store' && S.stores.length > 1;
       const groups = byStore ? S.stores.concat(Object.keys(SHOP_PLACES).filter(x => S.stores.indexOf(x) < 0)).map(st => ({ st, items: t.buyItems.filter(i => i.store === st) })).filter(g => g.items.length) : [{ st: null, items: t.buyItems }];
       for (const g of groups) {
@@ -937,10 +984,10 @@
     $('#pg-einkauf').innerHTML = h;
   }
   function shopRow(day, i, p) {
-    const k = day + '|' + i.key, done = !!p.shop[k];
+    const k = shopKeyOf(day, i.key), done = !!p.shop[k];
     const uses = i.uses.slice().sort((a, b) => a.day - b.day);
     const uniq = a => a.filter((v, j) => a.indexOf(v) === j);
-    const useTxt = uniq(uses.map(u => DAYS[u.day].slice(0, 2))).join(', ') + ': ' + uniq(uses.map(u => u.n)).slice(0, 2).join(', ') + (uniq(uses.map(u => u.n)).length > 2 ? ' …' : '');
+    const useTxt = uniq(uses.map(u => dayName(u.day).slice(0, 2))).join(', ') + ': ' + uniq(uses.map(u => u.n)).slice(0, 2).join(', ') + (uniq(uses.map(u => u.n)).length > 2 ? ' …' : '');
     const unit = LIQUIDS.has(i.key) ? 'ml' : 'g';
     return '<div class="shop-item ' + (done ? 'done' : '') + '" data-shop="' + k + '" style="align-items:flex-start"><span class="cb" style="margin-top:2px">' + ic('check') + '</span><span class="n">' + esc(i.prod ? i.prod.name + (i.prod.brand ? ' (' + i.prod.brand + ')' : '') : i.ing.n) +
       '<small>' + esc(useTxt) + '</small>' + gfHint(i.key, true, i.store) +
@@ -980,10 +1027,10 @@
     return 'Einkaufsliste: ' + r.n + ' (' + r1(recShop.serv) + ' Portionen)\n' + trip.buyItems.map(i => '☐ ' + i.ing.n + ' – ' + packLabel(i) + (S.stores.length > 1 ? ' [' + SHOP_PLACES[i.store].n + ']' : '')).join('\n');
   }
   function shopText() {
-    const p = plan(); let t = 'Einkaufsplan (SuPER Küche) – Woche ab ' + weekStart.toLocaleDateString('de-DE') + ' · ' + (MARKETS[S.market] || {}).n + '\n';
+    const p = plan(); let t = 'Einkaufsplan (SuPER Küche) – ' + weekStart.toLocaleDateString('de-DE') + ' bis ' + addDays(weekStart, 6).toLocaleDateString('de-DE') + ' · ' + (MARKETS[S.market] || {}).n + '\n';
     for (const tr of buildTrips()) {
-      t += '\n🛒 ' + DAYS[tr.day] + ':\n';
-      for (const c in SHOP_CATS) { const items = tr.buyItems.filter(i => i.ing.cat === c && !p.shop[tr.day + '|' + i.key]); if (!items.length) continue; t += '  ' + SHOP_CATS[c].n + ':\n' + items.map(i => '  ☐ ' + (i.prod ? i.prod.name : i.ing.n) + ' – ' + packLabel(i) + (S.stores.length > 1 ? ' [' + SHOP_PLACES[i.store].n + ']' : '') + (i.na ? ' (nicht im Hauptmarkt!)' : '')).join('\n') + '\n'; }
+      t += '\n🛒 ' + dayName(tr.day) + ':\n';
+      for (const c in SHOP_CATS) { const items = tr.buyItems.filter(i => i.ing.cat === c && !p.shop[shopKeyOf(tr.day, i.key)]); if (!items.length) continue; t += '  ' + SHOP_CATS[c].n + ':\n' + items.map(i => '  ☐ ' + (i.prod ? i.prod.name : i.ing.n) + ' – ' + packLabel(i) + (S.stores.length > 1 ? ' [' + SHOP_PLACES[i.store].n + ']' : '') + (i.na ? ' (nicht im Hauptmarkt!)' : '')).join('\n') + '\n'; }
       const pan = tr.pantryItems.filter(i => !S.pantry[i.key]); if (pan.length) t += '  Vorrat prüfen: ' + pan.map(i => i.ing.n).join(', ') + '\n';
     }
     return t;
@@ -1123,7 +1170,7 @@
     openSheet(h); $('#sheet').scrollTop = keepScroll;
     // Live-Zähler: wie viele Gerichte passen pro Mahlzeit
     const cnt = activeMeals().map(m => MEALS[m].n + ': ' + RECIPES.filter(r => eligible(r, m)).length).join(' · ');
-    $('#wzcount').innerHTML = futureMealsCount() + ' Mahlzeiten ab ' + (todayIndex() > 0 ? 'heute (' + DAYS[todayIndex()] + ')' : DAYS[0]) + ' · passende Gerichte – ' + cnt;
+    $('#wzcount').innerHTML = futureMealsCount() + ' Mahlzeiten von ' + dayLabel(Math.max(0, todayIndex())) + ' bis ' + dayLabel(6) + ' · passende Gerichte – ' + cnt;
     const br = $('#wzbudget'); br.oninput = () => { S.budget = +br.value; $('#wzb').textContent = '€' + S.budget; };
     $$('[data-wz]').forEach(b => b.onclick = ev => {
       ev.stopPropagation();
@@ -1264,8 +1311,8 @@
       case 'wizgo': { const keep = !!$('#wizKeep') && $('#wizKeep').classList.contains('on'); save(); generateWeek(keep); closeSheet(); location.hash = '#plan'; renderPlan(); const n = Object.keys(plan().slots).length; toast(n ? 'Wochenplan erstellt ✓ (' + n + ' Gerichte)' : 'Keine passenden Gerichte – Auswahl lockern'); break; }
       case 'wizkeep': t.classList.toggle('on'); break;
       case 'regen-go': generateWeek(true); location.hash = '#plan'; toast('Neuer Plan erstellt ✓'); break;
-      case 'clearweek': if (confirm('Alle Gerichte dieser Woche entfernen?')) { S.plans[wk()] = { slots: {}, shop: {} }; save(); renderPlan(); planWizard(false); } break;
-      case 'thisweek': ev.preventDefault(); weekStart = mondayOf(new Date()); renderPlan(); break;
+      case 'clearweek': if (confirm('Alle Gerichte dieser 7 Tage entfernen?')) { plan().slots = {}; save(); renderPlan(); planWizard(false); } break;
+      case 'thisweek': ev.preventDefault(); weekStart = startOfDay(new Date()); renderPlan(); break;
       case 'wprev': weekStart = addDays(weekStart, -7); renderPlan(); break;
       case 'wnext': ev.preventDefault(); weekStart = addDays(weekStart, 7); renderPlan(); break;
       case 'moreRecipes': { const y = window.scrollY; RF.limit += 48; renderRecipes(); window.scrollTo(0, y); break; }
@@ -1320,7 +1367,7 @@
   window.addEventListener('hashchange', route);
   // Datum aktuell halten (App bleibt z. B. über Nacht offen): beim Zurückkehren neu berechnen
   let lastDay = keyOf(new Date());
-  function checkDate() { const k = keyOf(new Date()); if (k !== lastDay) { const wasThisWeek = keyOf(weekStart) === keyOf(mondayOf(new Date(Date.now() - 864e5))); lastDay = k; if (wasThisWeek) weekStart = mondayOf(new Date()); refresh(); } }
+  function checkDate() { const k = keyOf(new Date()); if (k !== lastDay) { if (keyOf(weekStart) === lastDay) weekStart = startOfDay(new Date()); lastDay = k; refresh(); } }
   document.addEventListener('visibilitychange', () => { if (!document.hidden) checkDate(); });
   window.addEventListener('focus', checkDate);
   setInterval(checkDate, 60000);

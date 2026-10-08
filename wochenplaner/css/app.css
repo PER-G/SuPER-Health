@@ -391,3 +391,6 @@ html, body { max-width: 100%; overflow-x: hidden; }
 /* Hinweistexte unter Zutaten (Marken, glutenfrei, Austausch) – eigener Stil, nicht der Schalter (.sw) */
 .hint { display: block; font-size: 12px; line-height: 1.35; color: var(--acc2); font-weight: 600; margin-top: 2px; white-space: normal; overflow-wrap: anywhere; }
 .shop-item .n small.hint, .shop-item .n small { display: block; }
+.dp-btn { aspect-ratio: auto; padding: 8px 0 6px; line-height: 1.1; }
+.dp-btn small { display: block; font-size: 10.5px; font-weight: 600; color: var(--t3); margin-top: 3px; }
+.dp-day.on .dp-btn small { color: var(--acc2); }
