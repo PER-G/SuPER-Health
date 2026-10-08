@@ -1280,5 +1280,10 @@
   route();
   publishPlan();
   if (!S.onboarded) setTimeout(onboarding, 300);
-  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => { });
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    // Neue Version veröffentlicht → neuer Service Worker übernimmt → Seite einmal neu laden (immer aktueller Stand)
+    const hadController = !!navigator.serviceWorker.controller; let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController && !reloaded) { reloaded = true; location.reload(); } });
+    navigator.serviceWorker.register('sw.js').then(reg => reg.update()).catch(() => { });
+  }
 })();
