@@ -128,6 +128,7 @@
     shopDays: [0, 3],
     thermomix: false,
     proteinBrand: '',
+    noProtein: [],
     theke: false,
     pantry: {},
     products: {},
@@ -155,11 +156,45 @@
   function adapted(r) { return Core.adapt(r, S.proteinBrand ? Object.assign({}, S.diet, { pref: { whey: S.proteinBrand, whey_iso: S.proteinBrand === 'esn_isoclear' ? 'esn_isoclear' : '' } }) : S.diet); }
   function nutriFor(r, factor) { return Core.nutrition(adapted(r).items, factor || 1); }
   function costFor(r) { return nutriFor(r).cost * servings() * marketF(); }
+  /* Fleisch- & Fischsorten: einzeln an-/abwählbar (S.noProtein = ausgeschlossene Gruppen) */
+  const PROTEIN_GROUPS = {
+    fleisch: { n: 'Fleisch', e: '🥩', items: {
+      gefluegel: { n: 'Hähnchen', keys: ['haehnchenbrust', 'haehnchenschenkel', 'haehnchenkeule', 'huehnerbruehe'] },
+      pute: { n: 'Pute', keys: ['putenbrust', 'putenhack'] },
+      rind: { n: 'Rind', keys: ['rinderhack', 'rindersteak', 'rindergulasch', 'asia_rinderbruehe', 'gemischtes_hack'] },
+      schwein: { n: 'Schwein', keys: ['schweinefilet', 'schinken_gekocht', 'gemischtes_hack', 'prot_gelatine'] },
+      lamm: { n: 'Lamm', keys: ['lammhack'] },
+    } },
+    fisch: { n: 'Fisch & Meeresfrüchte', e: '🐟', items: {
+      lachs: { n: 'Lachs', keys: ['lachs', 'lachs_sushi', 'raeucherlachs'] },
+      weissfisch: { n: 'Kabeljau & Seelachs', keys: ['kabeljau', 'seelachs'] },
+      forelle: { n: 'Forelle', keys: ['forelle'] },
+      thunfisch: { n: 'Thunfisch', keys: ['thunfisch_dose'] },
+      garnelen: { n: 'Garnelen', keys: ['garnelen', 'austernsauce'] },
+    } },
+  };
+  const PG_KEY = {}; // Zutat → Gruppen
+  for (const c in PROTEIN_GROUPS) for (const g in PROTEIN_GROUPS[c].items) for (const k of PROTEIN_GROUPS[c].items[g].keys) (PG_KEY[k] = PG_KEY[k] || []).push(g);
+  function proteinBlocked(r) {
+    if (!S.noProtein || !S.noProtein.length) return false;
+    const fishAll = Object.keys(PROTEIN_GROUPS.fisch.items).every(g => S.noProtein.indexOf(g) >= 0);
+    return adapted(r).items.some(it => (PG_KEY[it.key] || []).some(g => S.noProtein.indexOf(g) >= 0) || (fishAll && it.key === 'fischsauce'));
+  }
+  function proteinPickerHtml() {
+    let h = '';
+    for (const c in PROTEIN_GROUPS) {
+      const grp = PROTEIN_GROUPS[c], ids = Object.keys(grp.items), on = ids.filter(g => S.noProtein.indexOf(g) < 0).length;
+      h += '<div class="card pg-card"><button class="pg-all" data-pgall="' + c + '"><span class="pg-cb ' + (on === ids.length ? 'on' : on ? 'part' : '') + '">' + ic('check') + '</span><b>' + grp.e + ' ' + grp.n + '</b><span class="muted" style="margin-left:auto;font-size:12.5px">' + (on === ids.length ? 'alle' : on ? on + ' von ' + ids.length : 'keine') + '</span></button><div class="pg-items">' +
+        ids.map(g => '<button class="fchip ' + (S.noProtein.indexOf(g) < 0 ? 'on' : '') + '" data-pg="' + g + '">' + (S.noProtein.indexOf(g) < 0 ? '✓ ' : '') + grp.items[g].n + '</button>').join('') + '</div></div>';
+    }
+    return h;
+  }
   function eligible(r, mealType) {
     if (mealType && r.m.indexOf(mealType) < 0) return false;
     if (!adapted(r).ok) return false;
     if (S.exclude.length && Core.allergens(adapted(r).items).some(a => S.exclude.indexOf(a) >= 0)) return false;
     if (S.dislikes.indexOf(r.id) >= 0) return false;
+    if (proteinBlocked(r)) return false;
     // Mit Baby im Haushalt: gemeinsame Hauptmahlzeiten müssen babytauglich sein (Snacks & Frühstück dürfen getrennt sein)
     if ((S.household.baby || 0) > 0 && r.baby === 0 && (mealType === 'mittag' || mealType === 'abend')) return false;
     return true;
@@ -588,7 +623,7 @@
   /* ---------- Schnellfilter (Gericht hinzufügen & Rezepte-Seite) ---------- */
   const QF_STYLES = ['protein', 'leicht', 'schnell', 'familie', 'comfort', 'mealprep'];
   const QF_DIETS = { gf: 'Glutenfrei', lf: 'Laktosefrei', fm: 'FODMAP-arm', veg: 'Vegetarisch' };
-  function newFilter() { return { q: '', st: [], dt: [], tm: false, fav: false, sort: 'protein' }; }
+  function newFilter() { return { q: '', st: [], dt: [], pg: [], tm: false, fav: false, sort: 'protein' }; }
   /* Diät-Filter: ist die Ernährungsform in den Einstellungen aktiv, sind alle passenden Gerichte schon angepasst.
    * Sonst zeigt der Filter nur Gerichte, die von Natur aus passen (ohne Austausch). */
   function matchF(r, F) {
@@ -597,6 +632,8 @@
     for (const d of F.dt) if (!S.diet[d] && r._diet[d] !== 2) return false;
     if (F.tm && !(r.tm && r.tm.fit >= 2)) return false;
     if (F.fav && S.favorites.indexOf(r.id) < 0) return false;
+    // Sorten-Filter: Gericht muss mindestens eine der gewählten Fleisch-/Fischsorten enthalten
+    if (F.pg && F.pg.length && !adapted(r).items.some(it => (PG_KEY[it.key] || []).some(g => F.pg.indexOf(g) >= 0))) return false;
     return true;
   }
   function sortF(list, F) {
@@ -609,6 +646,7 @@
       '<div class="filter-row">' + QF_STYLES.map(s => chip(F.st.indexOf(s) >= 0, 'data-qf="st:' + s + '"', STYLES[s].e + ' ' + STYLES[s].n.replace(' (≤ 20 Min.)', ''))).join('') + '</div>' +
       '<div class="filter-row">' + Object.keys(QF_DIETS).map(d => chip(F.dt.indexOf(d) >= 0 || S.diet[d], 'data-qf="dt:' + d + '"' + (S.diet[d] ? ' disabled title="In den Einstellungen aktiv"' : ''), (d === 'veg' ? '🥦 ' : '🌾 ') + QF_DIETS[d] + (S.diet[d] ? ' ✓' : ''))).join('') +
       chip(F.tm, 'data-qf="tm"', '⚙️ Thermomix') + chip(F.fav, 'data-qf="fav"', '❤️ Favoriten') + '</div>' +
+      (S.diet.veg ? '' : '<div class="filter-row">' + Object.keys(PROTEIN_GROUPS).map(c => Object.keys(PROTEIN_GROUPS[c].items).filter(g => S.noProtein.indexOf(g) < 0).map(g => chip(F.pg.indexOf(g) >= 0, 'data-qf="pg:' + g + '"', PROTEIN_GROUPS[c].e + ' ' + PROTEIN_GROUPS[c].items[g].n)).join('')).join('') + '</div>') +
       (F.dt.some(d => !S.diet[d]) ? '<p class="muted" style="font-size:12px;margin:0 2px 8px">Zeigt Gerichte, die von Natur aus ' + F.dt.filter(d => !S.diet[d]).map(d => QF_DIETS[d].toLowerCase()).join(' & ') + ' sind. Aktivierst du das in den <a href="#einstellungen" style="color:var(--acc2)">Einstellungen</a>, werden weitere Gerichte automatisch angepasst.</p>' : '') +
       '<div class="filter-row" style="align-items:center"><span class="muted" style="font-size:12.5px;white-space:nowrap">Sortieren:</span>' + [['protein', 'Meiste Proteine'], ['kcal', 'Wenigste kcal'], ['zeit', 'Schnellste'], ['preis', 'Günstigste']].map(o => chip(F.sort === o[0], 'data-qf="sort:' + o[0] + '"', o[1])).join('') + '</div>';
   }
@@ -617,7 +655,7 @@
     $$('[data-qf]', root).forEach(b => b.onclick = ev => {
       ev.stopPropagation();
       const [k, v] = b.dataset.qf.split(':');
-      if (k === 'st' || k === 'dt') { const a = F[k], i = a.indexOf(v); if (i >= 0) a.splice(i, 1); else a.push(v); }
+      if (k === 'st' || k === 'dt' || k === 'pg') { const a = F[k], i = a.indexOf(v); if (i >= 0) a.splice(i, 1); else a.push(v); }
       else if (k === 'sort') F.sort = v;
       else F[k] = !F[k];
       onChange(false);
@@ -634,7 +672,7 @@
     const drawFilter = () => { $('#slotFilter').innerHTML = filterChipsHtml(slotF, true); bindFilter($('#slotFilter'), slotF, fromSearch => { if (!fromSearch) drawFilter(); drawList(); }); };
     const drawList = () => {
       const list = sortF(RECIPES.filter(r => eligible(r, meal) && matchF(r, slotF)), slotF);
-      $('#slotList').innerHTML = '<div class="count-l">' + list.length + ' passende Gerichte' + (slotF.st.length || slotF.dt.length || slotF.q || slotF.tm || slotF.fav ? ' · <a href="#" data-qreset style="color:var(--acc2)">Filter zurücksetzen</a>' : '') + '</div>' +
+      $('#slotList').innerHTML = '<div class="count-l">' + list.length + ' passende Gerichte' + (slotF.st.length || slotF.dt.length || slotF.pg.length || slotF.q || slotF.tm || slotF.fav ? ' · <a href="#" data-qreset style="color:var(--acc2)">Filter zurücksetzen</a>' : '') + '</div>' +
         (list.length ? '<div class="rgrid">' + list.map(r => recipeCard(r).replace('data-open="' + r.id + '"', 'data-choose="' + r.id + '"')).join('') + '</div>' : '<div class="empty"><div class="big">🔍</div>Keine Gerichte mit diesen Filtern – Filter lockern.</div>');
       const rs = $('[data-qreset]'); if (rs) rs.onclick = ev => { ev.preventDefault(); slotF = Object.assign(newFilter(), { sort: slotF.sort }); drawFilter(); drawList(); };
       $$('#slotList [data-choose]').forEach(el => el.addEventListener('click', ev => { if (ev.target.closest('[data-fav]')) return; ev.stopPropagation(); plan().slots[sk] = { r: el.dataset.choose, lock: true }; plan().shop = {}; save(); closeSheet(); renderPlan(); toast('Hinzugefügt ✓'); }, true));
@@ -872,6 +910,7 @@
       [['gf', 'Glutenfrei', 'Zöliakie / Glutenunverträglichkeit'], ['lf', 'Laktosefrei', 'Laktoseintoleranz'], ['fm', 'FODMAP-arm', 'Reizdarm – nach Monash-Portionsgrenzen'], ['veg', 'Vegetarisch', 'Ohne Fleisch & Fisch']].map(d => '<div class="card toggle ' + (S.diet[d[0]] ? 'on' : '') + '" data-diet="' + d[0] + '"><span class="tx"><b>' + d[1] + '</b><span>' + d[2] + '</span></span><span class="sw"></span></div>').join('') + '</div></div>';
     h += '<div class="set-block"><div class="field-l">Küchengeräte</div><div class="toggles"><div class="card toggle ' + (S.thermomix ? 'on' : '') + '" data-act="tmtoggle"><span class="tx"><b>⚙️ Ich koche mit dem Thermomix</b><span>TM6 / TM7 – Rezepte zeigen zuerst die Thermomix-Einstellungen</span></span><span class="sw"></span></div></div></div>';
     h += '<div class="set-block"><div class="field-l">Proteinpulver</div><div class="field-s">Deine Lieblingsmarke ersetzt in allen Rezepten das Proteinpulver – Nährwerte & Einkauf passen sich an.</div><select class="select" id="sprot">' + Object.keys(PROTEIN_BRANDS).map(k => '<option value="' + k + '" ' + (S.proteinBrand === k ? 'selected' : '') + '>' + PROTEIN_BRANDS[k] + '</option>').join('') + '</select></div>';
+    h += '<div class="set-block"><div class="field-l">Fleisch & Fisch</div><div class="field-s">Abgewählte Sorten werden nicht vorgeschlagen.</div><div class="pg-wrap" data-pgscope="settings">' + proteinPickerHtml() + '</div></div>';
     h += '<div class="set-block"><div class="field-l">Allergene ausschließen</div><div class="field-s">Gerichte mit diesen Zutaten werden nicht vorgeschlagen.</div><div class="filter-row" style="flex-wrap:wrap">' + ['E', 'N', 'P', 'F', 'K', 'Y', 'Z', 'M'].map(a => '<button class="fchip ' + (S.exclude.indexOf(a) >= 0 ? 'on' : '') + '" data-excl="' + a + '">' + ALLERGENS[a] + '</button>').join('') + '</div></div>';
     h += '<div class="set-block"><div class="field-l">Essensstimmung</div><div class="field-s">Wähle bis zu 3 Stile, die bevorzugt werden.</div><div class="styles-grid">' + Object.keys(STYLES).map(s => '<button class="style-card ' + (S.styles.indexOf(s) >= 0 ? 'on' : '') + '" data-sstyle="' + s + '"><span class="e">' + STYLES[s].e + '</span>' + STYLES[s].n + '</button>').join('') + '</div></div>';
     h += '<div class="set-block"><div class="field-l">Tagesziele (pro Erwachsenem)</div><div class="field-s">' + (S.goals.src === 'superhealth' ? '✓ Aus SuPER Health übernommen.' : 'Manuell – oder direkt aus SuPER Health übernehmen.') + '</div><div class="goal-grid">' +
@@ -905,6 +944,40 @@
     $('#pname').onchange = e => { S.name = e.target.value.trim(); save(); renderAccount(); };
   }
 
+  /* ================= Plan-Assistent =================
+   * Fragt vor dem Erstellen alles Wichtige ab (wie beim ersten Start) – Änderungen gelten auch für die Einstellungen. */
+  function planWizard(fromRegen) {
+    const hasLocked = Object.values(plan().slots).some(x => x.lock);
+    const toggle = (on, attr, label, sub) => '<div class="card toggle ' + (on ? 'on' : '') + '" ' + attr + '><span class="tx"><b>' + label + '</b>' + (sub ? '<span>' + sub + '</span>' : '') + '</span><span class="sw"></span></div>';
+    let h = '<div class="sheet-pad"><div class="ob-hero" style="padding-top:0"><div class="big">🗓️</div><h2>Wochenplan erstellen</h2><p>Kurz prüfen – dann stellen wir die Woche passend zusammen.</p></div>';
+    h += '<div class="set-block" style="margin-top:18px"><div class="field-l">Wer isst mit?</div><div class="members">' +
+      Object.keys(MEMBER_TYPES).map(t => '<div class="card member" style="padding:9px 14px"><span class="e" style="font-size:22px">' + MEMBER_TYPES[t].e + '</span><span class="tx"><b>' + MEMBER_TYPES[t].n + '</b><span>' + MEMBER_TYPES[t].age + '</span></span><div class="stepper sm"><button data-wz="hh:' + t + ':-1">−</button><b>' + (S.household[t] || 0) + '</b><button data-wz="hh:' + t + ':1">+</button></div></div>').join('') + '</div></div>';
+    h += '<div class="set-block"><div class="field-l">Kochtage</div><div class="days">' + DAYS_S.map((d, i) => '<button class="' + (S.days[i] ? 'on' : '') + '" data-wz="day:' + i + '" title="' + DAYS[i] + '">' + d + '</button>').join('') + '</div></div>';
+    h += '<div class="set-block"><div class="field-l">Mahlzeiten</div><div class="pick-grid">' + MEAL_ORDER.map(m => '<button class="' + (S.meals[m] ? 'on' : '') + '" data-wz="meal:' + m + '">' + MEALS[m].e + ' ' + MEALS[m].n + '</button>').join('') + '</div></div>';
+    h += '<div class="set-block"><div class="field-l">Ernährung</div><div class="toggles">' + [['gf', 'Glutenfrei'], ['lf', 'Laktosefrei'], ['fm', 'FODMAP-arm'], ['veg', 'Vegetarisch']].map(d => toggle(S.diet[d[0]], 'data-wz="diet:' + d[0] + '"', d[1])).join('') + '</div></div>';
+    if (!S.diet.veg) h += '<div class="set-block"><div class="field-l">Fleisch & Fisch</div><div class="field-s">Alles angehakt = alles erlaubt. Einzelne Sorten abwählen.</div><div class="pg-wrap" data-pgscope="wizard">' + proteinPickerHtml() + '</div></div>';
+    h += '<div class="set-block"><div class="field-l">Stil (bis zu 3)</div><div class="filter-row" style="flex-wrap:wrap">' + Object.keys(STYLES).map(st => '<button class="fchip ' + (S.styles.indexOf(st) >= 0 ? 'on' : '') + '" data-wz="style:' + st + '">' + STYLES[st].e + ' ' + STYLES[st].n + '</button>').join('') + '</div></div>';
+    h += '<div class="set-block"><div class="field-l">Wochenbudget: <span id="wzb">€' + S.budget + '</span></div><input type="range" class="range" id="wzbudget" min="30" max="400" step="5" value="' + S.budget + '"></div>';
+    if (fromRegen && hasLocked) h += '<div class="set-block">' + toggle(true, 'data-act="wizkeep" id="wizKeep"', 'Fixierte Gerichte behalten', '🔒 markierte Gerichte bleiben im Plan') + '</div>';
+    h += '<div class="set-block" style="margin-bottom:6px"><div class="count-l" id="wzcount"></div><button class="btn btn-lime btn-block" data-act="wizgo">' + ic('spark') + 'Plan erstellen</button></div></div>';
+    const keepScroll = $('#overlay').classList.contains('open') ? $('#sheet').scrollTop : 0;
+    openSheet(h); $('#sheet').scrollTop = keepScroll;
+    // Live-Zähler: wie viele Gerichte passen pro Mahlzeit
+    const cnt = activeMeals().map(m => MEALS[m].n + ': ' + RECIPES.filter(r => eligible(r, m)).length).join(' · ');
+    $('#wzcount').innerHTML = 'Passende Gerichte – ' + cnt;
+    const br = $('#wzbudget'); br.oninput = () => { S.budget = +br.value; $('#wzb').textContent = '€' + S.budget; };
+    $$('[data-wz]').forEach(b => b.onclick = ev => {
+      ev.stopPropagation();
+      const [k, v, x] = b.dataset.wz.split(':');
+      if (k === 'hh') { S.household[v] = Math.max(0, Math.min(12, (S.household[v] || 0) + +x)); if (persons() === 0) S.household.erwachsen = 1; }
+      if (k === 'day') { S.days[+v] = !S.days[+v]; if (!S.days.some(Boolean)) S.days[+v] = true; }
+      if (k === 'meal') { S.meals[v] = !S.meals[v]; if (!activeMeals().length) S.meals[v] = true; }
+      if (k === 'diet') S.diet[v] = !S.diet[v];
+      if (k === 'style') { const i = S.styles.indexOf(v); if (i >= 0) S.styles.splice(i, 1); else { if (S.styles.length >= 3) S.styles.shift(); S.styles.push(v); } }
+      planWizard(fromRegen);
+    });
+  }
+
   /* ================= Onboarding ================= */
   let ob = 0;
   function onboarding() {
@@ -932,7 +1005,7 @@
 
   /* ================= Events ================= */
   document.addEventListener('click', ev => {
-    const t = ev.target.closest('[data-act],[data-open],[data-fav],[data-swap],[data-lock],[data-del],[data-addslot],[data-go],[data-style],[data-cu],[data-fmeal],[data-ffav],[data-fbaby],[data-ftm],[data-fdiet],[data-cook],[data-fstyle-clear],[data-fcu-clear],[data-tab],[data-portion],[data-serv],[data-shop],[data-hh],[data-day],[data-meal],[data-diet],[data-excl],[data-sstyle],[data-profile],[data-shopday],[data-pantry],[data-mode],[data-prod],[data-ob],[data-obhh],[data-obdiet],[data-obmeal]');
+    const t = ev.target.closest('[data-act],[data-open],[data-fav],[data-swap],[data-lock],[data-del],[data-addslot],[data-go],[data-style],[data-cu],[data-fmeal],[data-ffav],[data-fbaby],[data-ftm],[data-fdiet],[data-cook],[data-fstyle-clear],[data-fcu-clear],[data-tab],[data-portion],[data-serv],[data-shop],[data-hh],[data-day],[data-meal],[data-diet],[data-excl],[data-sstyle],[data-profile],[data-pg],[data-pgall],[data-shopday],[data-pantry],[data-mode],[data-prod],[data-ob],[data-obhh],[data-obdiet],[data-obmeal]');
     if (!t) { if (ev.target === $('#overlay')) closeSheet(); return; }
     const d = t.dataset;
     if (d.fav) { ev.preventDefault(); ev.stopPropagation(); const i = S.favorites.indexOf(d.fav); if (i >= 0) S.favorites.splice(i, 1); else S.favorites.push(d.fav); save(); toast(i >= 0 ? 'Aus Favoriten entfernt' : 'Zu Favoriten hinzugefügt ❤️'); if ($('#sheet [data-choose]')) { t.classList.toggle('on'); refresh(); return; } if ($('#overlay').classList.contains('open') && detail.id === d.fav) renderRecipeSheet(); refresh(); return; }
@@ -966,6 +1039,15 @@
     if (d.diet) { S.diet[d.diet] = !S.diet[d.diet]; save(); renderSettings(); toast(Core.DIETS[d.diet].n + (S.diet[d.diet] ? ' aktiviert' : ' deaktiviert')); return; }
     if (d.excl) { const i = S.exclude.indexOf(d.excl); if (i >= 0) S.exclude.splice(i, 1); else S.exclude.push(d.excl); save(); renderSettings(); return; }
     if (d.sstyle) { const i = S.styles.indexOf(d.sstyle); if (i >= 0) S.styles.splice(i, 1); else { if (S.styles.length >= 3) S.styles.shift(); S.styles.push(d.sstyle); } save(); renderSettings(); return; }
+    if (d.pg || d.pgall) {
+      ev.stopPropagation();
+      const toggleG = g => { const i = S.noProtein.indexOf(g); if (i >= 0) S.noProtein.splice(i, 1); else S.noProtein.push(g); };
+      if (d.pg) toggleG(d.pg);
+      else { const ids = Object.keys(PROTEIN_GROUPS[d.pgall].items), allOn = ids.every(g => S.noProtein.indexOf(g) < 0); S.noProtein = S.noProtein.filter(g => ids.indexOf(g) < 0); if (allOn) S.noProtein.push(...ids); }
+      save();
+      const scope = t.closest('[data-pgscope]'); if (scope && scope.dataset.pgscope === 'wizard') planWizard(!!$('#wizKeep')); else renderSettings();
+      return;
+    }
     if (d.profile) { if (d.profile !== profiles.active) switchProfile(d.profile); return; }
     if (d.obhh) { S.household[d.obhh] = Math.max(0, Math.min(12, (S.household[d.obhh] || 0) + +d.d)); if (persons() === 0) S.household.erwachsen = 1; onboarding(); return; }
     if (d.obdiet) { S.diet[d.obdiet] = !S.diet[d.obdiet]; onboarding(); return; }
@@ -984,10 +1066,12 @@
     const p = plan();
     switch (a) {
       case 'close': closeSheet(); break;
-      case 'generate': generateWeek(false); renderPlan(); toast('Wochenplan erstellt ✓'); break;
-      case 'regen': generateWeek(true); renderPlan(); toast('Neu gemischt – fixierte Gerichte bleiben'); break;
+      case 'generate': planWizard(false); break;
+      case 'regen': planWizard(true); break;
+      case 'wizgo': { const keep = !!$('#wizKeep') && $('#wizKeep').classList.contains('on'); save(); generateWeek(keep); closeSheet(); location.hash = '#plan'; renderPlan(); const n = Object.keys(plan().slots).length; toast(n ? 'Wochenplan erstellt ✓ (' + n + ' Gerichte)' : 'Keine passenden Gerichte – Auswahl lockern'); break; }
+      case 'wizkeep': t.classList.toggle('on'); break;
       case 'regen-go': generateWeek(true); location.hash = '#plan'; toast('Neuer Plan erstellt ✓'); break;
-      case 'clearweek': if (confirm('Alle Gerichte dieser Woche entfernen?')) { S.plans[wk()] = { slots: {}, shop: {} }; save(); renderPlan(); } break;
+      case 'clearweek': if (confirm('Alle Gerichte dieser Woche entfernen?')) { S.plans[wk()] = { slots: {}, shop: {} }; save(); renderPlan(); planWizard(false); } break;
       case 'wprev': weekStart = addDays(weekStart, -7); renderPlan(); break;
       case 'wnext': weekStart = addDays(weekStart, 7); renderPlan(); break;
       case 'togglediet': ev.preventDefault(); RF.dietOnly = !RF.dietOnly; renderRecipes(); break;

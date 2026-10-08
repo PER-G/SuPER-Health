@@ -356,3 +356,11 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .sheet .tabs { position: sticky; top: 10px; z-index: 2; margin-right: 52px; box-shadow: 0 4px 14px rgba(244,246,242,.9); }
 #slotFilter .filter-row { flex-wrap: wrap; overflow: visible; }
 .gf-badge { background: var(--accg); color: var(--acc2); font-family: var(--mono); font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 6px; }
+/* Fleisch- & Fischauswahl */
+.pg-wrap { display: grid; gap: 10px; }
+.pg-card { padding: 4px 14px 12px; }
+.pg-all { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 0; font-size: 15px; text-align: left; }
+.pg-cb { width: 24px; height: 24px; border-radius: 8px; border: 2px solid var(--bdr2); display: grid; place-items: center; color: transparent; flex-shrink: 0; }
+.pg-cb.on { background: var(--lime); border-color: var(--lime); color: #fff; }
+.pg-cb.part { background: var(--lime-g); border-color: var(--lime); color: var(--lime-d); }
+.pg-items { display: flex; flex-wrap: wrap; gap: 8px; }
