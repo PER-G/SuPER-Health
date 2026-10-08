@@ -214,7 +214,7 @@
       '<button class="icon-btn" data-act="dnext" title="1 Tag weiter" aria-label="1 Tag weiter">' + ic('right') + '</button><button class="icon-btn" data-act="wnext" title="7 Tage weiter" aria-label="7 Tage weiter">»</button></div>' +
       '<div class="filter-row" style="justify-content:center;flex-wrap:wrap;margin-top:6px">' + chip(t, 'Ab heute', 'thisweek') + chip(tom, 'Ab morgen', 'fromtomorrow') + chip(mon, 'Ab Montag ' + mon.getDate() + '.' + (mon.getMonth() + 1) + '. (ganze Woche)', 'nextmonday') + '</div>';
   }
-  function shiftRange(days, abs) { weekStart = abs ? startOfDay(abs) : addDays(weekStart, days); if ($('#wzcount')) planWizard(!!$('#wizKeep')); renderPlan(); }
+  function shiftRange(days, abs) { weekStart = abs ? startOfDay(abs) : addDays(weekStart, days); if ($('#wzcount')) planWizard(!!$('#wizKeep')); if (current === 'einkauf') renderShop(); else renderPlan(); }
   function shopKeyOf(off, key) { return keyOf(addDays(weekStart, off)) + '|' + key; }
   // plan() liefert eine Sicht auf das aktuelle Fenster; Lesen/Schreiben geht direkt in den Datums-Kalender S.cal
   function plan() {
@@ -958,7 +958,7 @@
     const done = trips.reduce((s, t) => s + t.buyItems.filter(i => p.shop[shopKeyOf(t.day, i.key)]).length, 0);
     const bon = all.reduce((s, i) => s + i.costBuy, 0), used = all.reduce((s, i) => s + i.costUsed, 0);
     const mk = MARKETS[S.market] || MARKETS.kaufland;
-    let h = '<div class="page-head"><div class="eyebrow">' + mk.n + ' · ' + r1(servings()) + ' Portionen pro Gericht</div><h1>Einkaufsplan</h1></div>';
+    let h = '<div class="page-head"><div class="eyebrow">' + mk.n + ' · ' + r1(servings()) + ' Portionen pro Gericht</div><h1>Einkaufsplan</h1></div>' + rangeNavHtml();
     if (!trips.length) { $('#pg-einkauf').innerHTML = h + '<div class="card empty"><div class="big">🛒</div>Erstelle zuerst einen Wochenplan – die Einkäufe werden automatisch geplant.<div style="margin-top:16px"><a class="btn btn-lime" href="#plan">Zum Plan</a></div></div>'; return; }
     h += '<div class="stats"><div class="card stat"><div class="eyebrow">Erledigt</div><div class="v">' + done + ' <small>/ ' + all.length + '</small></div><div class="bar"><i style="width:' + (all.length ? done / all.length * 100 : 0) + '%"></i></div></div>' +
       '<div class="card stat"><div class="eyebrow">Kassenbon ca.</div><div class="v">' + eur(bon) + '</div><div class="muted" style="font-size:12px;margin-top:6px">davon verkocht ' + eur(used) + ' – der Rest bleibt im Vorrat</div></div></div>';
