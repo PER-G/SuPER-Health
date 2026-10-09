@@ -690,10 +690,13 @@
       '<button class="icon-btn ' + (fav ? 'on' : '') + '" data-fav="' + r.id + '" aria-label="Favorit" style="' + (fav ? 'color:#D9365E' : '') + '">' + ic('heart') + '</button></div>' +
       '<div class="r-meta">' + (S.diet.gf ? '<span class="chip diet">🌾 ' + (r._diet.gf === 2 ? 'Von Natur aus glutenfrei' : 'Glutenfrei angepasst') + '</span>' : '') + chipsFor(r, 4) + '<span class="chip ghost">' + ic('clock') + ' ' + r.t + ' Min.</span><span class="chip ghost">' + ['', 'Einfach', 'Mittel', 'Anspruchsvoll'][r.d] + '</span><span class="chip ghost">' + eur(costFor(r) / servings()) + ' / Portion</span></div>';
     const chk = S.diet.gf ? a.items.filter(it => GF_CHECK.has(it.key)).map(it => it.ing.n) : [];
-    if (chk.length) h += '<div class="diet-row" style="background:var(--orag);border-color:transparent;margin-bottom:8px">🌾 <span><b>Glutenfrei-Check:</b> bei ' + esc(chk.join(', ')) + ' auf „glutenfrei“ bzw. die durchgestrichene Ähre achten.</span></div>';
-    if (a.swaps.length) h += '<div class="diet-row" style="background:var(--accg);border-color:transparent">✨ <span><b>Automatisch angepasst</b> für ' + Object.keys(S.diet).filter(d => S.diet[d]).map(d => Core.DIETS[d].n).join(', ') + ': ' + a.swaps.map(s => esc(s.from) + ' → ' + esc(s.to)).join(' · ') + '</span></div>';
-    if (!a.ok) h += '<div class="diet-row" style="background:var(--orag);border-color:transparent">⚠️ <span>Nicht passend für deine Ernährung: ' + esc(a.blockers.join(', ')) + '</span></div>';
-    h += '<div class="tabs">' + [['naehr', 'Nährwerte'], ['zutaten', 'Zutaten'], ['zubereitung', 'Zubereitung'], ['familie', 'Baby & Kind']].map(t => '<button class="' + (detail.tab === t[0] ? 'on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>').join('') + '</div>';
+    const sumParts = [];
+    if (!a.ok) sumParts.push('⚠️ nicht passend');
+    if (a.swaps.length) sumParts.push('✨ ' + a.swaps.length + ' Zutat' + (a.swaps.length > 1 ? 'en' : '') + ' angepasst');
+    if (chk.length) sumParts.push('🌾 ' + chk.length + ' Hinweis' + (chk.length > 1 ? 'e' : ''));
+    if (alls.length) sumParts.push('Allergene: ' + alls.map(x => ALLERGENS[x]).join(', '));
+    if (sumParts.length) h += '<button class="diet-sum' + (!a.ok ? ' bad' : '') + '" data-tab="allergene">' + esc(sumParts.join(' · ')) + ' <b>Details ›</b></button>';
+    h += '<div class="tabs">' + [['naehr', 'Nährwerte'], ['zutaten', 'Zutaten'], ['zubereitung', 'Anleitung'], ['familie', 'Baby & Kind'], ['allergene', 'Allergene']].map(t => '<button class="' + (detail.tab === t[0] ? 'on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>').join('') + '</div>';
 
     if (detail.tab === 'naehr') {
       h += '<div class="portion-sw">' + Object.keys(MEMBER_TYPES).map(t => '<button class="' + (detail.portion === t ? 'on' : '') + '" data-portion="' + t + '">' + MEMBER_TYPES[t].e + ' ' + MEMBER_TYPES[t].n + '</button>').join('') + '</div>';
@@ -702,9 +705,7 @@
         [['Protein', n.p, 'p', 60 * pf], ['Kohlenhydrate', n.c, 'c', 100 * pf], ['Fett', n.f, 'f', 40 * pf]].map(m => '<div class="mrow"><span>' + m[0] + '</span><span class="mb"><i class="dot-' + m[2] + '" style="width:' + Math.min(100, m[1] / m[3] * 100) + '%"></i></span><span class="val">' + r1(m[1]) + ' g</span></div>').join('') +
         '</div></div><div class="micro"><div><b>' + r1(n.fi) + 'g</b><span>Ballaststoffe</span></div><div><b>' + r1(n.su) + 'g</b><span>Zucker</span></div><div><b>' + r1(n.sa) + 'g</b><span>Salz</span></div><div><b>' + r0(pk) + '%</b><span>kcal aus Protein</span></div></div>' +
         '<p class="muted" style="font-size:12px;margin-top:12px">Pro Portion „' + MEMBER_TYPES[detail.portion].n + '“ (' + r0(n.g) + ' g Zutaten). ' + (detail.portion === 'erwachsen' ? 'Das sind ' + r0(n.k / S.goals.k * 100) + ' % deines Kalorien- und ' + r0(n.p / S.goals.p * 100) + ' % deines Proteinziels.' : 'Richtwert – Kinder essen nach Hunger.') + ' Berechnet aus der Zutaten-Datenbank (BLS/USDA-Richtwerte).</p></div>';
-      h += '<div class="section-t" style="margin-top:20px"><h2 style="font-size:18px">Ernährungsformen</h2></div><div class="diet-box">' +
-        ['gf', 'lf', 'fm', 'veg'].map(d => '<div class="diet-row"><span>' + Core.DIETS[d].n + '</span><span class="st st-' + ds[d] + '">' + ['✕ nicht möglich', '✓ mit Austausch', '✓ von Natur aus'][ds[d]] + '</span></div>').join('') + '</div>';
-      if (alls.length) h += '<p class="muted" style="font-size:13px">Allergene: ' + alls.map(x => ALLERGENS[x]).join(', ') + '</p>';
+
     }
     if (detail.tab === 'zutaten') {
       h += '<div class="card" style="padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px"><div><b>Portionen</b><div class="muted" style="font-size:12.5px">Haushalt = ' + r1(servings()) + ' Erwachsenen-Portionen</div></div><div class="stepper sm"><button data-serv="-0.5">−</button><b>' + r1(serv) + '</b><button data-serv="0.5">+</button></div></div>';
@@ -722,6 +723,18 @@
         h += '<ol class="steps">' + r.s.map(s => '<li><span>' + esc(s) + '</span></li>').join('') + '</ol>';
         h += '<div class="plan-actions" style="justify-content:flex-start"><a class="btn btn-sec btn-sm" href="' + cookidooUrl(r) + '" target="_blank" rel="noopener">' + ic('search') + 'Ähnliche Thermomix-Rezepte auf Cookidoo</a></div>';
       }
+    }
+    if (detail.tab === 'allergene') {
+      const sec = (open, title, body) => '<details class="acc"' + (open ? ' open' : '') + '><summary>' + title + '</summary><div class="acc-b">' + body + '</div></details>';
+      const active = Object.keys(S.diet).filter(d => S.diet[d]).map(d => Core.DIETS[d].n);
+      if (!a.ok) h += sec(true, '⚠️ Nicht passend für deine Ernährung', '<ul class="acc-list">' + a.blockers.map(b => '<li>' + esc(b) + '</li>').join('') + '</ul>');
+      if (chk.length) h += sec(true, '🌾 Glutenfrei-Check (' + chk.length + ')', '<p>Bei diesen Zutaten auf „glutenfrei“ bzw. die durchgestrichene Ähre achten:</p><ul class="acc-list">' + chk.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>');
+      if (a.swaps.length) h += sec(true, '✨ Automatisch angepasst (' + a.swaps.length + ')', '<p class="muted" style="font-size:12.5px">Für ' + esc(active.join(', ')) + ':</p><ul class="acc-list sw-list">' + a.swaps.map(x => '<li><span class="muted">' + esc(x.from) + '</span> → <b>' + esc(x.to) + '</b></li>').join('') + '</ul>');
+      h += sec(true, '🧾 Allergene', alls.length ? '<div class="filter-row" style="flex-wrap:wrap">' + alls.map(x => '<span class="chip warn">' + ALLERGENS[x] + '</span>').join('') + '</div><p class="muted" style="font-size:12px;margin-top:6px">Nach Anpassung an deine Ernährung. Angaben ohne Gewähr – bei Allergien immer Etiketten prüfen.</p>' : '<p>Keine der 14 Hauptallergene in den Zutaten erkannt.</p>');
+      // FODMAP-Details: Grenzen pro Portion (Monash-Richtwerte)
+      const fmRows = a.items.filter(it => it.ing.fm !== undefined).map(it => { const lim = it.ing.fm, over = it.g > lim; return '<li><span>' + esc(it.ing.n) + '</span><span class="' + (over ? 'st-0' : 'st-2') + '" style="font-weight:700;white-space:nowrap">' + r0(it.g) + ' g ' + (lim === 0 ? '· reich an FODMAPs' : (over ? '> ' : '≤ ') + lim + ' g') + '</span></li>'; });
+      h += sec(S.diet.fm, '🌿 FODMAP-Details', (fmRows.length ? '<ul class="acc-list fm">' + fmRows.join('') + '</ul>' : '<p>Alle Zutaten gelten in dieser Menge als FODMAP-arm.</p>') + '<p class="muted" style="font-size:12px;margin-top:6px">Mengen pro Erwachsenen-Portion · Grenze = Menge, die laut Monash noch als FODMAP-arm gilt.' + (S.diet.fm ? '' : ' Aktiviere „FODMAP-arm“ in den Einstellungen, dann wird automatisch getauscht.') + '</p>');
+      h += sec(false, '🥗 Ernährungsformen', '<div class="diet-box" style="margin:0">' + ['gf', 'lf', 'fm', 'veg'].map(d => '<div class="diet-row"><span>' + Core.DIETS[d].n + '</span><span class="st st-' + ds[d] + '">' + ['✕ nicht möglich', '✓ mit Austausch', '✓ von Natur aus'][ds[d]] + '</span></div>').join('') + '</div>');
     }
     if (detail.tab === 'familie') {
       h += '<div class="kid-box"><h3>👶 Für Baby & Kleinkind</h3><p>' + esc(r.kid) + '</p>' +
