@@ -1,6 +1,6 @@
 // SuPER Küche – Offline-Cache (App-Shell + Rezeptbilder bei Bedarf)
-const V = 'sk-mv19ss80';
-const SHELL = ['./', 'index.html', 'css/app.css', 'js/ingredients.js', 'js/core.js', 'js/packs.js', 'js/recipes/fruehstueck.js', 'js/recipes/mediterran.js', 'js/recipes/asiatisch.js', 'js/recipes/familie.js', 'js/recipes/z-extra.js', 'js/recipes/protein.js', 'js/recipes/dessert-quark.js', 'js/recipes/dessert-backen.js', 'js/recipes/snacks.js', 'js/recipes/fruehstueck2.js', 'js/recipes/gefluegel.js', 'js/recipes/fleisch.js', 'js/recipes/fisch.js', 'js/recipes/veggie.js', 'js/image-credits.js', 'js/app.js', 'img/icon.svg', 'manifest.webmanifest'];
+const V = 'sk-mv1b280b';
+const SHELL = ['./', 'index.html', 'css/app.css', 'js/ingredients.js', 'js/core.js', 'js/packs.js', 'js/recipes/fruehstueck.js', 'js/recipes/mediterran.js', 'js/recipes/asiatisch.js', 'js/recipes/familie.js', 'js/recipes/z-extra.js', 'js/recipes/protein.js', 'js/recipes/dessert-quark.js', 'js/recipes/dessert-backen.js', 'js/recipes/snacks.js', 'js/recipes/fruehstueck2.js', 'js/recipes/gefluegel.js', 'js/recipes/fleisch.js', 'js/recipes/fisch.js', 'js/recipes/veggie.js', 'js/dk/teil-1.js', 'js/dk/teil-2.js', 'js/dk/teil-3.js', 'js/image-credits.js', 'js/app.js', 'img/icon.svg', 'manifest.webmanifest'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', e => {

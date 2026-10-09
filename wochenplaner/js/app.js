@@ -103,6 +103,7 @@
     r._styles = Core.styles(r, r._n);
     r._all = Core.allergens(base.items);
     r._img = 'img/recipes/' + r.id + '.jpg';
+    r.dk = (typeof DK !== 'undefined' && DK[r.id]) || null; // Schnellkochtopf-Anleitung (js/dk/*.js)
     r._search = (r.n + ' ' + r.cu + ' ' + r.i.map(x => (ING[x[0]] || {}).n).join(' ')).toLowerCase();
     R[r.id] = r;
   }
@@ -129,6 +130,7 @@
     shopDays: [0, 3],
     thermomix: false,
     proteinBrand: '',
+    dampfdruck: false,
     noProtein: [],
     noCuisine: [],
     cal: {},
@@ -542,7 +544,7 @@
       '<button class="fav ' + (fav ? 'on' : '') + '" data-fav="' + r.id + '" aria-label="Favorit">' + ic('heart') + '</button>' +
       '<span class="kc">' + r0(n.k) + ' kcal · ' + r0(n.p) + ' g P</span></div>' +
       '<div class="b"><h3>' + esc(r.n) + '</h3><div class="chips">' + chipsFor(r, 2) + '</div>' +
-      '<div class="meta"><span>' + ic('clock') + r.t + 'm</span><span class="sep"></span><span>' + eur(costFor(r) / servings()) + '/P.</span>' + (r.baby >= 2 ? '<span class="sep"></span><span title="Baby-geeignet">👶</span>' : '') + (S.thermomix && r.tm && r.tm.fit === 2 ? '<span class="sep"></span><span class="tm-badge" title="Komplett im Thermomix">TM</span>' : '') + (S.diet.gf ? '<span class="sep"></span><span class="gf-badge" title="' + (r._diet.gf === 2 ? 'Von Natur aus glutenfrei' : 'Glutenfrei mit Austauschprodukt') + '">' + (r._diet.gf === 2 ? 'GF' : 'GF*') + '</span>' : '') + '</div></div></article>';
+      '<div class="meta"><span>' + ic('clock') + r.t + 'm</span><span class="sep"></span><span>' + eur(costFor(r) / servings()) + '/P.</span>' + (r.baby >= 2 ? '<span class="sep"></span><span title="Baby-geeignet">👶</span>' : '') + (S.thermomix && r.tm && r.tm.fit === 2 ? '<span class="sep"></span><span class="tm-badge" title="Komplett im Thermomix">TM</span>' : '') + (S.dampfdruck && r.dk ? '<span class="sep"></span><span title="Schnellkochtopf: ' + r.dk.t + ' Min.">♨️</span>' : '') + (S.diet.gf ? '<span class="sep"></span><span class="gf-badge" title="' + (r._diet.gf === 2 ? 'Von Natur aus glutenfrei' : 'Glutenfrei mit Austauschprodukt') + '">' + (r._diet.gf === 2 ? 'GF' : 'GF*') + '</span>' : '') + '</div></div></article>';
   }
 
   /* ================= Seite: Plan ================= */
@@ -600,7 +602,7 @@
   }
 
   /* ================= Seite: Rezepte ================= */
-  const RF = { q: '', meal: '', style: '', cu: '', fav: false, baby: false, tm: false, dt: [], dietOnly: true, limit: 48 };
+  const RF = { q: '', meal: '', style: '', cu: '', fav: false, baby: false, tm: false, dk: false, dt: [], dietOnly: true, limit: 48 };
   function filteredRecipes() {
     const q = RF.q.trim().toLowerCase();
     return RECIPES.filter(r => {
@@ -611,6 +613,7 @@
       if (RF.fav && S.favorites.indexOf(r.id) < 0) return false;
       if (RF.baby && r.baby < 2) return false;
       if (RF.tm && !(r.tm && r.tm.fit >= 2)) return false;
+      if (RF.dk && !r.dk) return false;
       for (const dd of RF.dt) if (!S.diet[dd] && r._diet[dd] !== 2) return false;
       if (RF.dietOnly && !eligible(r)) return false;
       return true;
@@ -618,11 +621,11 @@
   }
   let lastRF = '';
   function renderRecipes() {
-    const sig = JSON.stringify([RF.q, RF.meal, RF.style, RF.cu, RF.fav, RF.baby, RF.tm, RF.dt, RF.dietOnly]); if (sig !== lastRF) { RF.limit = 48; lastRF = sig; }
+    const sig = JSON.stringify([RF.q, RF.meal, RF.style, RF.cu, RF.fav, RF.baby, RF.tm, RF.dk, RF.dt, RF.dietOnly]); if (sig !== lastRF) { RF.limit = 48; lastRF = sig; }
     const activeDiets = Object.keys(S.diet).filter(d => S.diet[d]).map(d => Core.DIETS[d].n);
     let html = '<div class="page-head"><div class="eyebrow">' + RECIPES.length + ' Familienrezepte</div><h1>Gerichte</h1></div>' +
       '<div class="search">' + ic('search') + '<input class="input" id="rq" placeholder="Gerichte oder Zutaten suchen" value="' + esc(RF.q) + '" autocomplete="off"></div>';
-    const browsing = !RF.q && !RF.meal && !RF.style && !RF.cu && !RF.fav && !RF.baby && !RF.tm && !RF.dt.length;
+    const browsing = !RF.q && !RF.meal && !RF.style && !RF.cu && !RF.fav && !RF.baby && !RF.tm && !RF.dk && !RF.dt.length;
     if (browsing) {
       html += '<div class="section-t"><h2>Deine Stile</h2><a class="link" href="#einstellungen">Anpassen ' + ic('right') + '</a></div><div class="styles-grid">' +
         Object.keys(STYLES).map(s => '<button class="style-card ' + (S.styles.indexOf(s) >= 0 ? 'on' : '') + '" data-style="' + s + '"><span class="e">' + STYLES[s].e + '</span>' + STYLES[s].n + '</button>').join('') + '</div>';
@@ -638,7 +641,7 @@
     }
     html += '<div class="filter-row">' +
       ['', ...MEAL_ORDER].map(m => '<button class="fchip ' + (RF.meal === m ? 'on' : '') + '" data-fmeal="' + m + '">' + (m ? MEALS[m].e + ' ' + MEALS[m].n : 'Alle') + '</button>').join('') +
-      '<button class="fchip ' + (RF.fav ? 'on' : '') + '" data-ffav>❤️ Favoriten</button><button class="fchip ' + (RF.baby ? 'on' : '') + '" data-fbaby>👶 Baby-tauglich</button><button class="fchip ' + (RF.tm ? 'on' : '') + '" data-ftm>⚙️ Thermomix</button>' +
+      '<button class="fchip ' + (RF.fav ? 'on' : '') + '" data-ffav>❤️ Favoriten</button><button class="fchip ' + (RF.baby ? 'on' : '') + '" data-fbaby>👶 Baby-tauglich</button><button class="fchip ' + (RF.tm ? 'on' : '') + '" data-ftm>⚙️ Thermomix</button><button class="fchip ' + (RF.dk ? 'on' : '') + '" data-fdk>♨️ Schnellkochtopf</button>' +
       Object.keys(QF_DIETS).filter(dd => !S.diet[dd]).map(dd => '<button class="fchip ' + (RF.dt.indexOf(dd) >= 0 ? 'on' : '') + '" data-fdiet="' + dd + '">' + (dd === 'veg' ? '🥦 ' : '🌾 ') + QF_DIETS[dd] + '</button>').join('') +
       (RF.style ? '<button class="fchip on" data-fstyle-clear>' + STYLES[RF.style].e + ' ' + STYLES[RF.style].n + ' ✕</button>' : '') +
       (RF.cu ? '<button class="fchip on" data-fcu-clear>' + CUISINES[RF.cu].n + ' ✕</button>' : '') + '</div>';
@@ -654,7 +657,7 @@
   /* ================= Rezept-Detail ================= */
   let detail = { id: null, tab: 'naehr', portion: 'erwachsen', serv: null, cook: 'klassisch' };
   function openRecipe(id) {
-    detail = { id, tab: 'naehr', portion: 'erwachsen', serv: null, cook: S.thermomix && R[id] && R[id].tm ? 'tm' : 'klassisch' };
+    detail = { id, tab: 'naehr', portion: 'erwachsen', serv: null, cook: S.thermomix && R[id] && R[id].tm ? 'tm' : S.dampfdruck && R[id] && R[id].dk ? 'dk' : 'klassisch' };
     renderRecipeSheet();
     if (location.hash !== '#rezept/' + id) history.replaceState(null, '', '#rezept/' + id);
   }
@@ -688,7 +691,7 @@
       (cred ? '<div class="credit">Foto: ' + esc(cred.artist || 'Wikimedia Commons') + ' · <a href="' + esc(cred.page) + '" target="_blank" rel="noopener">' + esc(cred.license || 'Lizenz') + '</a> · Symbolbild</div>' : '') +
       '<div class="sheet-pad"><div class="r-title"><div><div class="eyebrow">' + (CUISINES[r.cu] || {}).n + ' · ' + r.m.map(m => MEALS[m].n).join(' / ') + '</div><h2 style="margin-top:4px">' + esc(r.n) + '</h2></div>' +
       '<button class="icon-btn ' + (fav ? 'on' : '') + '" data-fav="' + r.id + '" aria-label="Favorit" style="' + (fav ? 'color:#D9365E' : '') + '">' + ic('heart') + '</button></div>' +
-      '<div class="r-meta">' + (S.diet.gf ? '<span class="chip diet">🌾 ' + (r._diet.gf === 2 ? 'Von Natur aus glutenfrei' : 'Glutenfrei angepasst') + '</span>' : '') + chipsFor(r, 4) + '<span class="chip ghost">' + ic('clock') + ' ' + r.t + ' Min.</span><span class="chip ghost">' + ['', 'Einfach', 'Mittel', 'Anspruchsvoll'][r.d] + '</span><span class="chip ghost">' + eur(costFor(r) / servings()) + ' / Portion</span></div>';
+      '<div class="r-meta">' + (S.diet.gf ? '<span class="chip diet">🌾 ' + (r._diet.gf === 2 ? 'Von Natur aus glutenfrei' : 'Glutenfrei angepasst') + '</span>' : '') + chipsFor(r, 4) + '<span class="chip ghost">' + ic('clock') + ' ' + r.t + ' Min.</span>' + (r.dk ? '<span class="chip dk" data-act="showdk" title="Schnellkochtopf-Anleitung">♨️ ' + r.dk.t + ' Min.</span>' : '') + '<span class="chip ghost">' + ['', 'Einfach', 'Mittel', 'Anspruchsvoll'][r.d] + '</span><span class="chip ghost">' + eur(costFor(r) / servings()) + ' / Portion</span></div>';
     const chk = S.diet.gf ? a.items.filter(it => GF_CHECK.has(it.key)).map(it => it.ing.n) : [];
     const sumParts = [];
     if (!a.ok) sumParts.push('⚠️ nicht passend');
@@ -713,8 +716,16 @@
       h += '<p class="muted" style="font-size:12.5px;margin-top:10px">Geschätzte Kosten: ' + eur(Core.nutrition(a.items, serv).cost * marketF()) + ' bei ' + (MARKETS[S.market] || {}).n + '.</p>';
     }
     if (detail.tab === 'zubereitung') {
-      if (r.tm) h += '<div class="portion-sw"><button class="' + (detail.cook === 'klassisch' ? 'on' : '') + '" data-cook="klassisch">🍳 Klassisch</button><button class="' + (detail.cook === 'tm' ? 'on' : '') + '" data-cook="tm">⚙️ Thermomix TM6 / TM7</button></div>';
-      if (detail.cook === 'tm' && r.tm) {
+      const modes = [['klassisch', '🍳 Klassisch']].concat(r.tm ? [['tm', '⚙️ Thermomix']] : [], r.dk ? [['dk', '♨️ Schnellkochtopf']] : []);
+      if (modes.length > 1) h += '<div class="portion-sw">' + modes.map(m => '<button class="' + (detail.cook === m[0] ? 'on' : '') + '" data-cook="' + m[0] + '">' + m[1] + '</button>').join('') + '</div>';
+      if (detail.cook === 'dk' && r.dk) {
+        const dk = r.dk, saved = Math.max(0, r.t - dk.t);
+        const ringTxt = { '1': '◉ 1. Ring · Schonstufe', '2': '◉◉ 2. Ring · Schnellstufe' };
+        const relTxt = { 'natürlich': '💨 Druck natürlich abbauen (Herd aus, 10–15 Min.)', 'schnell': '💨 Schnell abdampfen (Ventil)', 'kaltes Wasser': '💧 Unter kaltem Wasser abkühlen' };
+        h += '<div class="diet-row" style="margin-bottom:10px;background:var(--accg);border-color:transparent">♨️ <span><b>ca. ' + dk.t + ' Min. statt ' + r.t + ' Min.</b>' + (saved ? ' – ' + saved + ' Min. schneller' : '') + (dk.fit === 1 ? ' · teilweise im Schnellkochtopf' : '') + (dk.note ? '<br><span class="muted" style="font-size:12.5px">' + esc(dk.note) + '</span>' : '') + '</span></div>';
+        h += '<ol class="steps dk-steps">' + dk.steps.map(st => '<li><span>' + esc(st[0]) + (st[1] || st[2] || st[3] ? '<span class="dk-set">' + (st[1] ? '<b class="dkring r' + st[1] + '">' + ringTxt[st[1]] + '</b>' : '') + (st[2] ? '<b>⏱ ' + esc(st[2]) + (st[1] ? ' ab Ring' : '') + '</b>' : '') + (st[3] ? '<b class="rel">' + (relTxt[st[3]] || esc(st[3])) + '</b>' : '') + '</span>' : '') + '</span></li>').join('') + '</ol>';
+        h += '<details class="acc" style="margin-top:12px"><summary>ℹ️ So funktionieren die Ringe</summary><div class="acc-b"><p><b>1. Ring (Schonstufe, ca. 109 °C):</b> Gemüse, Fisch, Reis, Kartoffelstücke.</p><p style="margin-top:6px"><b>2. Ring (Schnellstufe, ca. 117 °C):</b> Fleisch, Hülsenfrüchte, Brühen, ganze Kartoffeln.</p><p style="margin-top:6px">Auf hoher Stufe erhitzen, bis der Ring erscheint – dann Hitze zurückschalten, sodass der Ring gerade sichtbar bleibt. <b>Die Garzeit zählt ab Erreichen des Rings.</b> Immer mind. 250 ml Flüssigkeit, max. 2/3 füllen (Hülsenfrüchte & Suppen max. 1/2). Sahne, Milch & Stärke erst nach dem Druckgaren einrühren.</p><p class="muted" style="margin-top:6px;font-size:12px">Richtwerte für übliche Schnellkochtöpfe (z. B. Fissler, WMF, Silit) – Anleitung deines Topfes beachten.</p></div></details>';
+      } else if (detail.cook === 'tm' && r.tm) {
         h += '<div class="diet-row" style="margin-bottom:10px;background:' + (r.tm.fit === 2 ? 'var(--accg)' : 'var(--orag)') + ';border-color:transparent">' + (r.tm.fit === 2 ? '✓ Komplett im Thermomix' : r.tm.fit === 1 ? '◐ Teilweise im Thermomix' : '○ Thermomix nur für Teilschritte') + (r.tm.note ? ' · ' + esc(r.tm.note) : '') + '</div>';
         h += '<ol class="steps tm-steps">' + r.tm.steps.map(st => '<li><span>' + esc(st[0]) + (st[1] || st[2] || st[3] || st[4] ? '<span class="tm-set">' + [st[1] ? '⏱ ' + esc(st[1]) : '', st[2] ? '🌡 ' + esc(st[2]) : '', st[4] === 'Linkslauf' ? '↺ Linkslauf' : st[4] ? '◆ ' + esc(st[4]) : '', st[3] ? '⚙ ' + esc(st[3]) : ''].filter(Boolean).map(x => '<b>' + x + '</b>').join('') + '</span>' : '') + '</span></li>').join('') + '</ol>';
         h += '<div class="plan-actions" style="justify-content:flex-start"><button class="btn btn-sec btn-sm" data-act="cookidoo">' + ic('copy') + 'Für Cookidoo kopieren</button><a class="btn btn-sec btn-sm" href="' + cookidooUrl(r) + '" target="_blank" rel="noopener">' + ic('search') + 'Ähnliche Rezepte auf Cookidoo</a></div>' +
@@ -778,7 +789,7 @@
   /* ---------- Schnellfilter (Gericht hinzufügen & Rezepte-Seite) ---------- */
   const QF_STYLES = ['protein', 'leicht', 'dessert', 'schnell', 'familie', 'comfort', 'mealprep'];
   const QF_DIETS = { gf: 'Glutenfrei', lf: 'Laktosefrei', fm: 'FODMAP-arm', veg: 'Vegetarisch' };
-  function newFilter() { return { q: '', st: [], dt: [], pg: [], tm: false, fav: false, sort: 'protein' }; }
+  function newFilter() { return { q: '', st: [], dt: [], pg: [], tm: false, dk: false, fav: false, sort: 'protein' }; }
   /* Diät-Filter: ist die Ernährungsform in den Einstellungen aktiv, sind alle passenden Gerichte schon angepasst.
    * Sonst zeigt der Filter nur Gerichte, die von Natur aus passen (ohne Austausch). */
   function matchF(r, F) {
@@ -786,6 +797,7 @@
     for (const st of F.st) if (r._styles.indexOf(st) < 0) return false;
     for (const d of F.dt) if (!S.diet[d] && r._diet[d] !== 2) return false;
     if (F.tm && !(r.tm && r.tm.fit >= 2)) return false;
+    if (F.dk && !r.dk) return false;
     if (F.fav && S.favorites.indexOf(r.id) < 0) return false;
     // Sorten-Filter: Gericht muss mindestens eine der gewählten Fleisch-/Fischsorten enthalten
     if (F.pg && F.pg.length && !adapted(r).items.some(it => (PG_KEY[it.key] || []).some(g => F.pg.indexOf(g) >= 0))) return false;
@@ -800,7 +812,7 @@
     return (withSearch ? '<div class="search" style="margin-bottom:10px">' + ic('search') + '<input class="input" data-qfq placeholder="Gericht oder Zutat suchen" value="' + esc(F.q) + '" autocomplete="off"></div>' : '') +
       '<div class="filter-row">' + QF_STYLES.map(s => chip(F.st.indexOf(s) >= 0, 'data-qf="st:' + s + '"', STYLES[s].e + ' ' + STYLES[s].n.replace(' (≤ 20 Min.)', ''))).join('') + '</div>' +
       '<div class="filter-row">' + Object.keys(QF_DIETS).map(d => chip(F.dt.indexOf(d) >= 0 || S.diet[d], 'data-qf="dt:' + d + '"' + (S.diet[d] ? ' disabled title="In den Einstellungen aktiv"' : ''), (d === 'veg' ? '🥦 ' : '🌾 ') + QF_DIETS[d] + (S.diet[d] ? ' ✓' : ''))).join('') +
-      chip(F.tm, 'data-qf="tm"', '⚙️ Thermomix') + chip(F.fav, 'data-qf="fav"', '❤️ Favoriten') + '</div>' +
+      chip(F.tm, 'data-qf="tm"', '⚙️ Thermomix') + chip(F.dk, 'data-qf="dk"', '♨️ Schnellkochtopf') + chip(F.fav, 'data-qf="fav"', '❤️ Favoriten') + '</div>' +
       (S.diet.veg ? '' : '<div class="filter-row">' + Object.keys(PROTEIN_GROUPS).map(c => Object.keys(PROTEIN_GROUPS[c].items).filter(g => S.noProtein.indexOf(g) < 0).map(g => chip(F.pg.indexOf(g) >= 0, 'data-qf="pg:' + g + '"', PROTEIN_GROUPS[c].e + ' ' + PROTEIN_GROUPS[c].items[g].n)).join('')).join('') + '</div>') +
       (F.dt.some(d => !S.diet[d]) ? '<p class="muted" style="font-size:12px;margin:0 2px 8px">Zeigt Gerichte, die von Natur aus ' + F.dt.filter(d => !S.diet[d]).map(d => QF_DIETS[d].toLowerCase()).join(' & ') + ' sind. Aktivierst du das in den <a href="#einstellungen" style="color:var(--acc2)">Einstellungen</a>, werden weitere Gerichte automatisch angepasst.</p>' : '') +
       '<div class="filter-row" style="align-items:center"><span class="muted" style="font-size:12.5px;white-space:nowrap">Sortieren:</span>' + [['protein', 'Meiste Proteine'], ['kcal', 'Wenigste kcal'], ['zeit', 'Schnellste'], ['preis', 'Günstigste']].map(o => chip(F.sort === o[0], 'data-qf="sort:' + o[0] + '"', o[1])).join('') + '</div>';
@@ -1134,7 +1146,7 @@
     h += '<div class="set-block"><div class="field-l">Wochenbudget</div><div class="budget-v">€' + S.budget + ' <small>für ' + nd + ' Tage</small></div><input type="range" class="range" id="sbudget" min="30" max="400" step="5" value="' + S.budget + '"><div class="range-l"><span>€30</span><span>€400</span></div></div>';
     h += '<div class="set-block"><div class="field-l">Ernährung</div><div class="field-s">Rezepte werden automatisch angepasst (z. B. glutenfreie Nudeln, laktosefreier Quark, Knoblauch-Öl statt Knoblauch).</div><div class="toggles">' +
       [['gf', 'Glutenfrei', 'Zöliakie / Glutenunverträglichkeit'], ['lf', 'Laktosefrei', 'Laktoseintoleranz'], ['fm', 'FODMAP-arm', 'Reizdarm – nach Monash-Portionsgrenzen'], ['veg', 'Vegetarisch', 'Ohne Fleisch & Fisch']].map(d => '<div class="card toggle ' + (S.diet[d[0]] ? 'on' : '') + '" data-diet="' + d[0] + '"><span class="tx"><b>' + d[1] + '</b><span>' + d[2] + '</span></span><span class="sw"></span></div>').join('') + '</div></div>';
-    h += '<div class="set-block"><div class="field-l">Küchengeräte</div><div class="toggles"><div class="card toggle ' + (S.thermomix ? 'on' : '') + '" data-act="tmtoggle"><span class="tx"><b>⚙️ Ich koche mit dem Thermomix</b><span>TM6 / TM7 – Rezepte zeigen zuerst die Thermomix-Einstellungen</span></span><span class="sw"></span></div></div></div>';
+    h += '<div class="set-block"><div class="field-l">Küchengeräte</div><div class="toggles"><div class="card toggle ' + (S.thermomix ? 'on' : '') + '" data-act="tmtoggle"><span class="tx"><b>⚙️ Ich koche mit dem Thermomix</b><span>TM6 / TM7 – Rezepte zeigen zuerst die Thermomix-Einstellungen</span></span><span class="sw"></span></div><div class="card toggle ' + (S.dampfdruck ? 'on' : '') + '" data-act="dktoggle"><span class="tx"><b>♨️ Ich koche mit dem Schnellkochtopf</b><span>Dampfdrucktopf – passende Rezepte zeigen zuerst die Anleitung mit 1./2. Ring</span></span><span class="sw"></span></div></div></div>';
     h += '<div class="set-block"><div class="field-l">Proteinpulver</div><div class="field-s">Deine Lieblingsmarke ersetzt in allen Rezepten das Proteinpulver – Nährwerte & Einkauf passen sich an.</div><select class="select" id="sprot">' + Object.keys(PROTEIN_BRANDS).map(k => '<option value="' + k + '" ' + (S.proteinBrand === k ? 'selected' : '') + '>' + PROTEIN_BRANDS[k] + '</option>').join('') + '</select></div>';
     h += '<div class="set-block"><div class="field-l">Küchen</div><div class="field-s">Welche Küchen sollen vorgeschlagen werden?</div><div data-pgscope="settings">' + cuisinePickerHtml() + '</div></div>';
     h += '<div class="set-block"><div class="field-l">Fleisch & Fisch</div><div class="field-s">Abgewählte Sorten werden nicht vorgeschlagen.</div><div class="pg-wrap" data-pgscope="settings">' + proteinPickerHtml() + '</div></div>';
@@ -1234,7 +1246,7 @@
 
   /* ================= Events ================= */
   document.addEventListener('click', ev => {
-    const t = ev.target.closest('[data-act],[data-open],[data-fav],[data-swap],[data-lock],[data-del],[data-addslot],[data-go],[data-style],[data-cu],[data-fmeal],[data-ffav],[data-fbaby],[data-ftm],[data-fdiet],[data-cook],[data-fstyle-clear],[data-fcu-clear],[data-tab],[data-portion],[data-serv],[data-shop],[data-hh],[data-day],[data-meal],[data-diet],[data-excl],[data-sstyle],[data-profile],[data-rsdone],[data-rsserv],[data-exrm],[data-kx],[data-dm],[data-shopplace],[data-shopgroup],[data-pg],[data-pgall],[data-shopday],[data-pantry],[data-mode],[data-prod],[data-ob],[data-obhh],[data-obdiet],[data-obmeal]');
+    const t = ev.target.closest('[data-act],[data-open],[data-fav],[data-swap],[data-lock],[data-del],[data-addslot],[data-go],[data-style],[data-cu],[data-fmeal],[data-ffav],[data-fbaby],[data-ftm],[data-fdk],[data-fdiet],[data-cook],[data-fstyle-clear],[data-fcu-clear],[data-tab],[data-portion],[data-serv],[data-shop],[data-hh],[data-day],[data-meal],[data-diet],[data-excl],[data-sstyle],[data-profile],[data-rsdone],[data-rsserv],[data-exrm],[data-kx],[data-dm],[data-shopplace],[data-shopgroup],[data-pg],[data-pgall],[data-shopday],[data-pantry],[data-mode],[data-prod],[data-ob],[data-obhh],[data-obdiet],[data-obmeal]');
     if (!t) { if (ev.target === $('#overlay')) closeSheet(); return; }
     const d = t.dataset;
     if (d.fav) { ev.preventDefault(); ev.stopPropagation(); const i = S.favorites.indexOf(d.fav); if (i >= 0) S.favorites.splice(i, 1); else S.favorites.push(d.fav); save(); toast(i >= 0 ? 'Aus Favoriten entfernt' : 'Zu Favoriten hinzugefügt ❤️'); if ($('#sheet [data-choose]')) { t.classList.toggle('on'); refresh(); return; } if ($('#overlay').classList.contains('open') && detail.id === d.fav) renderRecipeSheet(); refresh(); return; }
@@ -1250,6 +1262,7 @@
     if ('ffav' in d) { RF.fav = !RF.fav; renderRecipes(); return; }
     if ('fbaby' in d) { RF.baby = !RF.baby; renderRecipes(); return; }
     if ('ftm' in d) { RF.tm = !RF.tm; renderRecipes(); return; }
+    if ('fdk' in d) { RF.dk = !RF.dk; renderRecipes(); return; }
     if (d.fdiet) { const i = RF.dt.indexOf(d.fdiet); if (i >= 0) RF.dt.splice(i, 1); else RF.dt.push(d.fdiet); renderRecipes(); return; }
     if (d.cook) { detail.cook = d.cook; renderRecipeSheet(); return; }
     if ('fstyleClear' in d) { RF.style = ''; renderRecipes(); return; }
@@ -1356,6 +1369,8 @@
       case 'shareshop': if (navigator.share) navigator.share({ title: 'Einkaufsliste', text: shopText() }).catch(() => { }); else copy(shopText()).then(() => toast('Kopiert – jetzt einfügen & teilen')); break;
       case 'printshop': $$('.page').forEach(x => x.classList.toggle('print-me', x.id === 'pg-einkauf')); window.print(); break;
       case 'resetshop': p.shop = {}; p.mode = {}; save(); renderShop(); break;
+      case 'dktoggle': S.dampfdruck = !S.dampfdruck; save(); renderSettings(); toast(S.dampfdruck ? 'Schnellkochtopf-Modus aktiv ♨️ (' + RECIPES.filter(r => r.dk).length + ' Rezepte)' : 'Schnellkochtopf-Modus aus'); break;
+      case 'showdk': detail.tab = 'zubereitung'; detail.cook = 'dk'; renderRecipeSheet(); break;
       case 'tmtoggle': S.thermomix = !S.thermomix; save(); renderSettings(); toast(S.thermomix ? 'Thermomix-Modus aktiv ⚙️' : 'Thermomix-Modus aus'); break;
       case 'cookidoo': copy(cookidooText(R[detail.id])).then(() => toast('Rezept kopiert – in Cookidoo einfügen ✓')); break;
       case 'recipeshop': recipeShopSheet(detail.id); break;

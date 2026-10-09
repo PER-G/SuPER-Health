@@ -415,3 +415,12 @@ details.acc[open] summary::after { transform: rotate(90deg); }
 .acc-list { list-style: none; display: grid; gap: 6px; margin-top: 6px; }
 .acc-list li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px dashed var(--bdr); }
 .acc-list li:last-child { border-bottom: none; }
+
+/* Schnellkochtopf */
+.dk-set { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.dk-set b { font-weight: 600; font-size: 12.5px; padding: 4px 9px; border-radius: 8px; background: var(--soft); color: var(--t1); }
+.dk-set b.dkring { background: #2F6FB0; color: #fff; }
+.dk-set b.dkring.r2 { background: #B03A2E; }
+.dk-set b.rel { background: var(--sky); color: var(--blu); }
+.chip.dk { background: #FDE8DE; color: #A0471C; cursor: pointer; }
+.dk-set { align-items: flex-start; } .dk-set b { white-space: nowrap; line-height: 1.3; } .dk-set b.rel { white-space: normal; }
